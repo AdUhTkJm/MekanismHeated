@@ -1,0 +1,441 @@
+{
+	default_hide_dependency_lines: false
+	default_quest_shape: ""
+	filename: "5BC220669731F7A2"
+	group: "0B40A5B128118B9B"
+	icon: {
+		id: "minecraft:iron_ingot"
+	}
+	id: "5BC220669731F7A2"
+	images: [ ]
+	order_index: 0
+	quest_links: [ ]
+	quests: [
+		{
+			id: "6D13DFB37C8F7821"
+			rewards: [{
+				count: 64
+				id: "017806BB24DFD38B"
+				item: {
+					count: 1
+					id: "minecraft:cobblestone"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				count: 6L
+				id: "623047F26AF2F8B8"
+				item: { count: 1, id: "minecraft:cobblestone" }
+				type: "item"
+			}]
+			x: -8.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["6D13DFB37C8F7821"]
+			id: "779582DB227391FE"
+			rewards: [{
+				count: 64
+				id: "74F434CAD5139D56"
+				item: {
+					count: 1
+					id: "minecraft:gravel"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "6D033B03259347BC"
+				item: { count: 1, id: "minecraft:gravel" }
+				type: "item"
+			}]
+			x: -4.0d
+			y: 0.0d
+		}
+		{
+			dependencies: ["779582DB227391FE"]
+			id: "6076A979EAF2CAA4"
+			rewards: [{
+				count: 64
+				id: "0E22C02D55518FDF"
+				item: {
+					count: 1
+					id: "minecraft:sand"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "57A480922C581735"
+				item: { count: 1, id: "minecraft:sand" }
+				type: "item"
+			}]
+			x: -0.5d
+			y: 0.0d
+		}
+		{
+			dependencies: ["6D13DFB37C8F7821"]
+			id: "4653DD8A49440BF4"
+			rewards: [{
+				count: 15
+				id: "56A0EC83632DAAA7"
+				item: {
+					count: 1
+					id: "kubejs:fe2o3_dust"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "1B264D0EBEDC1E63"
+				item: { count: 1, id: "kubejs:fe2o3_dust" }
+				type: "item"
+			}]
+			x: -8.0d
+			y: -2.0d
+		}
+		{
+			dependencies: ["4653DD8A49440BF4"]
+			id: "48395807EC9FDBC1"
+			rewards: [{
+				count: 15
+				id: "6A0CD0479E9DF360"
+				item: {
+					count: 1
+					id: "kubejs:sponge_iron_ingot"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "34F65EF3A69E459E"
+				item: { count: 1, id: "kubejs:sponge_iron_ingot" }
+				type: "item"
+			}]
+			x: -8.0d
+			y: -4.0d
+		}
+		{
+			dependencies: ["48395807EC9FDBC1"]
+			id: "18A3F62F1EDD8BE5"
+			rewards: [{
+				count: 63
+				id: "1B5B238DE10EB1BC"
+				item: {
+					count: 1
+					id: "minecraft:iron_ingot"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "4C514B74562C434F"
+				item: { count: 1, id: "minecraft:iron_ingot" }
+				type: "item"
+			}]
+			x: -8.0d
+			y: -6.0d
+		}
+		{
+			dependencies: ["18A3F62F1EDD8BE5"]
+			id: "17EFAB87461C0523"
+			rewards: [{
+				count: 8
+				id: "5DD9A03A2B361954"
+				item: {
+					count: 1
+					id: "minecraft:anvil"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "3EEE379508A93343"
+				item: { count: 1, id: "minecraft:anvil" }
+				type: "item"
+			}]
+			x: -11.0d
+			y: -6.0d
+		}
+		{
+			dependencies: ["779582DB227391FE"]
+			id: "4C48188DBD6E7AD5"
+			rewards: [{
+				count: 15
+				id: "34A60D8CF9B50AB8"
+				item: {
+					count: 1
+					id: "kubejs:cuo_dust"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "37E4EFC75320225F"
+				item: { count: 1, id: "kubejs:cuo_dust" }
+				type: "item"
+			}]
+			x: -4.0d
+			y: -2.0d
+		}
+		{
+			dependencies: ["779582DB227391FE"]
+			id: "608D7DDE52D1E1D7"
+			rewards: [{
+				count: 15
+				id: "5911480DE262210F"
+				item: {
+					count: 1
+					id: "kubejs:caco3_dust"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "4C22888DF83D2914"
+				item: { count: 1, id: "kubejs:caco3_dust" }
+				type: "item"
+			}]
+			x: -2.5d
+			y: 2.0d
+		}
+		{
+			dependencies: ["4C48188DBD6E7AD5"]
+			id: "18DF74D1DDC08ACB"
+			rewards: [{
+				count: 63
+				id: "769DF3EA7C8DB673"
+				item: {
+					count: 1
+					id: "minecraft:copper_ingot"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "7C0FD7CFD1DE6F78"
+				item: { count: 1, id: "minecraft:copper_ingot" }
+				type: "item"
+			}]
+			x: -4.0d
+			y: -4.0d
+		}
+		{
+			dependencies: [
+				"18A3F62F1EDD8BE5"
+				"18DF74D1DDC08ACB"
+				"106CEFFCECA19FA2"
+			]
+			id: "75002315371A10B6"
+			rewards: [{
+				count: 63
+				id: "1C45A20F360E6F34"
+				item: {
+					count: 1
+					id: "minecraft:redstone"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "031290EC7F0AD832"
+				item: { count: 1, id: "minecraft:redstone" }
+				type: "item"
+			}]
+			x: -4.0d
+			y: -6.0d
+		}
+		{
+			dependencies: ["6076A979EAF2CAA4"]
+			id: "68C70533C312F01B"
+			rewards: [{
+				count: 63
+				id: "7EAA071A88D7FD54"
+				item: {
+					count: 1
+					id: "minecraft:clay"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "72AD6C64043CB687"
+				item: { count: 1, id: "minecraft:clay" }
+				type: "item"
+			}]
+			x: 3.5d
+			y: 0.0d
+		}
+		{
+			dependencies: [
+				"68C70533C312F01B"
+				"63B1135EF4AA43CB"
+			]
+			id: "253A3A0BAF516C7C"
+			rewards: [{
+				count: 8
+				id: "00E90C5DA4955FE6"
+				item: {
+					count: 1
+					id: "kubejs:sno2_dust"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "3027ECC2AAD0A37B"
+				item: { count: 1, id: "kubejs:sno2_dust" }
+				type: "item"
+			}]
+			x: 1.5d
+			y: 2.0d
+		}
+		{
+			id: "63B1135EF4AA43CB"
+			tasks: [{
+				id: "7F11849205E8875A"
+				item: { components: { "custommachinery:machine": "custommachinery:shaker" }, count: 1, id: "custommachinery:custom_machine_item" }
+				type: "item"
+			}]
+			x: 4.5d
+			y: 2.0d
+		}
+		{
+			dependencies: [
+				"253A3A0BAF516C7C"
+				"608D7DDE52D1E1D7"
+				"6076A979EAF2CAA4"
+				"733587355D7DA199"
+			]
+			id: "1D951836E2DAC331"
+			tasks: [{
+				id: "50812499CC66D291"
+				item: { count: 1, id: "kubejs:impure_sn_ingot" }
+				type: "item"
+			}]
+			x: -0.5d
+			y: 4.0d
+		}
+		{
+			id: "733587355D7DA199"
+			tasks: [{
+				id: "370001417A32B76C"
+				item: { components: { "custommachinery:machine": "custommachinery:energized_smelter" }, count: 1, id: "custommachinery:custom_machine_item" }
+				type: "item"
+			}]
+			x: 3.0d
+			y: 4.0d
+		}
+		{
+			dependencies: [
+				"18DF74D1DDC08ACB"
+				"1D951836E2DAC331"
+			]
+			id: "118E7F48ABDF13C5"
+			rewards: [{
+				count: 15
+				id: "279C080475ADB25F"
+				item: {
+					count: 1
+					id: "mekanism:ingot_bronze"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "342280212B23859D"
+				item: { count: 1, id: "mekanism:ingot_bronze" }
+				type: "item"
+			}]
+			x: -8.0d
+			y: 4.0d
+		}
+		{
+			dependencies: ["6076A979EAF2CAA4"]
+			id: "78B0972A28E42F99"
+			rewards: [{
+				count: 4
+				id: "020292A9A92F7205"
+				item: {
+					count: 1
+					id: "minecraft:glass"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "0EEC7E8916393279"
+				item: { count: 1, id: "minecraft:glass" }
+				type: "item"
+			}]
+			x: -0.5d
+			y: -2.0d
+		}
+		{
+			dependencies: ["78B0972A28E42F99"]
+			id: "6A74A50426AD51AD"
+			rewards: [{
+				id: "34F18940DFA61079"
+				item: {
+					count: 1
+					id: "cobblegengalore:block_gen_iron"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "05BEDFDDF2A75B70"
+				item: { count: 1, id: "cobblegengalore:block_gen_stone" }
+				type: "item"
+			}]
+			x: -0.5d
+			y: -4.0d
+		}
+		{
+			dependencies: [
+				"18A3F62F1EDD8BE5"
+				"75002315371A10B6"
+			]
+			id: "5F5BFF9F672327FC"
+			rewards: [{
+				count: 15
+				id: "2C653E4C78CA225B"
+				item: {
+					count: 1
+					id: "mekanism:basic_universal_cable"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "088E967C44521137"
+				item: { count: 1, id: "mekanism:basic_universal_cable" }
+				type: "item"
+			}]
+			x: -6.0d
+			y: -8.5d
+		}
+		{
+			dependencies: ["18A3F62F1EDD8BE5"]
+			id: "781B3F57A1203D81"
+			rewards: [{
+				count: 15
+				id: "75CB14E29BEF2256"
+				item: {
+					count: 1
+					id: "mekanism:basic_thermodynamic_conductor"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "4F52D92B3FE208C8"
+				item: { count: 1, id: "mekanism:basic_thermodynamic_conductor" }
+				type: "item"
+			}]
+			x: -10.0d
+			y: -8.5d
+		}
+		{
+			id: "106CEFFCECA19FA2"
+			rewards: [{
+				id: "3D00A372D3AE8F3C"
+				item: {
+					count: 1
+					id: "mekanism:crusher"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "08729DF847DEDAC2"
+				item: { count: 1, id: "mekanism:crusher" }
+				type: "item"
+			}]
+			x: -0.5d
+			y: -6.0d
+		}
+	]
+}

@@ -1,0 +1,98 @@
+{
+	default_hide_dependency_lines: false
+	default_quest_shape: ""
+	filename: "77D37C9A00BB2C6E"
+	group: "0B40A5B128118B9B"
+	icon: {
+		id: "mekanismgenerators:heat_generator"
+	}
+	id: "77D37C9A00BB2C6E"
+	images: [ ]
+	order_index: 1
+	quest_links: [ ]
+	quests: [
+		{
+			dependencies: ["1380ADCDC79DE7BC"]
+			id: "369A0995C4B07D0D"
+			rewards: [{
+				id: "16C3A1C41DB44EDA"
+				item: {
+					count: 1
+					id: "minecraft:emerald"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "578A9AD499DD4AF6"
+				item: { count: 1, id: "mekanismgenerators:heat_generator" }
+				type: "item"
+			}]
+			x: -1.0d
+			y: 0.0d
+		}
+		{
+			id: "1380ADCDC79DE7BC"
+			tasks: [{
+				id: "52FD8DB6AC4015A7"
+				type: "checkmark"
+			}]
+			x: -4.0d
+			y: 0.0d
+		}
+		{
+			dependencies: [
+				"1380ADCDC79DE7BC"
+				"16FE7470686B8704"
+			]
+			id: "1F179DBE3C3629CC"
+			rewards: [{
+				count: 2
+				id: "6BBD0776DD204947"
+				item: {
+					count: 1
+					id: "minecraft:lava_bucket"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "14A04E50CDBA9B89"
+				item: { count: 1, id: "minecraft:lava_bucket" }
+				type: "item"
+			}]
+			x: -1.0d
+			y: -2.0d
+		}
+		{
+			dependencies: ["1380ADCDC79DE7BC"]
+			hide_dependency_lines: true
+			id: "16FE7470686B8704"
+			tasks: [{
+				id: "5421473182010403"
+				item: { count: 1, id: "minecraft:cobblestone" }
+				type: "item"
+			}]
+			x: -1.0d
+			y: -4.0d
+		}
+		{
+			dependencies: ["369A0995C4B07D0D"]
+			id: "022270D601801D3D"
+			rewards: [{
+				count: 2
+				id: "1C818B2007B024CE"
+				item: {
+					count: 1
+					id: "minecraft:emerald"
+				}
+				type: "item"
+			}]
+			tasks: [{
+				id: "07679A92F9F358CB"
+				item: { components: { "custommachinery:machine": "custommachinery:energized_smelter" }, count: 1, id: "custommachinery:custom_machine_item" }
+				type: "item"
+			}]
+			x: 1.5d
+			y: 0.0d
+		}
+	]
+}

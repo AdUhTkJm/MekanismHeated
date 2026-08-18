@@ -1,0 +1,48 @@
+{
+	default_hide_dependency_lines: false
+	default_quest_shape: ""
+	filename: "2BB2EDF78B0A21A0"
+	group: ""
+	id: "2BB2EDF78B0A21A0"
+	images: [ ]
+	order_index: 0
+	quest_links: [ ]
+	quests: [{
+		id: "5A2BE9DCEBC704B0"
+		rewards: [
+			{
+				count: 2
+				id: "73468AAE67148A83"
+				item: {
+					count: 1
+					id: "minecraft:lava_bucket"
+				}
+				type: "item"
+			}
+			{
+				count: 2
+				id: "1D57F94946859F9F"
+				item: {
+					count: 1
+					id: "minecraft:water_bucket"
+				}
+				type: "item"
+			}
+			{
+				count: 16
+				id: "344204C730AC3554"
+				item: {
+					count: 1
+					id: "minecraft:oak_sapling"
+				}
+				type: "item"
+			}
+		]
+		tasks: [{
+			id: "5C1D8A34536CF342"
+			type: "checkmark"
+		}]
+		x: 0.0d
+		y: 0.0d
+	}]
+}

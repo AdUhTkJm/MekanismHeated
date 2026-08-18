@@ -1,0 +1,11 @@
+{
+  "item.kubejs.fe2o3_dust": "氧化铁粉末",
+  "item.kubejs.caco3_dust": "石灰石粉末",
+  "item.kubejs.sno2_dust": "二氧化锡粉末",
+  "item.kubejs.cuo_dust": "氧化铜粉末",
+
+  "item.kubejs.sponge_iron_ingot": "海绵铁锭",
+  "item.kubejs.impure_sn_ingot": "不纯的锡锭",
+
+  "gas.kubejs.co": "一氧化碳"
+}

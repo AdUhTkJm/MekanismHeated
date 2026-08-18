@@ -1,0 +1,15 @@
+{
+  "type": "elc:overworld_like",
+  "generator": {
+    "type": "flat",
+    "settings": {
+      "biome": "minecraft:plains",
+      "lakes": false,
+      "features": false,
+      "layers": [
+        { "height": 128 },
+        { "block": "minecraft:white_concrete", "height": 2 }
+      ]
+    }
+  }
+}

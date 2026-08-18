@@ -1,0 +1,139 @@
+{
+  "name": {
+    "text": {
+      "translate": "摇床"
+    }
+  },
+  "appearance": {
+    "running": {
+      "custommachinery:light": 15,
+      "custommachinery:mining_level": "minecraft:needs_stone_tool"
+    },
+    "custommachinery:block": "kubejs:shaker"
+  },
+  "components": [
+    {
+      "type": "custommachinery:fluid",
+      "mode": "input",
+      "max_output": 0,
+      "id": "fluid",
+      "capacity": 6000
+    },
+    {
+      "type": "custommachinery:item",
+      "id": "input",
+      "mode": "input",
+      "capacity": 64
+    },
+    {
+      "type": "custommachinery:item",
+      "config": {
+        "TOP": "INPUT",
+        "BOTTOM": "INPUT",
+        "FRONT": "INPUT",
+        "RIGHT": "INPUT",
+        "BACK": "INPUT",
+        "LEFT": "INPUT"
+      },
+      "id": "output0",
+      "capacity": 64
+    },
+    {
+      "type": "custommachinery:item",
+      "config": {
+        "TOP": "INPUT",
+        "BOTTOM": "INPUT",
+        "FRONT": "INPUT",
+        "RIGHT": "INPUT",
+        "BACK": "INPUT",
+        "LEFT": "INPUT"
+      },
+      "id": "output1",
+      "capacity": 64
+    },
+    {
+      "type": "custommachinery:item",
+      "config": {
+        "TOP": "INPUT",
+        "BOTTOM": "INPUT",
+        "FRONT": "INPUT",
+        "RIGHT": "INPUT",
+        "BACK": "INPUT",
+        "LEFT": "INPUT"
+      },
+      "id": "output2",
+      "capacity": 64
+    }
+  ],
+  "gui": [
+    {
+      "type": "custommachinery:background",
+      "width": 192,
+      "height": 160
+    },
+    {
+      "type": "custommachinery:config",
+      "x": 166,
+      "y": 6
+    },
+    {
+      "type": "custommachinery:fluid",
+      "id": "fluid",
+      "texture": {
+        "texture": "kubejs:textures/block/fluid_storage.png"
+      },
+      "x": 26,
+      "y": 23,
+      "width": 4,
+      "height": 50
+    },
+    {
+      "type": "custommachinery:player_inventory",
+      "x": 17,
+      "y": 79
+    },
+    {
+      "type": "custommachinery:progress",
+      "x": 71,
+      "y": 42
+    },
+    {
+      "type": "custommachinery:slot",
+      "id": "input",
+      "x": 42,
+      "y": 41
+    },
+    {
+      "type": "custommachinery:slot",
+      "id": "output0",
+      "x": 107,
+      "y": 41
+    },
+    {
+      "type": "custommachinery:slot",
+      "id": "output1",
+      "x": 127,
+      "y": 41
+    },
+    {
+      "type": "custommachinery:slot",
+      "id": "output2",
+      "x": 147,
+      "y": 41
+    },
+    {
+      "type": "custommachinery:text",
+      "x": 87,
+      "y": 9,
+      "text": {
+        "text": {
+          "translate": "摇床"
+        }
+      }
+    }
+  ],
+  "processor": {
+    "type": "custommachinery:machine",
+    "cooldown": 1
+  }
+}

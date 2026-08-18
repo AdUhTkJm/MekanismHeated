@@ -1,0 +1,218 @@
+{
+  "name": {
+    "text": {
+      "translate": "热力熔炼炉"
+    }
+  },
+  "appearance": {
+    "custommachinery:block": "mekanism:energized_smelter",
+    "custommachinery:mining_level": "minecraft:needs_stone_tool"
+  },
+  "components": [
+    {
+      "type": "custommachinery:fluid",
+      "mode": "output",
+      "config": {
+        "TOP": "INPUT",
+        "BOTTOM": "INPUT",
+        "FRONT": "INPUT",
+        "RIGHT": "INPUT",
+        "BACK": "INPUT",
+        "LEFT": "INPUT"
+      },
+      "id": "fluid_output",
+      "capacity": 10000
+    },
+    {
+      "type": "custommachinery:heat",
+      "capacity": 55.0
+    },
+    {
+      "type": "custommachinery:item",
+      "id": "input0",
+      "mode": "input",
+      "capacity": 64
+    },
+    {
+      "type": "custommachinery:item",
+      "id": "input1",
+      "mode": "input",
+      "capacity": 64
+    },
+    {
+      "type": "custommachinery:item",
+      "id": "input2",
+      "mode": "input",
+      "capacity": 64
+    },
+    {
+      "type": "custommachinery:item",
+      "whitelist": [
+        "minecraft:redstone",
+        "minecraft:redstone_block"
+      ],
+      "config": {
+        "TOP": "INPUT",
+        "BOTTOM": "INPUT",
+        "FRONT": "INPUT",
+        "RIGHT": "INPUT",
+        "BACK": "INPUT",
+        "LEFT": "INPUT"
+      },
+      "id": "input_redstone",
+      "capacity": 64
+    },
+    {
+      "type": "custommachinery:item",
+      "config": {
+        "TOP": "INPUT",
+        "BOTTOM": "INPUT",
+        "FRONT": "INPUT",
+        "RIGHT": "INPUT",
+        "BACK": "INPUT",
+        "LEFT": "INPUT"
+      },
+      "id": "output0",
+      "mode": "output",
+      "capacity": 64
+    }
+  ],
+  "gui": [
+    {
+      "type": "custommachinery:background",
+      "width": 192,
+      "height": 192
+    },
+    {
+      "type": "custommachinery:config",
+      "x": 9,
+      "y": 8
+    },
+    {
+      "type": "custommachinery:fluid",
+      "id": "fluid_output",
+      "texture": {
+        "texture": "kubejs:textures/block/fluid_storage.png"
+      },
+      "x": 147,
+      "y": 28,
+      "width": 5,
+      "height": 70
+    },
+    {
+      "type": "custommachinery:heat",
+      "max": 1999.9999999999998,
+      "x": 165,
+      "y": 28,
+      "width": 5,
+      "height": 70,
+      "texture_empty": {
+        "texture": "kubejs:textures/block/fluid_storage.png"
+      },
+      "texture_filled": {
+        "texture": "kubejs:textures/mekgui/bar/vertical_power.png"
+      }
+    },
+    {
+      "type": "custommachinery:player_inventory",
+      "x": 18,
+      "y": 107
+    },
+    {
+      "type": "custommachinery:progress",
+      "x": 92,
+      "y": 41,
+      "texture_empty": {
+        "texture": "kubejs:textures/mekgui/progress/bar_empty.png"
+      },
+      "texture_filled": {
+        "texture": "kubejs:textures/mekgui/progress/bar_filled.png"
+      }
+    },
+    {
+      "type": "custommachinery:slot",
+      "id": "input0",
+      "x": 29,
+      "y": 38
+    },
+    {
+      "type": "custommachinery:slot",
+      "id": "input1",
+      "x": 49,
+      "y": 38
+    },
+    {
+      "type": "custommachinery:slot",
+      "id": "input2",
+      "x": 69,
+      "y": 38
+    },
+    {
+      "type": "custommachinery:slot",
+      "id": "input_redstone",
+      "x": 49,
+      "y": 77
+    },
+    {
+      "type": "custommachinery:slot",
+      "id": "output0",
+      "x": 124,
+      "y": 38
+    },
+    {
+      "type": "custommachinery:text",
+      "x": 78,
+      "y": 14,
+      "text": {
+        "text": {
+          "translate": "热力熔炼炉"
+        }
+      }
+    },
+    {
+      "type": "custommachinery:texture",
+      "priority": 2,
+      "texture": {
+        "texture": "kubejs:textures/mekgui/slot/power.png"
+      },
+      "x": 48,
+      "y": 76,
+      "width": 20,
+      "height": 20,
+      "jei": true
+    },
+    {
+      "type": "custommachinery:texture",
+      "texture": {
+        "texture": "mekanism:textures/gui/up_arrow.png"
+      },
+      "x": 85,
+      "y": 96
+    },
+    {
+      "type": "custommachinery:texture",
+      "texture": {
+        "texture": "kubejs:textures/mekgui/slot/overlay_power.png"
+      },
+      "x": 49,
+      "y": 77,
+      "width": 18,
+      "jei": true
+    },
+    {
+      "type": "custommachinery:texture",
+      "texture": {
+        "texture": "kubejs:textures/mekgui/up_arrow.png"
+      },
+      "x": 53,
+      "y": 60,
+      "width": 10,
+      "height": 12,
+      "jei": true
+    }
+  ],
+  "processor": {
+    "type": "custommachinery:machine",
+    "cooldown": 1
+  }
+}

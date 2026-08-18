@@ -1,0 +1,25 @@
+[spawn]
+	#Whether new players (players who have never played in this world before) should spawn at the configured location.
+	enabled = true
+	#Resource location of the dimension new players spawn in, e.g. minecraft:overworld.
+	dimension = "elc:flatdim"
+	#X block coordinate new players spawn at.
+	# Default: 8
+	# Range: > -2147483648
+	x = 0
+	#Y block coordinate new players spawn at. Any negative value resolves the height automatically from the terrain.
+	# Default: -1
+	# Range: > -2147483648
+	y = 67
+	#Z block coordinate new players spawn at.
+	# Default: 8
+	# Range: > -2147483648
+	z = 0
+	#Initial yaw (horizontal rotation, 0 = +Z, 90 = -X) for new players.
+	# Default: 0.0
+	# Range: -180.0 ~ 180.0
+	yaw = 0.0
+	#Initial pitch (vertical rotation, -90 = up, 90 = down) for new players.
+	# Default: 0.0
+	# Range: -90.0 ~ 90.0
+	pitch = 0.0
