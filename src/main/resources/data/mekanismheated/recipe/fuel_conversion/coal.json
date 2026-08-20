@@ -1,0 +1,8 @@
+{
+  "type": "mekanismheated:fuel_conversion",
+  "input": {
+    "count": 1,
+    "tag": "minecraft:coals"
+  },
+  "output": 2000
+}
