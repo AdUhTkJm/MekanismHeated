@@ -1,5 +1,7 @@
 package io.aduhtkjm.mekanismheated.tile;
 
+import io.aduhtkjm.mekanismheated.Config;
+import io.aduhtkjm.mekanismheated.recipe.lookup.monitor.HeatSmelterRecipeCacheLookupMonitor;
 import io.aduhtkjm.mekanismheated.recipes.ItemStackToHeatRecipe;
 import io.aduhtkjm.mekanismheated.recipes.MekHeatedRecipeType;
 import io.aduhtkjm.mekanismheated.registries.MekHeatedBlocks;
@@ -33,13 +35,13 @@ import mekanism.common.recipe.IMekanismRecipeTypeProvider;
 import mekanism.common.recipe.MekanismRecipeType;
 import mekanism.common.recipe.lookup.IRecipeLookupHandler;
 import mekanism.common.recipe.lookup.cache.InputRecipeCache.SingleItem;
+import mekanism.common.recipe.lookup.monitor.RecipeCacheLookupMonitor;
 import mekanism.common.tile.component.TileComponentEjector;
 import mekanism.common.tile.component.config.ConfigInfo;
 import mekanism.common.tile.component.config.DataType;
 import mekanism.common.tile.component.config.slot.InventorySlotInfo;
 import mekanism.common.tile.prefab.TileEntityProgressMachine;
 import mekanism.common.util.MekanismUtils;
-import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
@@ -56,14 +58,10 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
           RecipeError.NOT_ENOUGH_OUTPUT_SPACE,
           RecipeError.INPUT_DOESNT_PRODUCE_OUTPUT
     );
-    public static final int BASE_TICKS_REQUIRED = 10 * SharedConstants.TICKS_PER_SECOND;
-
-    //Same values as the Mekanism Resistive Heater
     public static final double HEAT_CAPACITY = 100;
     public static final double INVERSE_CONDUCTION_COEFFICIENT = 5;
     public static final double INVERSE_INSULATION_COEFFICIENT = 10;
-    //Stop burning fuel once this temperature is reached so we don't waste fuel when already hot
-    public static final double MAXIMUM_TEMPERATURE = 1_000;
+    public static final double MAX_FUEL_TEMPERATURE = 1_000;
 
     protected final IInputHandler<@NotNull ItemStack> inputHandler;
     protected final IOutputHandler<@NotNull ItemStack> outputHandler;
@@ -78,7 +76,7 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
     OutputInventorySlot outputSlot;
 
     public TileEntityHeatSmelter(BlockPos pos, BlockState state) {
-        super(MekHeatedBlocks.HEAT_SMELTER, pos, state, TRACKED_ERROR_TYPES, BASE_TICKS_REQUIRED);
+        super(MekHeatedBlocks.HEAT_SMELTER, pos, state, TRACKED_ERROR_TYPES, Config.BASE_SPEED.get());
         ConfigInfo itemConfig = configComponent.getConfig(TransmissionType.ITEM);
         if (itemConfig != null) {
             itemConfig.addSlotInfo(DataType.INPUT, new InventorySlotInfo(true, false, inputSlot));
@@ -102,8 +100,8 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
         return builder.build();
     }
 
-    private boolean checkValidity(ItemStack item, int index) {
-        var recipe = getRecipe(index);
+    private boolean checkInputValidity(ItemStack item) {
+        var recipe = getRecipe(0);
         if (recipe == null || getLevel() == null)
             return false;
 
@@ -118,7 +116,7 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
     @Override
     protected IInventorySlotHolder getInitialInventory(IContentsListener listener, IContentsListener recipeCacheListener, IContentsListener recipeCacheUnpauseListener) {
         InventorySlotHelper builder = InventorySlotHelper.forSideWithConfig(this);
-        builder.addSlot(inputSlot = InputInventorySlot.at((x) -> checkValidity(x, 0), recipeCacheListener, 64, 17))
+        builder.addSlot(inputSlot = InputInventorySlot.at(this::checkInputValidity, recipeCacheListener, 64, 17))
             .tracksWarnings(slot -> slot.warning(WarningType.NO_MATCHING_RECIPE, getWarningCheck(RecipeError.NOT_ENOUGH_INPUT)));
         builder.addSlot(outputSlot = OutputInventorySlot.at(recipeCacheUnpauseListener, 116, 35))
             .tracksWarnings(slot -> slot.warning(WarningType.NO_SPACE_IN_OUTPUT, getWarningCheck(RecipeError.NOT_ENOUGH_OUTPUT_SPACE)));
@@ -168,7 +166,7 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
      * Checks if the smelter can currently burn fuel: it has a valid fuel item and is not already at its maximum temperature.
      */
     public boolean canBurnFuel() {
-        return heatCapacitor.getTemperature() < MAXIMUM_TEMPERATURE && !fuelSlot.isEmpty() && checkFuelValidity(fuelSlot.getStack());
+        return heatCapacitor.getTemperature() < MAX_FUEL_TEMPERATURE && !fuelSlot.isEmpty() && checkFuelValidity(fuelSlot.getStack());
     }
 
     @Nullable
@@ -179,12 +177,17 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
 
     @NotNull
     @Override
+    protected RecipeCacheLookupMonitor<ItemStackToItemStackRecipe> createNewCacheMonitor() {
+        return new HeatSmelterRecipeCacheLookupMonitor(this);
+    }
+
+    @NotNull
+    @Override
     public CachedRecipe<ItemStackToItemStackRecipe> createNewCachedRecipe(@NotNull ItemStackToItemStackRecipe recipe, int cacheIndex) {
         return OneInputCachedRecipe.itemToItem(recipe, recheckAllRecipeErrors, inputHandler, outputHandler)
               .setErrorsChanged(this::onErrorsChanged)
               .setCanHolderFunction(this::canFunction)
               .setActive(this::setActive)
-              .setRequiredTicks(this::getTicksRequired)
               .setOnFinish(this::markForSave)
               .setOperatingTicksChanged(this::setOperatingTicks);
     }
@@ -193,6 +196,46 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
     @Override
     public IMekanismRecipeTypeProvider<SingleRecipeInput, ItemStackToItemStackRecipe, SingleItem<ItemStackToItemStackRecipe>> getRecipeType() {
         return MekanismRecipeType.SMELTING;
+    }
+
+    /**
+     * Speed multiplier based on the smelter's current temperature. Runs linearly from zero at {@link Config#BASE_TEMPERATURE} up to one at
+     * {@link Config#FULL_SPEED_TEMPERATURE}, and is clamped to a minimum of zero.
+     */
+    public double getSpeedFactor() {
+        double temperature = heatCapacitor.getTemperature();
+        double base = Config.BASE_TEMPERATURE.get();
+        double full = Config.FULL_SPEED_TEMPERATURE.get();
+        double range = full - base;
+        if (range <= 0) {
+            //Invalid configuration, treat everything above the base temperature as full speed
+            return temperature > base ? 1 : 0;
+        }
+        return Math.clamp((temperature - base) / range, 0, 1);
+    }
+
+    /**
+     * Number of game ticks required to complete the current recipe at the smelter's current temperature.
+     */
+    public int getTicksRequiredForTemperature() {
+        double speedFactor = getSpeedFactor();
+        if (speedFactor <= 0) {
+            return Integer.MAX_VALUE;
+        }
+        //Clamp to Integer.MAX_VALUE so that a barely-positive speed factor can never overflow the int return type
+        return (int) Math.clamp(Math.ceil(getTicksRequired() / speedFactor), 1, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Number of operations that can be performed this tick, which is zero if the smelter is too cold to process.
+     */
+    public int getBaselineMaxOperations() {
+        return getSpeedFactor() > 0 ? 1 : 0;
+    }
+
+    @Override
+    public double getScaledProgress() {
+        return getOperatingTicks() / (double) getTicksRequiredForTemperature();
     }
 
     @Override

@@ -2,59 +2,30 @@ package io.aduhtkjm.mekanismheated;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-// An example config class. This is not required, but it's a good idea to have one to keep your config organized.
-// Demonstrates how to use Neo's config APIs
 @EventBusSubscriber(modid = MekanismHeated.MODID)
 public class Config {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
-    private static final ModConfigSpec.BooleanValue LOG_DIRT_BLOCK = BUILDER
-        .comment("Whether to log the dirt block on common setup")
-        .define("logDirtBlock", true);
+    public static final ModConfigSpec.IntValue BASE_SPEED = BUILDER.comment(
+          "Base number of game ticks the Heat Smelter takes to complete a recipe when running at full speed.")
+          .defineInRange("baseSpeed", 100, 1, Integer.MAX_VALUE);
 
-    private static final ModConfigSpec.IntValue MAGIC_NUMBER = BUILDER
-        .comment("A magic number")
-        .defineInRange("magicNumber", 42, 0, Integer.MAX_VALUE);
+    public static final ModConfigSpec.DoubleValue FULL_SPEED_TEMPERATURE = BUILDER.comment(
+          "Temperature in Kelvin the Heat Smelter must reach to process recipes at 100% base speed.")
+          .defineInRange("fullSpeedTemperature", 1_000D, 0D, Double.MAX_VALUE);
 
-    public static final ModConfigSpec.ConfigValue<String> MAGIC_NUMBER_INTRODUCTION = BUILDER
-        .comment("What you want the introduction message to be for the magic number")
-        .define("magicNumberIntroduction", "The magic number is... ");
-
-    // a list of strings that are treated as resource locations for items
-    private static final ModConfigSpec.ConfigValue<List<? extends String>> ITEM_STRINGS = BUILDER
-        .comment("A list of items to log on common setup.")
-        .defineListAllowEmpty("items", List.of("minecraft:iron_ingot"), Config::validateItemName);
+    public static final ModConfigSpec.DoubleValue BASE_TEMPERATURE = BUILDER.comment(
+          "Temperature in Kelvin below which the Heat Smelter cannot process recipes (speed is clamped to zero).")
+          .defineInRange("baseTemperature", 300D, 0D, Double.MAX_VALUE);
 
     static final ModConfigSpec SPEC = BUILDER.build();
 
-    public static boolean logDirtBlock;
-    public static int magicNumber;
-    public static String magicNumberIntroduction;
-    public static Set<Item> items;
-
-    private static boolean validateItemName(final Object obj) {
-        return obj instanceof String itemName && BuiltInRegistries.ITEM.containsKey(ResourceLocation.parse(itemName));
-    }
-
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
-        logDirtBlock = LOG_DIRT_BLOCK.get();
-        magicNumber = MAGIC_NUMBER.get();
-        magicNumberIntroduction = MAGIC_NUMBER_INTRODUCTION.get();
-
-        // convert the list of strings into a set of items
-        items = ITEM_STRINGS.get().stream()
-            .map(itemName -> BuiltInRegistries.ITEM.get(ResourceLocation.parse(itemName)))
-            .collect(Collectors.toSet());
     }
 }
