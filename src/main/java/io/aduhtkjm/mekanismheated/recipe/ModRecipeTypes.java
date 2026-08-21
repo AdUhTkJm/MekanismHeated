@@ -1,7 +1,6 @@
 package io.aduhtkjm.mekanismheated.recipe;
 
 import io.aduhtkjm.mekanismheated.Mod;
-import mekanism.api.recipes.ItemStackToItemStackRecipe;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeType;
