@@ -1,15 +1,21 @@
 # User-specific stuff
 .idea/
 .pi-lens/
-
+.project
+.settings/
 *.iml
 *.ipr
 *.iws
 
 # IntelliJ
 out/
+bin/
 # mpeltonen/sbt-idea plugin
 .idea_modules/
+
+# Java LSP
+.classpath
+.eclipse/
 
 # JIRA plugin
 atlassian-ide-plugin.xml

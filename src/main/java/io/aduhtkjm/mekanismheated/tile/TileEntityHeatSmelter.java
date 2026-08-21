@@ -59,11 +59,6 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
           RecipeError.NOT_ENOUGH_OUTPUT_SPACE,
           RecipeError.INPUT_DOESNT_PRODUCE_OUTPUT
     );
-    public static final double HEAT_CAPACITY = 100;
-    public static final double INVERSE_CONDUCTION_COEFFICIENT = 5;
-    public static final double INVERSE_INSULATION_COEFFICIENT = 10;
-    public static final double MAX_FUEL_TEMPERATURE = 1_000;
-
     protected final IInputHandler<@NotNull ItemStack> inputHandler;
     protected final IOutputHandler<@NotNull ItemStack> outputHandler;
 
@@ -97,12 +92,14 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
     protected IHeatCapacitorHolder getInitialHeatCapacitors(IContentsListener listener, IContentsListener recipeCacheListener, IContentsListener recipeCacheUnpauseListener,
           CachedAmbientTemperature ambientTemperature) {
         HeatCapacitorHelper builder = HeatCapacitorHelper.forSide(facingSupplier);
-        builder.addCapacitor(heatCapacitor = BasicHeatCapacitor.create(HEAT_CAPACITY, INVERSE_CONDUCTION_COEFFICIENT, INVERSE_INSULATION_COEFFICIENT, ambientTemperature, listener));
+        builder.addCapacitor(heatCapacitor = BasicHeatCapacitor.create(Config.HEAT_CAPACITY.get(), Config.INVERSE_CONDUCTION_COEFFICIENT.get(),
+              Config.INVERSE_INSULATION_COEFFICIENT.get(), ambientTemperature, listener));
         return builder.build();
     }
 
     private boolean checkInputValidity(ItemStack item) {
-        var recipe = getRecipe(0);
+        // We can't use getRecipe() here, since the input slot is still empty when we're testing.
+        var recipe = getSmelterRecipe(item);
         if (recipe == null || getLevel() == null)
             return false;
 
@@ -172,13 +169,17 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
      * Checks if the smelter can currently burn fuel: it has a valid fuel item and is not already at its maximum temperature.
      */
     public boolean canBurnFuel() {
-        return heatCapacitor.getTemperature() < MAX_FUEL_TEMPERATURE && !fuelSlot.isEmpty() && checkFuelValidity(fuelSlot.getStack());
+        return heatCapacitor.getTemperature() < Config.MAX_FUEL_TEMPERATURE.get() && !fuelSlot.isEmpty() && checkFuelValidity(fuelSlot.getStack());
+    }
+
+    private ItemStackToItemStackRecipe getSmelterRecipe(ItemStack item) {
+        return MekanismRecipeType.SMELTING.getInputCache().findFirstRecipe(getLevel(), item);
     }
 
     @Nullable
     @Override
     public ItemStackToItemStackRecipe getRecipe(int cacheIndex) {
-        return MekanismRecipeType.SMELTING.getInputCache().findFirstRecipe(getLevel(), inputHandler.getInput());
+        return getSmelterRecipe(inputHandler.getInput());
     }
 
     @NotNull

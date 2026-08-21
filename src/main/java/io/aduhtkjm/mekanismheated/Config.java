@@ -23,6 +23,22 @@ public class Config {
           "Temperature in Kelvin below which the Heat Smelter cannot process recipes (speed is clamped to zero).")
           .defineInRange("baseTemperature", 300D, 0D, Double.MAX_VALUE);
 
+    public static final ModConfigSpec.DoubleValue HEAT_CAPACITY = BUILDER.comment(
+          "Heat capacity of the Heat Smelter in J/K, controlling how quickly its temperature changes. Must be at least one.")
+          .defineInRange("heatCapacity", 100D, 1D, Double.MAX_VALUE);
+
+    public static final ModConfigSpec.DoubleValue INVERSE_CONDUCTION_COEFFICIENT = BUILDER.comment(
+          "Inverse conduction coefficient of the Heat Smelter, controlling how readily it exchanges heat with adjacent blocks. Must be at least one.")
+          .defineInRange("inverseConductionCoefficient", 5D, 1D, Double.MAX_VALUE);
+
+    public static final ModConfigSpec.DoubleValue INVERSE_INSULATION_COEFFICIENT = BUILDER.comment(
+          "Inverse insulation coefficient of the Heat Smelter, controlling how readily it loses heat to the environment. Must be at least one.")
+          .defineInRange("inverseInsulationCoefficient", 10D, 1D, Double.MAX_VALUE);
+
+    public static final ModConfigSpec.DoubleValue MAX_FUEL_TEMPERATURE = BUILDER.comment(
+          "Temperature in Kelvin at which the Heat Smelter stops burning fuel, i.e. its maximum achievable temperature.")
+          .defineInRange("maxFuelTemperature", 1_000D, 0D, Double.MAX_VALUE);
+
     static final ModConfigSpec SPEC = BUILDER.build();
 
     @SubscribeEvent
