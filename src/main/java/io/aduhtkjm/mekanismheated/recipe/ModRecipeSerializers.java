@@ -1,7 +1,7 @@
-package io.aduhtkjm.mekanismheated.recipes;
+package io.aduhtkjm.mekanismheated.recipe;
 
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.aduhtkjm.mekanismheated.MekanismHeated;
+import io.aduhtkjm.mekanismheated.Mod;
 import mekanism.api.SerializationConstants;
 import mekanism.api.SerializerHelper;
 import mekanism.api.recipes.ingredients.ItemStackIngredient;
@@ -13,12 +13,12 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-public class MekHeatedRecipeSerializers {
+public class ModRecipeSerializers {
 
-    private MekHeatedRecipeSerializers() {
+    private ModRecipeSerializers() {
     }
 
-    public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, MekanismHeated.MODID);
+    public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, Mod.MODID);
 
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BasicItemStackToHeatRecipe>> FUEL_CONVERSION =
           RECIPE_SERIALIZERS.register("fuel_conversion", () -> new MekanismRecipeSerializer<>(

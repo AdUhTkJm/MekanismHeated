@@ -1,7 +1,7 @@
 package io.aduhtkjm.mekanismheated.registries;
 
-import io.aduhtkjm.mekanismheated.MekanismHeated;
-import io.aduhtkjm.mekanismheated.MekanismHeatedLang;
+import io.aduhtkjm.mekanismheated.Mod;
+import io.aduhtkjm.mekanismheated.ModLang;
 import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
 import mekanism.common.block.attribute.AttributeSideConfig;
 import mekanism.common.block.prefab.BlockTile.BlockTileModel;
@@ -13,16 +13,16 @@ import mekanism.common.registration.impl.BlockDeferredRegister;
 import mekanism.common.registration.impl.BlockRegistryObject;
 import net.minecraft.world.level.material.MapColor;
 
-public class MekHeatedBlocks {
+public class ModBlocks {
 
-    private MekHeatedBlocks() {
+    private ModBlocks() {
     }
 
-    public static final BlockDeferredRegister BLOCKS = new BlockDeferredRegister(MekanismHeated.MODID);
+    public static final BlockDeferredRegister BLOCKS = new BlockDeferredRegister(Mod.MODID);
 
     public static final Machine<TileEntityHeatSmelter> HEAT_SMELTER_TYPE = MachineBuilder
-          .createMachine(() -> MekHeatedTileEntityTypes.HEAT_SMELTER, MekanismHeatedLang.DESCRIPTION_HEAT_SMELTER)
-          .withGui(() -> MekHeatedContainerTypes.HEAT_SMELTER)
+          .createMachine(() -> ModTileEntityTypes.HEAT_SMELTER, ModLang.DESCRIPTION_HEAT_SMELTER)
+          .withGui(() -> ModContainerTypes.HEAT_SMELTER)
           .with(AttributeSideConfig.create(TransmissionType.ITEM))
           .build();
 

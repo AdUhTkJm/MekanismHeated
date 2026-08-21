@@ -1,7 +1,8 @@
-package io.aduhtkjm.mekanismheated.recipes;
+package io.aduhtkjm.mekanismheated.recipe;
 
-import io.aduhtkjm.mekanismheated.MekanismHeated;
+import io.aduhtkjm.mekanismheated.Mod;
 import java.util.function.Predicate;
+
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.recipes.MekanismRecipe;
 import mekanism.api.recipes.ingredients.ItemStackIngredient;
@@ -28,7 +29,7 @@ import org.jetbrains.annotations.Range;
 public abstract class ItemStackToHeatRecipe extends MekanismRecipe<SingleRecipeInput> implements Predicate<@NotNull ItemStack> {
 
     private static final Holder<Item> HEAT_SMELTER = DeferredHolder.create(Registries.ITEM,
-          ResourceLocation.fromNamespaceAndPath(MekanismHeated.MODID, "heat_smelter"));
+          ResourceLocation.fromNamespaceAndPath(Mod.MODID, "heat_smelter"));
 
     @Override
     public abstract boolean test(ItemStack itemStack);
@@ -77,7 +78,7 @@ public abstract class ItemStackToHeatRecipe extends MekanismRecipe<SingleRecipeI
 
     @Override
     public final RecipeType<ItemStackToHeatRecipe> getType() {
-        return MekHeatedRecipeTypes.TYPE_FUEL_CONVERSION.value();
+        return ModRecipeTypes.TYPE_FUEL_CONVERSION.value();
     }
 
     @Override

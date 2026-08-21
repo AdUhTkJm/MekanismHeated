@@ -3,9 +3,9 @@ package io.aduhtkjm.mekanismheated.tile;
 import io.aduhtkjm.mekanismheated.Config;
 import io.aduhtkjm.mekanismheated.recipe.cache.HeatSensitiveOneInputCachedRecipe;
 import io.aduhtkjm.mekanismheated.recipe.lookup.monitor.HeatSmelterRecipeCacheLookupMonitor;
-import io.aduhtkjm.mekanismheated.recipes.ItemStackToHeatRecipe;
-import io.aduhtkjm.mekanismheated.recipes.MekHeatedRecipeType;
-import io.aduhtkjm.mekanismheated.registries.MekHeatedBlocks;
+import io.aduhtkjm.mekanismheated.recipe.ItemStackToHeatRecipe;
+import io.aduhtkjm.mekanismheated.recipe.ModRecipeType;
+import io.aduhtkjm.mekanismheated.registries.ModBlocks;
 import java.util.List;
 import mekanism.api.Action;
 import mekanism.api.IContentsListener;
@@ -13,7 +13,6 @@ import mekanism.api.heat.HeatAPI.HeatTransfer;
 import mekanism.api.recipes.ItemStackToItemStackRecipe;
 import mekanism.api.recipes.cache.CachedRecipe;
 import mekanism.api.recipes.cache.CachedRecipe.OperationTracker.RecipeError;
-import mekanism.api.recipes.cache.OneInputCachedRecipe;
 import mekanism.api.recipes.inputs.IInputHandler;
 import mekanism.api.recipes.inputs.InputHelper;
 import mekanism.api.recipes.outputs.IOutputHandler;
@@ -72,7 +71,7 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
     OutputInventorySlot outputSlot;
 
     public TileEntityHeatSmelter(BlockPos pos, BlockState state) {
-        super(MekHeatedBlocks.HEAT_SMELTER, pos, state, TRACKED_ERROR_TYPES, Config.BASE_SPEED.get());
+        super(ModBlocks.HEAT_SMELTER, pos, state, TRACKED_ERROR_TYPES, Config.BASE_SPEED.get());
         ConfigInfo itemConfig = configComponent.getConfig(TransmissionType.ITEM);
         if (itemConfig != null) {
             itemConfig.addSlotInfo(DataType.INPUT, new InventorySlotInfo(true, false, inputSlot));
@@ -107,7 +106,7 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
     }
 
     private boolean checkFuelValidity(ItemStack item) {
-        return MekHeatedRecipeType.findFirstFuelConversion(getLevel(), item) != null;
+        return ModRecipeType.findFirstFuelConversion(getLevel(), item) != null;
     }
 
     @NotNull
@@ -152,7 +151,7 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
     private boolean burnFuel() {
         if (canBurnFuel()) {
             ItemStack fuel = fuelSlot.getStack();
-            ItemStackToHeatRecipe recipe = MekHeatedRecipeType.findFirstFuelConversion(getLevel(), fuel);
+            ItemStackToHeatRecipe recipe = ModRecipeType.findFirstFuelConversion(getLevel(), fuel);
             if (recipe != null) {
                 ItemStack itemInput = recipe.getInput().getMatchingInstance(fuel);
                 if (!itemInput.isEmpty()) {
