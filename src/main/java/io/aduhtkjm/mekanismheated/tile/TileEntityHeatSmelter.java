@@ -1,6 +1,7 @@
 package io.aduhtkjm.mekanismheated.tile;
 
 import io.aduhtkjm.mekanismheated.Config;
+import io.aduhtkjm.mekanismheated.recipe.cache.HeatSensitiveOneInputCachedRecipe;
 import io.aduhtkjm.mekanismheated.recipe.lookup.monitor.HeatSmelterRecipeCacheLookupMonitor;
 import io.aduhtkjm.mekanismheated.recipes.ItemStackToHeatRecipe;
 import io.aduhtkjm.mekanismheated.recipes.MekHeatedRecipeType;
@@ -120,7 +121,7 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
             .tracksWarnings(slot -> slot.warning(WarningType.NO_MATCHING_RECIPE, getWarningCheck(RecipeError.NOT_ENOUGH_INPUT)));
         builder.addSlot(outputSlot = OutputInventorySlot.at(recipeCacheUnpauseListener, 116, 35))
             .tracksWarnings(slot -> slot.warning(WarningType.NO_SPACE_IN_OUTPUT, getWarningCheck(RecipeError.NOT_ENOUGH_OUTPUT_SPACE)));
-        builder.addSlot(fuelSlot = InputInventorySlot.at(this::checkFuelValidity, recipeCacheListener, 64, 60))
+        builder.addSlot(fuelSlot = InputInventorySlot.at(this::checkFuelValidity, recipeCacheListener, 64, 55))
             .tracksWarnings(slot -> slot.warning(WarningType.NO_MATCHING_RECIPE, getWarningCheck(RecipeError.NOT_ENOUGH_INPUT)));
         return builder.build();
     }
@@ -133,6 +134,11 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
         lastEnvironmentLoss = transfer.environmentTransfer();
         lastTransferLoss = transfer.adjacentTransfer();
         recipeCacheLookupMonitor.updateAndProcess();
+        //Keep the synced progress in step with the temperature-scaled fractional progress: the base implementation counts
+        // raw ticks, which would overflow the progress bar whenever the smelter runs slower than full speed
+        if (recipeCacheLookupMonitor.getCachedRecipe(0) instanceof HeatSensitiveOneInputCachedRecipe recipe) {
+            setOperatingTicks(recipe.getProgressTicks());
+        }
         if (burning) {
             //Only set active for burning if smelting didn't already set us active
             setActive(true);
@@ -184,7 +190,7 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
     @NotNull
     @Override
     public CachedRecipe<ItemStackToItemStackRecipe> createNewCachedRecipe(@NotNull ItemStackToItemStackRecipe recipe, int cacheIndex) {
-        return OneInputCachedRecipe.itemToItem(recipe, recheckAllRecipeErrors, inputHandler, outputHandler)
+        return new HeatSensitiveOneInputCachedRecipe(recipe, recheckAllRecipeErrors, inputHandler, outputHandler, this)
               .setErrorsChanged(this::onErrorsChanged)
               .setCanHolderFunction(this::canFunction)
               .setActive(this::setActive)
@@ -215,27 +221,10 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
     }
 
     /**
-     * Number of game ticks required to complete the current recipe at the smelter's current temperature.
-     */
-    public int getTicksRequiredForTemperature() {
-        double speedFactor = getSpeedFactor();
-        if (speedFactor <= 0) {
-            return Integer.MAX_VALUE;
-        }
-        //Clamp to Integer.MAX_VALUE so that a barely-positive speed factor can never overflow the int return type
-        return (int) Math.clamp(Math.ceil(getTicksRequired() / speedFactor), 1, Integer.MAX_VALUE);
-    }
-
-    /**
      * Number of operations that can be performed this tick, which is zero if the smelter is too cold to process.
      */
     public int getBaselineMaxOperations() {
         return getSpeedFactor() > 0 ? 1 : 0;
-    }
-
-    @Override
-    public double getScaledProgress() {
-        return getOperatingTicks() / (double) getTicksRequiredForTemperature();
     }
 
     @Override

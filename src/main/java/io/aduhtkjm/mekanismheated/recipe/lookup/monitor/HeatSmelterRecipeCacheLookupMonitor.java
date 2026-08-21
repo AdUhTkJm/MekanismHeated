@@ -21,9 +21,9 @@ public class HeatSmelterRecipeCacheLookupMonitor extends RecipeCacheLookupMonito
     public CachedRecipe<ItemStackToItemStackRecipe> createNewCachedRecipe(@NotNull ItemStackToItemStackRecipe recipe, int cacheIndex) {
         CachedRecipe<ItemStackToItemStackRecipe> cachedRecipe = super.createNewCachedRecipe(recipe, cacheIndex);
         if (cachedRecipe != null) {
-            //Speed up or slow down processing based on the smelter's current temperature
-            cachedRecipe.setRequiredTicks(heatSmelter::getTicksRequiredForTemperature)
-                  .setBaselineMaxOperations(heatSmelter::getBaselineMaxOperations);
+            //Don't let the smelter process at all when it is too cold to make any progress. The temperature-dependent
+            // processing speed itself is handled by HeatSensitiveOneInputCachedRecipe
+            cachedRecipe.setBaselineMaxOperations(heatSmelter::getBaselineMaxOperations);
         }
         return cachedRecipe;
     }
