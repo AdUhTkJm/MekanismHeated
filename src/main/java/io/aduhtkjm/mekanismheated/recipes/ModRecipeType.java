@@ -11,9 +11,9 @@ import org.jetbrains.annotations.Nullable;
  * Helper for looking up {@link ItemStackToHeatRecipe}s from the world's recipe manager.
  */
 @NothingNullByDefault
-public class MekHeatedRecipeType {
+public class ModRecipeType {
 
-    private MekHeatedRecipeType() {
+    private ModRecipeType() {
     }
 
     @Nullable
@@ -22,7 +22,7 @@ public class MekHeatedRecipeType {
             return null;
         }
         return level.getRecipeManager()
-              .getRecipeFor(MekHeatedRecipeTypes.TYPE_FUEL_CONVERSION.value(), new SingleRecipeInput(input), level)
+              .getRecipeFor(ModRecipeTypes.TYPE_FUEL_CONVERSION.value(), new SingleRecipeInput(input), level)
               .map(RecipeHolder::value)
               .orElse(null);
     }

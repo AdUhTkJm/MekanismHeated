@@ -77,7 +77,7 @@ public abstract class ItemStackToHeatRecipe extends MekanismRecipe<SingleRecipeI
 
     @Override
     public final RecipeType<ItemStackToHeatRecipe> getType() {
-        return MekHeatedRecipeTypes.TYPE_FUEL_CONVERSION.value();
+        return ModRecipeTypes.TYPE_FUEL_CONVERSION.value();
     }
 
     @Override

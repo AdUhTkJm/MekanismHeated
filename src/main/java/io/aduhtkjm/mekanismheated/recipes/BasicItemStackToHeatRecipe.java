@@ -55,7 +55,7 @@ public class BasicItemStackToHeatRecipe extends ItemStackToHeatRecipe {
 
     @Override
     public RecipeSerializer<BasicItemStackToHeatRecipe> getSerializer() {
-        return MekHeatedRecipeSerializers.FUEL_CONVERSION.get();
+        return ModRecipeSerializers.FUEL_CONVERSION.get();
     }
 
     @Override

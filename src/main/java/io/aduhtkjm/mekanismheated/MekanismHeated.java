@@ -1,11 +1,12 @@
 package io.aduhtkjm.mekanismheated;
 
 import com.mojang.logging.LogUtils;
-import io.aduhtkjm.mekanismheated.recipes.MekHeatedRecipeSerializers;
-import io.aduhtkjm.mekanismheated.recipes.MekHeatedRecipeTypes;
-import io.aduhtkjm.mekanismheated.registries.MekHeatedBlocks;
-import io.aduhtkjm.mekanismheated.registries.MekHeatedContainerTypes;
-import io.aduhtkjm.mekanismheated.registries.MekHeatedTileEntityTypes;
+import io.aduhtkjm.mekanismheated.recipes.ModRecipeSerializers;
+import io.aduhtkjm.mekanismheated.recipes.ModRecipeTypes;
+import io.aduhtkjm.mekanismheated.registries.ModBlockEntityTypes;
+import io.aduhtkjm.mekanismheated.registries.ModBlocks;
+import io.aduhtkjm.mekanismheated.registries.ModContainerTypes;
+import io.aduhtkjm.mekanismheated.registries.ModTileEntityTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -32,18 +33,18 @@ public class MekanismHeated {
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> HEATED_TAB = CREATIVE_MODE_TABS.register("heated_tab", () -> CreativeModeTab.builder()
           .title(Component.translatable("itemGroup.mekanismheated"))
           .withTabsBefore(CreativeModeTabs.COMBAT)
-          .icon(() -> MekHeatedBlocks.HEAT_SMELTER.asItem().getDefaultInstance())
+          .icon(() -> ModBlocks.HEAT_SMELTER.asItem().getDefaultInstance())
           .displayItems((parameters, output) -> {
-              output.accept(MekHeatedBlocks.HEAT_SMELTER);
+              output.accept(ModBlocks.HEAT_SMELTER);
           }).build());
 
     public MekanismHeated(IEventBus modEventBus, ModContainer modContainer) {
         // Register the Deferred Registers to the mod event bus so blocks/tiles/containers get registered
-        MekHeatedBlocks.BLOCKS.register(modEventBus);
-        MekHeatedTileEntityTypes.TILE_ENTITY_TYPES.register(modEventBus);
-        MekHeatedContainerTypes.CONTAINER_TYPES.register(modEventBus);
-        MekHeatedRecipeTypes.RECIPE_TYPES.register(modEventBus);
-        MekHeatedRecipeSerializers.RECIPE_SERIALIZERS.register(modEventBus);
+        ModBlocks.BLOCKS.register(modEventBus);
+        ModTileEntityTypes.TILE_ENTITY_TYPES.register(modEventBus);
+        ModContainerTypes.CONTAINER_TYPES.register(modEventBus);
+        ModRecipeTypes.RECIPE_TYPES.register(modEventBus);
+        ModRecipeSerializers.RECIPE_SERIALIZERS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in.

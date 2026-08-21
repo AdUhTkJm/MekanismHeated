@@ -7,14 +7,14 @@ import mekanism.common.registration.impl.TileEntityTypeDeferredRegister;
 import mekanism.common.registration.impl.TileEntityTypeRegistryObject;
 import mekanism.common.tile.base.TileEntityMekanism;
 
-public class MekHeatedTileEntityTypes {
+public class ModTileEntityTypes {
 
-    private MekHeatedTileEntityTypes() {
+    private ModTileEntityTypes() {
     }
 
     public static final TileEntityTypeDeferredRegister TILE_ENTITY_TYPES = new TileEntityTypeDeferredRegister(MekanismHeated.MODID);
 
-    public static final TileEntityTypeRegistryObject<TileEntityHeatSmelter> HEAT_SMELTER = TILE_ENTITY_TYPES.mekBuilder(MekHeatedBlocks.HEAT_SMELTER, TileEntityHeatSmelter::new)
+    public static final TileEntityTypeRegistryObject<TileEntityHeatSmelter> HEAT_SMELTER = TILE_ENTITY_TYPES.mekBuilder(ModBlocks.HEAT_SMELTER, TileEntityHeatSmelter::new)
           .clientTicker(TileEntityMekanism::tickClient)
           .serverTicker(TileEntityMekanism::tickServer)
           .withSimple(Capabilities.CONFIG_CARD)

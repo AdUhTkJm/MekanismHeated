@@ -13,9 +13,9 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-public class MekHeatedRecipeSerializers {
+public class ModRecipeSerializers {
 
-    private MekHeatedRecipeSerializers() {
+    private ModRecipeSerializers() {
     }
 
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, MekanismHeated.MODID);

@@ -7,9 +7,9 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-public class MekHeatedRecipeTypes {
+public class ModRecipeTypes {
 
-    private MekHeatedRecipeTypes() {
+    private ModRecipeTypes() {
     }
 
     public static final ResourceLocation NAME_FUEL_CONVERSION = ResourceLocation.fromNamespaceAndPath(MekanismHeated.MODID, "fuel_conversion");
