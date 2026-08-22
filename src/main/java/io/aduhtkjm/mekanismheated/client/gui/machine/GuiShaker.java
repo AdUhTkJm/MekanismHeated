@@ -1,6 +1,6 @@
 package io.aduhtkjm.mekanismheated.client.gui.machine;
 
-import io.aduhtkjm.mekanismheated.block.shaker.ShakerBlockEntity;
+import io.aduhtkjm.mekanismheated.tile.TileEntityShaker;
 import mekanism.client.gui.GuiConfigurableTile;
 import mekanism.client.gui.element.GuiUpArrow;
 import mekanism.client.gui.element.bar.GuiVerticalPowerBar;
@@ -14,9 +14,9 @@ import net.minecraft.world.entity.player.Inventory;
 import org.jetbrains.annotations.NotNull;
 
 /** Mekanism-style screen for the powered Shaker. */
-public class GuiShaker extends GuiConfigurableTile<ShakerBlockEntity, MekanismTileContainer<ShakerBlockEntity>> {
+public class GuiShaker extends GuiConfigurableTile<TileEntityShaker, MekanismTileContainer<TileEntityShaker>> {
 
-    public GuiShaker(MekanismTileContainer<ShakerBlockEntity> container, Inventory inv, Component title) {
+    public GuiShaker(MekanismTileContainer<TileEntityShaker> container, Inventory inv, Component title) {
         super(container, inv, title);
         dynamicSlots = true;
     }

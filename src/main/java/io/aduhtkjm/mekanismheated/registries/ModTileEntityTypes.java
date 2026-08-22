@@ -1,7 +1,7 @@
 package io.aduhtkjm.mekanismheated.registries;
 
 import io.aduhtkjm.mekanismheated.Mod;
-import io.aduhtkjm.mekanismheated.block.shaker.ShakerBlockEntity;
+import io.aduhtkjm.mekanismheated.tile.TileEntityShaker;
 import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.registration.impl.TileEntityTypeDeferredRegister;
@@ -21,7 +21,7 @@ public class ModTileEntityTypes {
           .withSimple(Capabilities.CONFIG_CARD)
           .build();
 
-    public static final TileEntityTypeRegistryObject<ShakerBlockEntity> SHAKER = TILE_ENTITY_TYPES.mekBuilder(ModBlocks.SHAKER, ShakerBlockEntity::new)
+    public static final TileEntityTypeRegistryObject<TileEntityShaker> SHAKER = TILE_ENTITY_TYPES.mekBuilder(ModBlocks.SHAKER, TileEntityShaker::new)
           .clientTicker(TileEntityMekanism::tickClient)
           .serverTicker(TileEntityMekanism::tickServer)
           .withSimple(Capabilities.CONFIG_CARD)

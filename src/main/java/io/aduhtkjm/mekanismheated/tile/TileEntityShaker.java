@@ -1,4 +1,4 @@
-package io.aduhtkjm.mekanismheated.block.shaker;
+package io.aduhtkjm.mekanismheated.tile;
 
 import io.aduhtkjm.mekanismheated.registries.ModBlocks;
 import mekanism.api.Action;
@@ -28,19 +28,19 @@ import net.minecraft.world.level.block.state.BlockState;
  * shake one input item at a time and transfers that item to the output. This gives the block a
  * useful, deterministic machine workflow while leaving room for recipe-backed shaking later.</p>
  */
-public class ShakerBlockEntity extends TileEntityConfigurableMachine {
+public class TileEntityShaker extends TileEntityConfigurableMachine {
 
     public static final int PROCESSING_TICKS = 40;
     public static final long ENERGY_PER_TICK = 40;
     public static final long MAX_ENERGY = 100_000;
 
-    private MachineEnergyContainer<ShakerBlockEntity> energyContainer;
+    private MachineEnergyContainer<TileEntityShaker> energyContainer;
     private InputInventorySlot inputSlot;
     private OutputInventorySlot outputSlot;
     private EnergyInventorySlot energySlot;
     private int operatingTicks;
 
-    public ShakerBlockEntity(BlockPos pos, BlockState blockState) {
+    public TileEntityShaker(BlockPos pos, BlockState blockState) {
         super(ModBlocks.SHAKER, pos, blockState);
         configComponent.setupItemIOConfig(inputSlot, outputSlot, energySlot);
         configComponent.setupInputConfig(TransmissionType.ENERGY, energyContainer);
@@ -138,7 +138,7 @@ public class ShakerBlockEntity extends TileEntityConfigurableMachine {
         }
     }
 
-    public MachineEnergyContainer<ShakerBlockEntity> getEnergyContainer() {
+    public MachineEnergyContainer<TileEntityShaker> getEnergyContainer() {
         return energyContainer;
     }
 

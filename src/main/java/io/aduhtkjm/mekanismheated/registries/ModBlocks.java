@@ -3,7 +3,7 @@ package io.aduhtkjm.mekanismheated.registries;
 import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.ModLang;
 import io.aduhtkjm.mekanismheated.block.shaker.ShakerBlock;
-import io.aduhtkjm.mekanismheated.block.shaker.ShakerBlockEntity;
+import io.aduhtkjm.mekanismheated.tile.TileEntityShaker;
 import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
 import mekanism.common.block.attribute.AttributeSideConfig;
 import mekanism.common.block.prefab.BlockTile.BlockTileModel;
@@ -36,10 +36,10 @@ public class ModBlocks {
           BLOCKS.register("heat_smelter", () -> new BlockTileModel<>(HEAT_SMELTER_TYPE, properties -> properties.mapColor(MapColor.METAL)),
                 (block, properties) -> new ItemBlockTooltip<>(block, true, properties));
 
-    public static final Machine<ShakerBlockEntity> SHAKER_TYPE = MachineBuilder
+    public static final Machine<TileEntityShaker> SHAKER_TYPE = MachineBuilder
           .createMachine(() -> ModTileEntityTypes.SHAKER, ModLang.DESCRIPTION_SHAKER)
           .withGui(() -> ModContainerTypes.SHAKER)
-          .withEnergyConfig(() -> ShakerBlockEntity.ENERGY_PER_TICK, () -> ShakerBlockEntity.MAX_ENERGY)
+          .withEnergyConfig(() -> TileEntityShaker.ENERGY_PER_TICK, () -> TileEntityShaker.MAX_ENERGY)
           .with(AttributeSideConfig.ELECTRIC_MACHINE)
           .build();
 

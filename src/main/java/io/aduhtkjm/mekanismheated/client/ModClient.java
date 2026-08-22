@@ -3,7 +3,7 @@ package io.aduhtkjm.mekanismheated.client;
 import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiHeatSmelter;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiShaker;
-import io.aduhtkjm.mekanismheated.client.renderer.ShakerBlockEntityRenderer;
+import io.aduhtkjm.mekanismheated.client.renderer.TileEntityShakerRenderer;
 import io.aduhtkjm.mekanismheated.registries.ModContainerTypes;
 import io.aduhtkjm.mekanismheated.registries.ModTileEntityTypes;
 import mekanism.client.ClientRegistrationUtil;
@@ -26,12 +26,12 @@ public class ModClient {
 
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerBlockEntityRenderer(ModTileEntityTypes.SHAKER.get(), ShakerBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(ModTileEntityTypes.SHAKER.get(), TileEntityShakerRenderer::new);
     }
 
     @SubscribeEvent
     public static void registerAdditionalModels(ModelEvent.RegisterAdditional event) {
-        event.register(ModelResourceLocation.standalone(ShakerBlockEntityRenderer.MODEL_LOCATION));
-        event.register(ModelResourceLocation.standalone(ShakerBlockEntityRenderer.GLASS_MODEL_LOCATION));
+        event.register(ModelResourceLocation.standalone(TileEntityShakerRenderer.MODEL_LOCATION));
+        event.register(ModelResourceLocation.standalone(TileEntityShakerRenderer.GLASS_MODEL_LOCATION));
     }
 }

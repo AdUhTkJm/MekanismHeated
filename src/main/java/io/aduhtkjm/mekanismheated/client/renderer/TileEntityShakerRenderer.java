@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.block.shaker.ShakerBlock;
-import io.aduhtkjm.mekanismheated.block.shaker.ShakerBlockEntity;
+import io.aduhtkjm.mekanismheated.tile.TileEntityShaker;
 import java.util.List;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -28,7 +28,7 @@ import net.neoforged.neoforge.client.model.data.ModelData;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
-public class ShakerBlockEntityRenderer implements BlockEntityRenderer<ShakerBlockEntity> {
+public class TileEntityShakerRenderer implements BlockEntityRenderer<TileEntityShaker> {
 
     public static final net.minecraft.resources.ResourceLocation MODEL_LOCATION =
           Mod.rl("block/shaker/shaker");
@@ -48,7 +48,7 @@ public class ShakerBlockEntityRenderer implements BlockEntityRenderer<ShakerBloc
     private ItemStack cachedItem = ItemStack.EMPTY;
     private float cachedItemMinY = DEFAULT_ITEM_MIN_Y;
 
-    public ShakerBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
+    public TileEntityShakerRenderer(BlockEntityRendererProvider.Context context) {
         this.blockRenderer = context.getBlockRenderDispatcher();
         this.itemRenderer = context.getItemRenderer();
         this.shakerModel = this.blockRenderer.getBlockModelShaper().getModelManager()
@@ -58,8 +58,8 @@ public class ShakerBlockEntityRenderer implements BlockEntityRenderer<ShakerBloc
     }
 
     @Override
-    public void render(ShakerBlockEntity blockEntity, float partialTick, PoseStack poseStack,
-          MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+    public void render(TileEntityShaker blockEntity, float partialTick, PoseStack poseStack,
+                       MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
         BlockState blockState = blockEntity.getBlockState();
         long gameTime = blockEntity.getLevel() == null ? 0L : blockEntity.getLevel().getGameTime();
         float animationTime = gameTime + partialTick;

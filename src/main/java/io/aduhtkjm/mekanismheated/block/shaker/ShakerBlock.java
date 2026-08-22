@@ -1,5 +1,6 @@
 package io.aduhtkjm.mekanismheated.block.shaker;
 
+import io.aduhtkjm.mekanismheated.tile.TileEntityShaker;
 import mekanism.common.block.prefab.BlockTile;
 import mekanism.common.content.blocktype.Machine;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -17,7 +18,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 @MethodsReturnNonnullByDefault
-public class ShakerBlock extends BlockTile<ShakerBlockEntity, Machine<ShakerBlockEntity>> {
+public class ShakerBlock extends BlockTile<TileEntityShaker, Machine<TileEntityShaker>> {
 
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
@@ -83,7 +84,7 @@ public class ShakerBlock extends BlockTile<ShakerBlockEntity, Machine<ShakerBloc
             Block.box(0.0D, 15.0D, 3.0D, 10.0D, 16.0D, 13.0D)
     ).optimize();
 
-    public ShakerBlock(Machine<ShakerBlockEntity> type, BlockBehaviour.Properties properties) {
+    public ShakerBlock(Machine<TileEntityShaker> type, BlockBehaviour.Properties properties) {
         super(type, properties);
     }
 
