@@ -102,6 +102,7 @@ public class TileEntityHeatSmelter
             itemConfig.addSlotInfo(DataType.INPUT_OUTPUT, new InventorySlotInfo(true, true, inputSlot, outputSlot));
         }
         configComponent.setupOutputConfig(TransmissionType.FLUID, fluidTank, RelativeSide.RIGHT);
+        configComponent.setupInputConfig(TransmissionType.HEAT, heatCapacitor);
 
         ejectorComponent = new TileComponentEjector(this);
         ejectorComponent.setOutputData(configComponent, TransmissionType.ITEM);
@@ -116,7 +117,7 @@ public class TileEntityHeatSmelter
     @Override
     protected IHeatCapacitorHolder getInitialHeatCapacitors(IContentsListener listener, IContentsListener recipeCacheListener, IContentsListener recipeCacheUnpauseListener,
           CachedAmbientTemperature ambientTemperature) {
-        HeatCapacitorHelper builder = HeatCapacitorHelper.forSide(facingSupplier);
+        HeatCapacitorHelper builder = HeatCapacitorHelper.forSideWithConfig(this);
         builder.addCapacitor(heatCapacitor = BasicHeatCapacitor.create(Config.HEAT_CAPACITY.get(), Config.INVERSE_CONDUCTION_COEFFICIENT.get(),
               Config.INVERSE_INSULATION_COEFFICIENT.get(), ambientTemperature, listener));
         return builder.build();

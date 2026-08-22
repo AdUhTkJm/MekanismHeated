@@ -16,7 +16,7 @@ public class HeatSmelterRecipe
     extends EitherRecipe<SingleRecipeInput, EitherRecipe<SingleRecipeInput, HeatedItemStackToItemStackRecipe, HeatedItemStackToFluidRecipe>, ItemStackToItemStackRecipe>
     implements Predicate<@NotNull ItemStack> {
     public HeatSmelterRecipe(@Nullable HeatedItemStackToItemStackRecipe oversmelt, @Nullable HeatedItemStackToFluidRecipe melt, @Nullable ItemStackToItemStackRecipe smelt) {
-        super(new EitherRecipe<>(oversmelt, melt), smelt);
+        super(oversmelt == null && melt == null ? null : new EitherRecipe<>(oversmelt, melt), smelt);
     }
 
     public static HeatSmelterRecipe oversmelt(HeatedItemStackToItemStackRecipe recipe) {
@@ -87,5 +87,16 @@ public class HeatSmelterRecipe
 
     public FluidStack getFluidOutput(ItemStack input) {
         return getMelt().getOutput(input);
+    }
+
+    @Override
+    public boolean test(ItemStack itemStack) {
+        if (isOversmelt())
+            return getOversmelt().test(itemStack);
+        if (isSmelt())
+            return getSmelt().test(itemStack);
+        if (isMelt())
+            return getMelt().test(itemStack);
+        return false;
     }
 }
