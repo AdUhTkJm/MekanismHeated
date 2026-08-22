@@ -1,14 +1,17 @@
 package io.aduhtkjm.mekanismheated.tile;
 
 import io.aduhtkjm.mekanismheated.Config;
-import io.aduhtkjm.mekanismheated.recipe.cache.HeatSensitiveOneInputCachedRecipe;
-import io.aduhtkjm.mekanismheated.recipe.lookup.monitor.HeatSmelterRecipeCacheLookupMonitor;
 import io.aduhtkjm.mekanismheated.recipe.ItemStackToHeatRecipe;
 import io.aduhtkjm.mekanismheated.recipe.ModRecipeType;
+import io.aduhtkjm.mekanismheated.recipe.cache.HeatSensitiveOneInputCachedRecipe;
+import io.aduhtkjm.mekanismheated.recipe.lookup.monitor.HeatSmelterRecipeCacheLookupMonitor;
 import io.aduhtkjm.mekanismheated.registries.ModBlocks;
 import java.util.List;
 import mekanism.api.Action;
 import mekanism.api.IContentsListener;
+import mekanism.api.RelativeSide;
+import mekanism.api.SerializationConstants;
+import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.heat.HeatAPI.HeatTransfer;
 import mekanism.api.recipes.ItemStackToItemStackRecipe;
 import mekanism.api.recipes.cache.CachedRecipe;
@@ -19,8 +22,11 @@ import mekanism.api.recipes.outputs.IOutputHandler;
 import mekanism.api.recipes.outputs.OutputHelper;
 import mekanism.client.recipe_viewer.type.IRecipeViewerRecipeType;
 import mekanism.client.recipe_viewer.type.RecipeViewerRecipeType;
+import mekanism.common.capabilities.fluid.BasicFluidTank;
 import mekanism.common.capabilities.heat.BasicHeatCapacitor;
 import mekanism.common.capabilities.heat.CachedAmbientTemperature;
+import mekanism.common.capabilities.holder.fluid.FluidTankHelper;
+import mekanism.common.capabilities.holder.fluid.IFluidTankHolder;
 import mekanism.common.capabilities.holder.heat.HeatCapacitorHelper;
 import mekanism.common.capabilities.holder.heat.IHeatCapacitorHolder;
 import mekanism.common.capabilities.holder.slot.IInventorySlotHolder;
@@ -42,24 +48,43 @@ import mekanism.common.tile.component.config.DataType;
 import mekanism.common.tile.component.config.slot.InventorySlotInfo;
 import mekanism.common.tile.prefab.TileEntityProgressMachine;
 import mekanism.common.util.MekanismUtils;
+import mekanism.common.util.NBTUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackToItemStackRecipe>
       implements IRecipeLookupHandler<ItemStackToItemStackRecipe> {
 
+    /** Error for the melting input slot, separate from the smelting input's error so their warnings do not cross-talk. */
+    public static final RecipeError NOT_ENOUGH_MELT_INPUT_ERROR = RecipeError.create();
+    /** Error for the melting fluid output tank, separate from the item output's error so their warnings do not cross-talk. */
+    public static final RecipeError NOT_ENOUGH_FLUID_OUTPUT_SPACE_ERROR = RecipeError.create();
+
     private static final List<RecipeError> TRACKED_ERROR_TYPES = List.of(
           RecipeError.NOT_ENOUGH_ENERGY,
           RecipeError.NOT_ENOUGH_INPUT,
           RecipeError.NOT_ENOUGH_OUTPUT_SPACE,
-          RecipeError.INPUT_DOESNT_PRODUCE_OUTPUT
+          RecipeError.INPUT_DOESNT_PRODUCE_OUTPUT,
+          NOT_ENOUGH_MELT_INPUT_ERROR,
+          NOT_ENOUGH_FLUID_OUTPUT_SPACE_ERROR
     );
+
+    /** Capacity of the melting fluid output tank, in milli-buckets. */
+    public static final int MAX_FLUID = 10 * FluidType.BUCKET_VOLUME;
+    private static final String FLUID_PROGRESS_KEY = "fluid_progress";
+
     protected final IInputHandler<@NotNull ItemStack> inputHandler;
     protected final IOutputHandler<@NotNull ItemStack> outputHandler;
+    protected final IOutputHandler<@NotNull FluidStack> fluidOutputHandler;
 
     private BasicHeatCapacitor heatCapacitor;
 
@@ -69,6 +94,7 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
     InputInventorySlot inputSlot;
     InputInventorySlot fuelSlot;
     OutputInventorySlot outputSlot;
+    public IExtendedFluidTank fluidTank;
 
     public TileEntityHeatSmelter(BlockPos pos, BlockState state) {
         super(ModBlocks.HEAT_SMELTER, pos, state, TRACKED_ERROR_TYPES, Config.BASE_SPEED.get());
@@ -78,12 +104,15 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
             itemConfig.addSlotInfo(DataType.OUTPUT, new InventorySlotInfo(false, true, outputSlot));
             itemConfig.addSlotInfo(DataType.INPUT_OUTPUT, new InventorySlotInfo(true, true, inputSlot, outputSlot));
         }
+        configComponent.setupOutputConfig(TransmissionType.FLUID, fluidTank, RelativeSide.RIGHT);
 
         ejectorComponent = new TileComponentEjector(this);
         ejectorComponent.setOutputData(configComponent, TransmissionType.ITEM);
+        ejectorComponent.setOutputData(configComponent, TransmissionType.FLUID);
 
         inputHandler = InputHelper.getInputHandler(inputSlot, RecipeError.NOT_ENOUGH_INPUT);
         outputHandler = OutputHelper.getOutputHandler(outputSlot, RecipeError.NOT_ENOUGH_OUTPUT_SPACE);
+        fluidOutputHandler = OutputHelper.getOutputHandler(fluidTank, NOT_ENOUGH_FLUID_OUTPUT_SPACE_ERROR);
     }
 
     @NotNull
@@ -93,6 +122,15 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
         HeatCapacitorHelper builder = HeatCapacitorHelper.forSide(facingSupplier);
         builder.addCapacitor(heatCapacitor = BasicHeatCapacitor.create(Config.HEAT_CAPACITY.get(), Config.INVERSE_CONDUCTION_COEFFICIENT.get(),
               Config.INVERSE_INSULATION_COEFFICIENT.get(), ambientTemperature, listener));
+        return builder.build();
+    }
+
+    @NotNull
+    @Override
+    protected IFluidTankHolder getInitialFluidTanks(IContentsListener listener, IContentsListener recipeCacheListener, IContentsListener recipeCacheUnpauseListener) {
+        FluidTankHelper builder = FluidTankHelper.forSideWithConfig(this);
+        //The tank is an output only; changes to it unpause the melting recipe cache so it can notice freed-up space
+        builder.addTank(fluidTank = BasicFluidTank.output(MAX_FLUID, listener));
         return builder.build();
     }
 
@@ -190,7 +228,7 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
     @NotNull
     @Override
     public CachedRecipe<ItemStackToItemStackRecipe> createNewCachedRecipe(@NotNull ItemStackToItemStackRecipe recipe, int cacheIndex) {
-        return new HeatSensitiveOneInputCachedRecipe(recipe, recheckAllRecipeErrors, inputHandler, outputHandler, this)
+        return HeatSensitiveOneInputCachedRecipe.itemToItem(recipe, recheckAllRecipeErrors, inputHandler, outputHandler, this)
               .setErrorsChanged(this::onErrorsChanged)
               .setCanHolderFunction(this::canFunction)
               .setActive(this::setActive)
@@ -237,6 +275,20 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
         super.addContainerTrackers(container);
         container.track(SyncableDouble.create(this::getLastTransferLoss, value -> lastTransferLoss = value));
         container.track(SyncableDouble.create(this::getLastEnvironmentLoss, value -> lastEnvironmentLoss = value));
+    }
+
+    @NotNull
+    @Override
+    public CompoundTag getReducedUpdateTag(@NotNull HolderLookup.Provider provider) {
+        CompoundTag updateTag = super.getReducedUpdateTag(provider);
+        updateTag.put(SerializationConstants.FLUID, fluidTank.serializeNBT(provider));
+        return updateTag;
+    }
+
+    @Override
+    public void handleUpdateTag(@NotNull CompoundTag tag, @NotNull HolderLookup.Provider provider) {
+        super.handleUpdateTag(tag, provider);
+        NBTUtils.setCompoundIfPresent(tag, SerializationConstants.FLUID, nbt -> fluidTank.deserializeNBT(provider, nbt));
     }
 
     public BasicHeatCapacitor getHeatCapacitor() {

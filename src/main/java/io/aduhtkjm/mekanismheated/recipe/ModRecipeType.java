@@ -8,7 +8,7 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Helper for looking up {@link ItemStackToHeatRecipe}s from the world's recipe manager.
+ * Helpers for looking up the mod's recipes from the world's recipe manager.
  */
 @NothingNullByDefault
 public class ModRecipeType {
@@ -23,6 +23,17 @@ public class ModRecipeType {
         }
         return level.getRecipeManager()
               .getRecipeFor(ModRecipeTypes.TYPE_FUEL_CONVERSION.value(), new SingleRecipeInput(input), level)
+              .map(RecipeHolder::value)
+              .orElse(null);
+    }
+
+    @Nullable
+    public static HeatedItemStackToFluidRecipe findFirstHeatedMelting(@Nullable Level level, ItemStack input) {
+        if (level == null || input.isEmpty()) {
+            return null;
+        }
+        return level.getRecipeManager()
+              .getRecipeFor(ModRecipeTypes.TYPE_HEATED_MELTING.value(), new SingleRecipeInput(input), level)
               .map(RecipeHolder::value)
               .orElse(null);
     }

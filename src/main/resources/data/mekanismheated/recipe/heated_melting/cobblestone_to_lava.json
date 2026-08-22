@@ -1,0 +1,12 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "input": {
+    "count": 1,
+    "item": "minecraft:cobblestone"
+  },
+  "output": {
+    "amount": 1000,
+    "id": "minecraft:lava"
+  },
+  "temperature": 1500
+}

@@ -1,0 +1,12 @@
+{
+  "type": "mekanismheated:heated_smelting",
+  "input": {
+    "count": 1,
+    "item": "minecraft:coal"
+  },
+  "output": {
+    "count": 1,
+    "id": "minecraft:diamond"
+  },
+  "temperature": 3000
+}

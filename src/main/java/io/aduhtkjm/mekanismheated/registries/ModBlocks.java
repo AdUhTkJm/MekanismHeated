@@ -23,7 +23,7 @@ public class ModBlocks {
     public static final Machine<TileEntityHeatSmelter> HEAT_SMELTER_TYPE = MachineBuilder
           .createMachine(() -> ModTileEntityTypes.HEAT_SMELTER, ModLang.DESCRIPTION_HEAT_SMELTER)
           .withGui(() -> ModContainerTypes.HEAT_SMELTER)
-          .with(AttributeSideConfig.create(TransmissionType.ITEM))
+          .with(AttributeSideConfig.create(TransmissionType.ITEM, TransmissionType.FLUID, TransmissionType.HEAT))
           .build();
 
     public static final BlockRegistryObject<BlockTileModel<TileEntityHeatSmelter, Machine<TileEntityHeatSmelter>>, ItemBlockTooltip<BlockTileModel<TileEntityHeatSmelter, Machine<TileEntityHeatSmelter>>>> HEAT_SMELTER =

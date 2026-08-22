@@ -1,22 +1,29 @@
 package io.aduhtkjm.mekanismheated.recipe.cache;
 
+import io.aduhtkjm.mekanismheated.recipe.HeatedItemStackToFluidRecipe;
 import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
 import java.util.function.BooleanSupplier;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.functions.ConstantPredicates;
 import mekanism.api.recipes.ItemStackToItemStackRecipe;
+import mekanism.api.recipes.MekanismRecipe;
 import mekanism.api.recipes.cache.CachedRecipe;
 import mekanism.api.recipes.cache.OneInputCachedRecipe;
+import mekanism.api.recipes.ingredients.InputIngredient;
 import mekanism.api.recipes.inputs.IInputHandler;
 import mekanism.api.recipes.outputs.IOutputHandler;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Temperature-aware variant of {@link OneInputCachedRecipe} used by the Heat Smelter. Instead of advancing a flat single
  * tick of progress each tick like the base implementation, each tick of processing advances the recipe's progress by the
  * smelter's current speed factor ({@link TileEntityHeatSmelter#getSpeedFactor()}), a value between zero (too cold) and one
- * (full speed), so the smelting speed scales smoothly with the smelter's temperature. The recipe completes once the
+ * (full speed), so the processing speed scales smoothly with the smelter's temperature. The recipe completes once the
  * accumulated fractional progress reaches the recipe's required ticks.
  * <p>
  * The base implementation hard-codes its progress accumulation ({@code operatingTicks++}) inside {@link CachedRecipe#process()}
@@ -32,9 +39,16 @@ import org.jetbrains.annotations.NotNull;
  *     <li>On completion any leftover fractional progress carries over to the next recipe, and progress is cleared if the
  *     recipe's progress gets reset (for example because the input no longer produces the output).</li>
  * </ul>
+ * <p>
+ * Whether the smelter is hot enough to process a given recipe at all (its temperature threshold) is <strong>not</strong>
+ * handled here; it is enforced by the caller through {@link CachedRecipe#setBaselineMaxOperations}.
+ *
+ * @param <OUTPUT> Type of the recipe's output (an {@link ItemStack} or a {@link FluidStack}).
+ * @param <RECIPE> Type of the recipe being processed, which must take a single {@link ItemStack} as input.
  */
 @NothingNullByDefault
-public class HeatSensitiveOneInputCachedRecipe extends OneInputCachedRecipe<@NotNull ItemStack, @NotNull ItemStack, ItemStackToItemStackRecipe> {
+public class HeatSensitiveOneInputCachedRecipe<OUTPUT, RECIPE extends MekanismRecipe<?> & Predicate<@NotNull ItemStack>>
+      extends OneInputCachedRecipe<@NotNull ItemStack, @NotNull OUTPUT, RECIPE> {
 
     private final TileEntityHeatSmelter smelter;
     /**
@@ -58,15 +72,40 @@ public class HeatSensitiveOneInputCachedRecipe extends OneInputCachedRecipe<@Not
      * @param recheckAllErrors Returns {@code true} if processing should be continued even if an error is hit in order to gather all the errors.
      * @param inputHandler     Input handler.
      * @param outputHandler    Output handler.
+     * @param inputSupplier    Supplier of the recipe's input ingredient.
+     * @param outputGetter     Gets the recipe's output when given the corresponding input.
+     * @param outputEmptyCheck Checks if the output is empty (indicating something went horribly wrong).
      * @param smelter          The heat smelter this recipe is processing for, used to look up the current speed factor and required ticks.
      */
-    public HeatSensitiveOneInputCachedRecipe(ItemStackToItemStackRecipe recipe, BooleanSupplier recheckAllErrors,
-          IInputHandler<@NotNull ItemStack> inputHandler, IOutputHandler<@NotNull ItemStack> outputHandler, TileEntityHeatSmelter smelter) {
-        super(recipe, recheckAllErrors, inputHandler, outputHandler, recipe::getInput, recipe::getOutput, ConstantPredicates.ITEM_EMPTY, ConstantPredicates.ITEM_EMPTY);
+    public HeatSensitiveOneInputCachedRecipe(RECIPE recipe, BooleanSupplier recheckAllErrors,
+          IInputHandler<@NotNull ItemStack> inputHandler, IOutputHandler<@NotNull OUTPUT> outputHandler,
+          Supplier<? extends InputIngredient<@NotNull ItemStack>> inputSupplier, Function<@NotNull ItemStack, OUTPUT> outputGetter,
+          Predicate<@NotNull OUTPUT> outputEmptyCheck, TileEntityHeatSmelter smelter) {
+        super(recipe, recheckAllErrors, inputHandler, outputHandler, inputSupplier, outputGetter, ConstantPredicates.ITEM_EMPTY, outputEmptyCheck);
         this.smelter = smelter;
         //The base implementation counts raw ticks via operatingTicks++ with no way to change the increment, so instead we
         // offset the required ticks by the raw tick count, turning the base's completion check into "progress >= required ticks"
         setRequiredTicks(() -> getOperatingTicks() + (int) Math.ceil(smelter.getTicksRequired() - progress));
+    }
+
+    /**
+     * Base implementation for handling heated ItemStack to ItemStack recipes.
+     */
+    public static HeatSensitiveOneInputCachedRecipe<@NotNull ItemStack, ItemStackToItemStackRecipe> itemToItem(ItemStackToItemStackRecipe recipe,
+          BooleanSupplier recheckAllErrors, IInputHandler<@NotNull ItemStack> inputHandler, IOutputHandler<@NotNull ItemStack> outputHandler,
+          TileEntityHeatSmelter smelter) {
+        return new HeatSensitiveOneInputCachedRecipe<>(recipe, recheckAllErrors, inputHandler, outputHandler, recipe::getInput, recipe::getOutput,
+              ConstantPredicates.ITEM_EMPTY, smelter);
+    }
+
+    /**
+     * Base implementation for handling heated ItemStack to Fluid recipes.
+     */
+    public static HeatSensitiveOneInputCachedRecipe<@NotNull FluidStack, HeatedItemStackToFluidRecipe> itemToFluid(HeatedItemStackToFluidRecipe recipe,
+          BooleanSupplier recheckAllErrors, IInputHandler<@NotNull ItemStack> inputHandler, IOutputHandler<@NotNull FluidStack> outputHandler,
+          TileEntityHeatSmelter smelter) {
+        return new HeatSensitiveOneInputCachedRecipe<>(recipe, recheckAllErrors, inputHandler, outputHandler, recipe::getInput, recipe::getOutput,
+              ConstantPredicates.FLUID_EMPTY, smelter);
     }
 
     @Override

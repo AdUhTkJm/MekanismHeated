@@ -5,6 +5,8 @@ import java.util.List;
 import mekanism.api.recipes.cache.CachedRecipe.OperationTracker.RecipeError;
 import mekanism.client.gui.GuiConfigurableTile;
 import mekanism.client.gui.element.GuiUpArrow;
+import mekanism.client.gui.element.gauge.GaugeType;
+import mekanism.client.gui.element.gauge.GuiFluidGauge;
 import mekanism.client.gui.element.progress.GuiProgress;
 import mekanism.client.gui.element.progress.ProgressType;
 import mekanism.client.gui.element.tab.GuiHeatTab;
@@ -33,6 +35,8 @@ public class GuiHeatSmelter extends GuiConfigurableTile<TileEntityHeatSmelter, M
         addRenderableWidget(new GuiUpArrow(this, 68, 38));
         addRenderableWidget(new GuiProgress(tile::getScaledProgress, ProgressType.BAR, this, 86, 38).recipeViewerCategory(tile))
               .warning(WarningType.INPUT_DOESNT_PRODUCE_OUTPUT, tile.getWarningCheck(RecipeError.INPUT_DOESNT_PRODUCE_OUTPUT));
+        addRenderableWidget(new GuiFluidGauge(() -> tile.fluidTank, () -> tile.getFluidTanks(null), GaugeType.STANDARD, this, 133, 13))
+              .warning(WarningType.NO_SPACE_IN_OUTPUT, tile.getWarningCheck(TileEntityHeatSmelter.NOT_ENOUGH_FLUID_OUTPUT_SPACE_ERROR));
         addRenderableWidget(new GuiHeatTab(this, () -> {
             Component temp = MekanismUtils.getTemperatureDisplay(tile.getTotalTemperature(), TemperatureUnit.KELVIN, true);
             Component transfer = MekanismUtils.getTemperatureDisplay(tile.getLastTransferLoss(), TemperatureUnit.KELVIN, false);
