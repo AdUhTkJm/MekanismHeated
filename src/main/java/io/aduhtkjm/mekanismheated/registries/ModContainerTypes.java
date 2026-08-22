@@ -1,6 +1,7 @@
 package io.aduhtkjm.mekanismheated.registries;
 
 import io.aduhtkjm.mekanismheated.Mod;
+import io.aduhtkjm.mekanismheated.block.shaker.ShakerBlockEntity;
 import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
 import mekanism.common.inventory.container.tile.MekanismTileContainer;
 import mekanism.common.registration.impl.ContainerTypeDeferredRegister;
@@ -15,4 +16,7 @@ public class ModContainerTypes {
 
     public static final ContainerTypeRegistryObject<MekanismTileContainer<TileEntityHeatSmelter>> HEAT_SMELTER =
           CONTAINER_TYPES.register(ModBlocks.HEAT_SMELTER, TileEntityHeatSmelter.class);
+
+    public static final ContainerTypeRegistryObject<MekanismTileContainer<ShakerBlockEntity>> SHAKER =
+          CONTAINER_TYPES.register(ModBlocks.SHAKER, ShakerBlockEntity.class);
 }

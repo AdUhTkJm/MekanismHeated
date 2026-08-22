@@ -32,7 +32,10 @@ public class Mod {
           .title(Component.translatable("itemGroup.mekanismheated"))
           .withTabsBefore(CreativeModeTabs.COMBAT)
           .icon(() -> ModBlocks.HEAT_SMELTER.asItem().getDefaultInstance())
-          .displayItems((parameters, output) -> output.accept(ModBlocks.HEAT_SMELTER)).build());
+          .displayItems((parameters, output) -> {
+              output.accept(ModBlocks.HEAT_SMELTER);
+              output.accept(ModBlocks.SHAKER);
+          }).build());
 
     public Mod(IEventBus modEventBus, ModContainer modContainer) {
         // Register the Deferred Registers to the mod event bus so blocks/tiles/containers get registered

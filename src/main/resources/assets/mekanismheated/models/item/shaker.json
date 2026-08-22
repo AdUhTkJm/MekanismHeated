@@ -1,0 +1,4 @@
+{
+  "render_type": "minecraft:translucent",
+  "parent": "mekanismheated:block/shaker/model"
+}

@@ -7,6 +7,7 @@ import net.minecraft.Util;
 @NothingNullByDefault
 public enum ModLang implements ILangEntry {
     DESCRIPTION_HEAT_SMELTER("block", "heat_smelter"),
+    DESCRIPTION_SHAKER("block", "shaker"),
     HEAT_SMELTER_TEMPERATURE("gui", "heat_smelter.temperature"),
     HEAT_SMELTER_BUFFER("gui", "heat_smelter.buffer");
 
