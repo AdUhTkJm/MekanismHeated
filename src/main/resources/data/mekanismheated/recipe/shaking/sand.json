@@ -1,0 +1,11 @@
+{
+  "type": "mekanismheated:shaking",
+  "input": {
+    "count": 3,
+    "item": "minecraft:sand"
+  },
+  "output": {
+    "id": "mekanismheated:cuo_dust",
+    "count": 1
+  }
+}

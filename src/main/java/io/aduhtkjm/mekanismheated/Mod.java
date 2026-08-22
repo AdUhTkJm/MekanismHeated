@@ -5,6 +5,7 @@ import io.aduhtkjm.mekanismheated.recipe.ModRecipeSerializers;
 import io.aduhtkjm.mekanismheated.recipe.ModRecipeTypes;
 import io.aduhtkjm.mekanismheated.registries.ModBlocks;
 import io.aduhtkjm.mekanismheated.registries.ModContainerTypes;
+import io.aduhtkjm.mekanismheated.registries.ModItems;
 import io.aduhtkjm.mekanismheated.registries.ModTileEntityTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -35,11 +36,15 @@ public class Mod {
           .displayItems((parameters, output) -> {
               output.accept(ModBlocks.HEAT_SMELTER);
               output.accept(ModBlocks.SHAKER);
+              output.accept(ModItems.CUO_DUST.get());
+              output.accept(ModItems.FE2O3_DUST.get());
+              output.accept(ModItems.SNO2_DUST.get());
           }).build());
 
     public Mod(IEventBus modEventBus, ModContainer modContainer) {
         // Register the Deferred Registers to the mod event bus so blocks/tiles/containers get registered
         ModBlocks.BLOCKS.register(modEventBus);
+        ModItems.ITEMS.register(modEventBus);
         ModTileEntityTypes.TILE_ENTITY_TYPES.register(modEventBus);
         ModContainerTypes.CONTAINER_TYPES.register(modEventBus);
         ModRecipeTypes.RECIPE_TYPES.register(modEventBus);
