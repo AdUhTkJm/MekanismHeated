@@ -94,7 +94,7 @@ public class TileEntityHeatSmelter
     public IExtendedFluidTank fluidTank;
 
     public TileEntityHeatSmelter(BlockPos pos, BlockState state) {
-        super(ModBlocks.HEAT_SMELTER, pos, state, TRACKED_ERROR_TYPES, Config.BASE_SPEED.get());
+        super(ModBlocks.HEAT_SMELTER, pos, state, TRACKED_ERROR_TYPES, Config.HeatSmelter.BASE_SPEED.get());
         ConfigInfo itemConfig = configComponent.getConfig(TransmissionType.ITEM);
         if (itemConfig != null) {
             itemConfig.addSlotInfo(DataType.INPUT, new InventorySlotInfo(true, false, inputSlot));
@@ -118,12 +118,11 @@ public class TileEntityHeatSmelter
     protected IHeatCapacitorHolder getInitialHeatCapacitors(IContentsListener listener, IContentsListener recipeCacheListener, IContentsListener recipeCacheUnpauseListener,
           CachedAmbientTemperature ambientTemperature) {
         HeatCapacitorHelper builder = HeatCapacitorHelper.forSideWithConfig(this);
-        builder.addCapacitor(heatCapacitor = BasicHeatCapacitor.create(Config.HEAT_CAPACITY.get(), Config.INVERSE_CONDUCTION_COEFFICIENT.get(),
-              Config.INVERSE_INSULATION_COEFFICIENT.get(), ambientTemperature, listener));
+        builder.addCapacitor(heatCapacitor = BasicHeatCapacitor.create(Config.HeatSmelter.HEAT_CAPACITY.get(), Config.HeatSmelter.INVERSE_CONDUCTION_COEFFICIENT.get(),
+              Config.HeatSmelter.INVERSE_INSULATION_COEFFICIENT.get(), ambientTemperature, listener));
         return builder.build();
     }
 
-    @NotNull
     @Override
     protected IFluidTankHolder getInitialFluidTanks(IContentsListener listener, IContentsListener recipeCacheListener, IContentsListener recipeCacheUnpauseListener) {
         FluidTankHelper builder = FluidTankHelper.forSideWithConfig(this);
@@ -141,7 +140,6 @@ public class TileEntityHeatSmelter
         return level != null && ModRecipeType.findFirstSingleItemRecipe(ModRecipeTypes.TYPE_FUEL_CONVERSION, level, item) != null;
     }
 
-    @NotNull
     @Override
     protected IInventorySlotHolder getInitialInventory(IContentsListener listener, IContentsListener recipeCacheListener, IContentsListener recipeCacheUnpauseListener) {
         InventorySlotHelper builder = InventorySlotHelper.forSideWithConfig(this);
@@ -204,7 +202,7 @@ public class TileEntityHeatSmelter
      * Checks if the smelter can currently burn fuel: it has a valid fuel item and is not already at its maximum temperature.
      */
     public boolean canBurnFuel() {
-        return heatCapacitor.getTemperature() < Config.MAX_FUEL_TEMPERATURE.get() && !fuelSlot.isEmpty() && checkFuelValidity(fuelSlot.getStack());
+        return heatCapacitor.getTemperature() < Config.HeatSmelter.MAX_FUEL_TEMPERATURE.get() && !fuelSlot.isEmpty() && checkFuelValidity(fuelSlot.getStack());
     }
 
     private HeatSmelterRecipe getRecipe(ItemStack input) {
@@ -283,13 +281,13 @@ public class TileEntityHeatSmelter
     }
 
     /**
-     * Speed multiplier based on the smelter's current temperature. Runs linearly from zero at {@link Config#BASE_TEMPERATURE} up to one at
-     * {@link Config#FULL_SPEED_TEMPERATURE}, and is clamped to a minimum of zero.
+     * Speed multiplier based on the smelter's current temperature. Runs linearly from zero at {@link Config.HeatSmelter#BASE_TEMPERATURE} up to one at
+     * {@link Config.HeatSmelter#FULL_SPEED_TEMPERATURE}, and is clamped to a minimum of zero.
      */
     public double getSpeedFactor() {
         double temperature = heatCapacitor.getTemperature();
-        double base = Config.BASE_TEMPERATURE.get();
-        double full = Config.FULL_SPEED_TEMPERATURE.get();
+        double base = Config.HeatSmelter.BASE_TEMPERATURE.get();
+        double full = Config.HeatSmelter.FULL_SPEED_TEMPERATURE.get();
         double range = full - base;
         if (range <= 0) {
             //Invalid configuration, treat everything above the base temperature as full speed

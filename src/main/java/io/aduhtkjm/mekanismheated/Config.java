@@ -9,35 +9,60 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 public class Config {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
-    public static final ModConfigSpec.IntValue BASE_SPEED = BUILDER.comment(
-          "Base number of game ticks the Heat Smelter takes to complete a recipe when running at full speed.")
-          .defineInRange("baseSpeed", 100, 1, Integer.MAX_VALUE);
+    public static class HeatSmelter {
+        public static ModConfigSpec.IntValue BASE_SPEED;
+        public static ModConfigSpec.DoubleValue FULL_SPEED_TEMPERATURE;
+        public static ModConfigSpec.DoubleValue BASE_TEMPERATURE;
+        public static ModConfigSpec.DoubleValue HEAT_CAPACITY;
+        public static ModConfigSpec.DoubleValue INVERSE_CONDUCTION_COEFFICIENT;
+        public static ModConfigSpec.DoubleValue INVERSE_INSULATION_COEFFICIENT;
+        public static ModConfigSpec.DoubleValue MAX_FUEL_TEMPERATURE;
+    }
 
-    public static final ModConfigSpec.DoubleValue FULL_SPEED_TEMPERATURE = BUILDER.comment(
-          "Temperature in Kelvin the Heat Smelter must reach to process recipes at 100% base speed.")
-          .defineInRange("fullSpeedTemperature", 1_000D, 0D, Double.MAX_VALUE);
+    public static class Shaker {
+        public static ModConfigSpec.IntValue BASE_SPEED;
+        public static ModConfigSpec.LongValue ENERGY_PER_TICK;
+        public static ModConfigSpec.LongValue MAX_ENERGY;
+    }
 
-    public static final ModConfigSpec.DoubleValue BASE_TEMPERATURE = BUILDER.comment(
-          "Temperature in Kelvin below which the Heat Smelter cannot process recipes (speed is clamped to zero).")
-          .defineInRange("baseTemperature", 300D, 0D, Double.MAX_VALUE);
+    public static ModConfigSpec SPEC;
+    static {
+        BUILDER.push("heatSmelter");
+        HeatSmelter.BASE_SPEED = BUILDER
+            .comment("Base number of game ticks the heat smelter takes to complete a recipe when running at full speed.")
+            .defineInRange("baseSpeed", 100, 1, Integer.MAX_VALUE);
+        HeatSmelter.FULL_SPEED_TEMPERATURE = BUILDER
+            .comment("Temperature in Kelvin the Heat Smelter must reach to process recipes at 100% base speed.")
+            .defineInRange("fullSpeedTemperature", 1_000D, 0D, Double.MAX_VALUE);
+        HeatSmelter.BASE_TEMPERATURE = BUILDER
+            .comment("Temperature in Kelvin below which the Heat Smelter cannot process recipes.")
+            .defineInRange("baseTemperature", 300D, 0D, Double.MAX_VALUE);
+        HeatSmelter.HEAT_CAPACITY = BUILDER
+            .comment("Heat capacity of the Heat Smelter in J/K, controlling how quickly its temperature changes. Must be at least one.")
+            .defineInRange("heatCapacity", 50D, 1D, Double.MAX_VALUE);
+        HeatSmelter.INVERSE_CONDUCTION_COEFFICIENT = BUILDER
+            .comment("Inverse conduction coefficient of the Heat Smelter, controlling how readily it exchanges heat with adjacent blocks (smaller means slower). Must be at least one.")
+            .defineInRange("inverseConductionCoefficient", 5D, 1D, Double.MAX_VALUE);
+        HeatSmelter.INVERSE_INSULATION_COEFFICIENT = BUILDER
+            .comment("Inverse insulation coefficient of the Heat Smelter, controlling how readily it loses heat to the environment (smaller means slower). Must be at least one.")
+            .defineInRange("inverseInsulationCoefficient", 3D, 1D, Double.MAX_VALUE);
+        HeatSmelter.MAX_FUEL_TEMPERATURE = BUILDER
+            .comment("Temperature in Kelvin at which the Heat Smelter stops burning fuel. Note the temperature can be raised by, e.g., resistive heaters beyond this point.")
+            .defineInRange("maxFuelTemperature", 1_000D, 0D, Double.MAX_VALUE);
+        BUILDER.pop();
 
-    public static final ModConfigSpec.DoubleValue HEAT_CAPACITY = BUILDER.comment(
-          "Heat capacity of the Heat Smelter in J/K, controlling how quickly its temperature changes. Must be at least one.")
-          .defineInRange("heatCapacity", 100D, 1D, Double.MAX_VALUE);
-
-    public static final ModConfigSpec.DoubleValue INVERSE_CONDUCTION_COEFFICIENT = BUILDER.comment(
-          "Inverse conduction coefficient of the Heat Smelter, controlling how readily it exchanges heat with adjacent blocks. Must be at least one.")
-          .defineInRange("inverseConductionCoefficient", 5D, 1D, Double.MAX_VALUE);
-
-    public static final ModConfigSpec.DoubleValue INVERSE_INSULATION_COEFFICIENT = BUILDER.comment(
-          "Inverse insulation coefficient of the Heat Smelter, controlling how readily it loses heat to the environment. Must be at least one.")
-          .defineInRange("inverseInsulationCoefficient", 10D, 1D, Double.MAX_VALUE);
-
-    public static final ModConfigSpec.DoubleValue MAX_FUEL_TEMPERATURE = BUILDER.comment(
-          "Temperature in Kelvin at which the Heat Smelter stops burning fuel, i.e. its maximum achievable temperature.")
-          .defineInRange("maxFuelTemperature", 1_000D, 0D, Double.MAX_VALUE);
-
-    static final ModConfigSpec SPEC = BUILDER.build();
+        BUILDER.push("shaker");
+        Shaker.BASE_SPEED = BUILDER
+            .comment("Base number of game ticks the shaker takes to complete a recipe.")
+            .defineInRange("baseSpeed", 200, 1, Integer.MAX_VALUE);
+        Shaker.ENERGY_PER_TICK = BUILDER
+            .comment("Energy consumed per tick.")
+            .defineInRange("energyPerTick", 40, 0, Long.MAX_VALUE);
+        Shaker.MAX_ENERGY = BUILDER
+            .comment("Maximum amount of energy the shaker can hold.")
+            .defineInRange("maxEnergy", 80000, 0, Long.MAX_VALUE);
+        SPEC = BUILDER.build();
+    }
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {

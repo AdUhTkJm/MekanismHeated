@@ -1,8 +1,9 @@
 {
   "itemGroup.mekanismheated": "通用机械：热量",
   "block.mekanismheated.heat_smelter": "热力熔炼炉",
+  "block.mekanismheated.shaker": "摇床",
   "container.mekanismheated.heat_smelter": "热力熔炼炉",
-  "block.mekanismheated.shaker": "振荡器",
+  "container.mekanismheated.shaker": "摇床",
   "description.mekanismheated.heat_smelter": "使用热量而非电力的熔炼炉。",
   "description.mekanismheated.shaker": "使用电力将物品从输入槽振荡至输出槽的机器。",
   "gui.mekanismheated.heat_smelter.temperature": "温度：%1$s",

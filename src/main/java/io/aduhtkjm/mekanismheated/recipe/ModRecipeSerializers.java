@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.aduhtkjm.mekanismheated.Mod;
 import mekanism.api.SerializationConstants;
 import mekanism.api.SerializerHelper;
+import mekanism.api.recipes.ingredients.FluidStackIngredient;
 import mekanism.api.recipes.ingredients.ItemStackIngredient;
 import mekanism.common.recipe.serializer.MekanismRecipeSerializer;
 import net.minecraft.core.registries.Registries;
@@ -69,5 +70,19 @@ public class ModRecipeSerializers {
                       FluidStack.STREAM_CODEC, BasicHeatedItemStackToFluidRecipe::getOutputRaw,
                       ByteBufCodecs.DOUBLE, HeatedItemStackToFluidRecipe::getTemperatureThreshold,
                       BasicHeatedItemStackToFluidRecipe::new
+                )));
+
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BasicShakerRecipe>> SHAKING =
+          RECIPE_SERIALIZERS.register("shaking", () -> new MekanismRecipeSerializer<>(
+                RecordCodecBuilder.mapCodec(instance -> instance.group(
+                      ItemStackIngredient.CODEC.fieldOf(SerializationConstants.INPUT).forGetter(BasicShakerRecipe::getInput),
+                      FluidStackIngredient.CODEC.optionalFieldOf(SerializationConstants.FLUID_INPUT).forGetter(BasicShakerRecipe::getFluidInput),
+                      BasicShakerRecipe.OUTPUT_CODEC.fieldOf(SerializationConstants.OUTPUT).forGetter(BasicShakerRecipe::getOutputRaw)
+                ).apply(instance, BasicShakerRecipe::new)),
+                StreamCodec.composite(
+                      ItemStackIngredient.STREAM_CODEC, BasicShakerRecipe::getInput,
+                      ByteBufCodecs.optional(FluidStackIngredient.STREAM_CODEC), BasicShakerRecipe::getFluidInput,
+                      ItemStack.STREAM_CODEC.apply(ByteBufCodecs.list()), BasicShakerRecipe::getOutputRaw,
+                      BasicShakerRecipe::new
                 )));
 }

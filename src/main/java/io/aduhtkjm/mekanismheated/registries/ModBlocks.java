@@ -1,5 +1,6 @@
 package io.aduhtkjm.mekanismheated.registries;
 
+import io.aduhtkjm.mekanismheated.Config;
 import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.ModLang;
 import io.aduhtkjm.mekanismheated.block.shaker.ShakerBlock;
@@ -39,8 +40,8 @@ public class ModBlocks {
     public static final Machine<TileEntityShaker> SHAKER_TYPE = MachineBuilder
           .createMachine(() -> ModTileEntityTypes.SHAKER, ModLang.DESCRIPTION_SHAKER)
           .withGui(() -> ModContainerTypes.SHAKER)
-          .withEnergyConfig(() -> TileEntityShaker.ENERGY_PER_TICK, () -> TileEntityShaker.MAX_ENERGY)
-          .with(AttributeSideConfig.ELECTRIC_MACHINE)
+          .withEnergyConfig(() -> Config.Shaker.ENERGY_PER_TICK.get(), () -> Config.Shaker.MAX_ENERGY.get())
+          .with(AttributeSideConfig.create(TransmissionType.ITEM, TransmissionType.ENERGY, TransmissionType.FLUID))
           .build();
 
     public static final BlockRegistryObject<ShakerBlock, BlockItem> SHAKER =
