@@ -3,7 +3,7 @@ package io.aduhtkjm.mekanismheated.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import io.aduhtkjm.mekanismheated.MekanismHeated;
+import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.block.shaker.ShakerBlock;
 import io.aduhtkjm.mekanismheated.block.shaker.ShakerBlockEntity;
 import java.util.List;
@@ -31,9 +31,9 @@ import org.joml.Vector4f;
 public class ShakerBlockEntityRenderer implements BlockEntityRenderer<ShakerBlockEntity> {
 
     public static final net.minecraft.resources.ResourceLocation MODEL_LOCATION =
-          MekanismHeated.rl("block/shaker/shaker");
+          Mod.rl("block/shaker/shaker");
     public static final net.minecraft.resources.ResourceLocation GLASS_MODEL_LOCATION =
-          MekanismHeated.rl("block/shaker/glass");
+          Mod.rl("block/shaker/glass");
 
     private static final float SHAKE_SPEED = 0.4F;
     private static final float SHAKE_ANGLE = 6.0F;

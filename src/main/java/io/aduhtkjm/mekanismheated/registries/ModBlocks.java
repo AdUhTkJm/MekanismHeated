@@ -2,6 +2,7 @@ package io.aduhtkjm.mekanismheated.registries;
 
 import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.ModLang;
+import io.aduhtkjm.mekanismheated.block.shaker.ShakerBlock;
 import io.aduhtkjm.mekanismheated.block.shaker.ShakerBlockEntity;
 import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
 import mekanism.common.block.attribute.AttributeSideConfig;
@@ -12,6 +13,8 @@ import mekanism.common.item.block.ItemBlockTooltip;
 import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.registration.impl.BlockDeferredRegister;
 import mekanism.common.registration.impl.BlockRegistryObject;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 
 public class ModBlocks {
@@ -34,7 +37,7 @@ public class ModBlocks {
                 (block, properties) -> new ItemBlockTooltip<>(block, true, properties));
 
     public static final Machine<ShakerBlockEntity> SHAKER_TYPE = MachineBuilder
-          .createMachine(() -> ModTileEntityTypes.SHAKER, MekanismHeatedLang.DESCRIPTION_SHAKER)
+          .createMachine(() -> ModTileEntityTypes.SHAKER, ModLang.DESCRIPTION_SHAKER)
           .withGui(() -> ModContainerTypes.SHAKER)
           .withEnergyConfig(() -> ShakerBlockEntity.ENERGY_PER_TICK, () -> ShakerBlockEntity.MAX_ENERGY)
           .with(AttributeSideConfig.ELECTRIC_MACHINE)
