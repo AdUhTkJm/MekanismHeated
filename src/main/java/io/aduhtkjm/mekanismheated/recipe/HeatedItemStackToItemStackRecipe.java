@@ -36,8 +36,11 @@ public abstract class HeatedItemStackToItemStackRecipe extends ItemStackToItemSt
      * @param temperatureThreshold Minimum temperature, in Kelvin, the processing machine must have to process this recipe.
      *                             Must be greater than zero.
      */
-    public HeatedItemStackToItemStackRecipe(RecipeType<ItemStackToItemStackRecipe> recipeType, double temperatureThreshold) {
-        super(recipeType);
+    @SuppressWarnings("all")
+    public HeatedItemStackToItemStackRecipe(RecipeType<HeatedItemStackToItemStackRecipe> recipeType, double temperatureThreshold) {
+        // We have to do this because Java generics are invariant.
+        // It should be safe.
+        super((RecipeType<ItemStackToItemStackRecipe>) (RecipeType<?>) recipeType);
         if (temperatureThreshold <= 0) {
             throw new IllegalArgumentException("Temperature threshold must be greater than zero.");
         }

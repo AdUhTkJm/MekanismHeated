@@ -1,27 +1,26 @@
 package io.aduhtkjm.mekanismheated.tile;
 
 import io.aduhtkjm.mekanismheated.Config;
-import io.aduhtkjm.mekanismheated.recipe.ItemStackToHeatRecipe;
-import io.aduhtkjm.mekanismheated.recipe.ModRecipeType;
+import io.aduhtkjm.mekanismheated.recipe.*;
 import io.aduhtkjm.mekanismheated.recipe.cache.HeatSensitiveOneInputCachedRecipe;
 import io.aduhtkjm.mekanismheated.recipe.lookup.monitor.HeatSmelterRecipeCacheLookupMonitor;
 import io.aduhtkjm.mekanismheated.registries.ModBlocks;
 import java.util.List;
+import java.util.function.BooleanSupplier;
+
 import mekanism.api.Action;
 import mekanism.api.IContentsListener;
 import mekanism.api.RelativeSide;
 import mekanism.api.SerializationConstants;
 import mekanism.api.fluid.IExtendedFluidTank;
+import mekanism.api.functions.ConstantPredicates;
 import mekanism.api.heat.HeatAPI.HeatTransfer;
-import mekanism.api.recipes.ItemStackToItemStackRecipe;
 import mekanism.api.recipes.cache.CachedRecipe;
 import mekanism.api.recipes.cache.CachedRecipe.OperationTracker.RecipeError;
 import mekanism.api.recipes.inputs.IInputHandler;
 import mekanism.api.recipes.inputs.InputHelper;
 import mekanism.api.recipes.outputs.IOutputHandler;
 import mekanism.api.recipes.outputs.OutputHelper;
-import mekanism.client.recipe_viewer.type.IRecipeViewerRecipeType;
-import mekanism.client.recipe_viewer.type.RecipeViewerRecipeType;
 import mekanism.common.capabilities.fluid.BasicFluidTank;
 import mekanism.common.capabilities.heat.BasicHeatCapacitor;
 import mekanism.common.capabilities.heat.CachedAmbientTemperature;
@@ -40,7 +39,6 @@ import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.recipe.IMekanismRecipeTypeProvider;
 import mekanism.common.recipe.MekanismRecipeType;
 import mekanism.common.recipe.lookup.IRecipeLookupHandler;
-import mekanism.common.recipe.lookup.cache.InputRecipeCache.SingleItem;
 import mekanism.common.recipe.lookup.monitor.RecipeCacheLookupMonitor;
 import mekanism.common.tile.component.TileComponentEjector;
 import mekanism.common.tile.component.config.ConfigInfo;
@@ -53,7 +51,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -61,8 +58,9 @@ import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackToItemStackRecipe>
-      implements IRecipeLookupHandler<ItemStackToItemStackRecipe> {
+public class TileEntityHeatSmelter
+      extends TileEntityProgressMachine<HeatSmelterRecipe>
+      implements IRecipeLookupHandler<HeatSmelterRecipe> {
 
     /** Error for the melting input slot, separate from the smelting input's error so their warnings do not cross-talk. */
     public static final RecipeError NOT_ENOUGH_MELT_INPUT_ERROR = RecipeError.create();
@@ -80,7 +78,6 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
 
     /** Capacity of the melting fluid output tank, in milli-buckets. */
     public static final int MAX_FLUID = 10 * FluidType.BUCKET_VOLUME;
-    private static final String FLUID_PROGRESS_KEY = "fluid_progress";
 
     protected final IInputHandler<@NotNull ItemStack> inputHandler;
     protected final IOutputHandler<@NotNull ItemStack> outputHandler;
@@ -135,16 +132,12 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
     }
 
     private boolean checkInputValidity(ItemStack item) {
-        // We can't use getRecipe() here, since the input slot is still empty when we're testing.
-        var recipe = getSmelterRecipe(item);
-        if (recipe == null || getLevel() == null)
-            return false;
-
-        return recipe.matches(new SingleRecipeInput(item), getLevel());
+        return getRecipe(item) != null;
     }
 
     private boolean checkFuelValidity(ItemStack item) {
-        return ModRecipeType.findFirstFuelConversion(getLevel(), item) != null;
+        var level = getLevel();
+        return level != null && ModRecipeType.findFirstSingleItemRecipe(ModRecipeTypes.TYPE_FUEL_CONVERSION, level, item) != null;
     }
 
     @NotNull
@@ -170,8 +163,8 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
         recipeCacheLookupMonitor.updateAndProcess();
         //Keep the synced progress in step with the temperature-scaled fractional progress: the base implementation counts
         // raw ticks, which would overflow the progress bar whenever the smelter runs slower than full speed
-        if (recipeCacheLookupMonitor.getCachedRecipe(0) instanceof HeatSensitiveOneInputCachedRecipe recipe) {
-            setOperatingTicks(recipe.getProgressTicks());
+        if (recipeCacheLookupMonitor.getCachedRecipe(0) instanceof HeatSensitiveOneInputCachedRecipe<?, ?> cachedRecipe) {
+            setOperatingTicks(cachedRecipe.getProgressTicks());
         }
         if (burning) {
             //Only set active for burning if smelting didn't already set us active
@@ -187,9 +180,13 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
      * @return {@code true} if a fuel item was consumed.
      */
     private boolean burnFuel() {
+        var level = getLevel();
+        if (level == null)
+            return false;
+
         if (canBurnFuel()) {
             ItemStack fuel = fuelSlot.getStack();
-            ItemStackToHeatRecipe recipe = ModRecipeType.findFirstFuelConversion(getLevel(), fuel);
+            ItemStackToHeatRecipe recipe = ModRecipeType.findFirstSingleItemRecipe(ModRecipeTypes.TYPE_FUEL_CONVERSION, level, fuel);
             if (recipe != null) {
                 ItemStack itemInput = recipe.getInput().getMatchingInstance(fuel);
                 if (!itemInput.isEmpty()) {
@@ -209,37 +206,79 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
         return heatCapacitor.getTemperature() < Config.MAX_FUEL_TEMPERATURE.get() && !fuelSlot.isEmpty() && checkFuelValidity(fuelSlot.getStack());
     }
 
-    private ItemStackToItemStackRecipe getSmelterRecipe(ItemStack item) {
-        return MekanismRecipeType.SMELTING.getInputCache().findFirstRecipe(getLevel(), item);
+    private HeatSmelterRecipe getRecipe(ItemStack input) {
+        Level level = getLevel();
+        if (level == null || input.isEmpty()) {
+            return null;
+        }
+        //Check in the order: oversmelt -> melt -> normal smelt.
+        var oversmelt = ModRecipeType.findFirstSingleItemRecipe(ModRecipeTypes.TYPE_HEATED_SMELTING, level, input);
+        if (oversmelt != null)
+            return HeatSmelterRecipe.oversmelt(oversmelt);
+
+        var melt = ModRecipeType.findFirstSingleItemRecipe(ModRecipeTypes.TYPE_HEATED_MELTING, level, input);
+        if (melt != null)
+            return HeatSmelterRecipe.melt(melt);
+
+        var smelt = MekanismRecipeType.SMELTING.getInputCache().findFirstRecipe(level, input);
+        if (smelt != null)
+            return HeatSmelterRecipe.smelt(smelt);
+
+        return null;
     }
 
     @Nullable
     @Override
-    public ItemStackToItemStackRecipe getRecipe(int cacheIndex) {
-        return getSmelterRecipe(inputHandler.getInput());
+    public HeatSmelterRecipe getRecipe(int cacheIndex) {
+        return getRecipe(inputHandler.getInput());
     }
 
     @NotNull
     @Override
-    protected RecipeCacheLookupMonitor<ItemStackToItemStackRecipe> createNewCacheMonitor() {
+    protected RecipeCacheLookupMonitor<HeatSmelterRecipe> createNewCacheMonitor() {
         return new HeatSmelterRecipeCacheLookupMonitor(this);
     }
 
+    /**
+     * Helper functions to create a cached recipe.
+     */
+    private static HeatSensitiveOneInputCachedRecipe<ItemStack, HeatSmelterRecipe> itemToItem(HeatSmelterRecipe recipe,
+            BooleanSupplier recheckAllErrors, IInputHandler<ItemStack> inputHandler, IOutputHandler<ItemStack> outputHandler,
+            TileEntityHeatSmelter smelter) {
+        return new HeatSensitiveOneInputCachedRecipe<>(recipe, recheckAllErrors, inputHandler, outputHandler, recipe::getInput, recipe::getItemOutput,
+            ConstantPredicates.ITEM_EMPTY, smelter);
+    }
+
+    private static HeatSensitiveOneInputCachedRecipe<FluidStack, HeatSmelterRecipe> itemToFluid(HeatSmelterRecipe recipe,
+            BooleanSupplier recheckAllErrors, IInputHandler<ItemStack> inputHandler, IOutputHandler<FluidStack> outputHandler,
+            TileEntityHeatSmelter smelter) {
+        return new HeatSensitiveOneInputCachedRecipe<>(recipe, recheckAllErrors, inputHandler, outputHandler, recipe::getInput, recipe::getFluidOutput,
+            ConstantPredicates.FLUID_EMPTY, smelter);
+    }
+
     @NotNull
     @Override
-    public CachedRecipe<ItemStackToItemStackRecipe> createNewCachedRecipe(@NotNull ItemStackToItemStackRecipe recipe, int cacheIndex) {
-        return HeatSensitiveOneInputCachedRecipe.itemToItem(recipe, recheckAllRecipeErrors, inputHandler, outputHandler, this)
-              .setErrorsChanged(this::onErrorsChanged)
+    public CachedRecipe<HeatSmelterRecipe> createNewCachedRecipe(HeatSmelterRecipe recipe, int cacheIndex) {
+        HeatSensitiveOneInputCachedRecipe<?, HeatSmelterRecipe> cached;
+
+        if (recipe.isItemOutput()) {
+            cached = itemToItem(recipe, recheckAllRecipeErrors, inputHandler, outputHandler, this);
+        } else {
+            cached = itemToFluid(recipe, recheckAllRecipeErrors, inputHandler, fluidOutputHandler, this);
+        }
+        cached.setErrorsChanged(this::onErrorsChanged)
               .setCanHolderFunction(this::canFunction)
               .setActive(this::setActive)
               .setOnFinish(this::markForSave)
               .setOperatingTicksChanged(this::setOperatingTicks);
+        return cached;
     }
 
-    @NotNull
+    //Safe to return null. Never used by outside code, but we must have one.
+    @Nullable
     @Override
-    public IMekanismRecipeTypeProvider<SingleRecipeInput, ItemStackToItemStackRecipe, SingleItem<ItemStackToItemStackRecipe>> getRecipeType() {
-        return MekanismRecipeType.SMELTING;
+    public IMekanismRecipeTypeProvider<?, HeatSmelterRecipe, ?> getRecipeType() {
+        return null;
     }
 
     /**
@@ -263,11 +302,6 @@ public class TileEntityHeatSmelter extends TileEntityProgressMachine<ItemStackTo
      */
     public int getBaselineMaxOperations() {
         return getSpeedFactor() > 0 ? 1 : 0;
-    }
-
-    @Override
-    public IRecipeViewerRecipeType<ItemStackToItemStackRecipe> recipeViewerType() {
-        return RecipeViewerRecipeType.SMELTING;
     }
 
     @Override

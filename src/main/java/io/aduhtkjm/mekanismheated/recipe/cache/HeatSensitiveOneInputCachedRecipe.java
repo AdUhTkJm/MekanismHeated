@@ -88,26 +88,6 @@ public class HeatSensitiveOneInputCachedRecipe<OUTPUT, RECIPE extends MekanismRe
         setRequiredTicks(() -> getOperatingTicks() + (int) Math.ceil(smelter.getTicksRequired() - progress));
     }
 
-    /**
-     * Base implementation for handling heated ItemStack to ItemStack recipes.
-     */
-    public static HeatSensitiveOneInputCachedRecipe<@NotNull ItemStack, ItemStackToItemStackRecipe> itemToItem(ItemStackToItemStackRecipe recipe,
-          BooleanSupplier recheckAllErrors, IInputHandler<@NotNull ItemStack> inputHandler, IOutputHandler<@NotNull ItemStack> outputHandler,
-          TileEntityHeatSmelter smelter) {
-        return new HeatSensitiveOneInputCachedRecipe<>(recipe, recheckAllErrors, inputHandler, outputHandler, recipe::getInput, recipe::getOutput,
-              ConstantPredicates.ITEM_EMPTY, smelter);
-    }
-
-    /**
-     * Base implementation for handling heated ItemStack to Fluid recipes.
-     */
-    public static HeatSensitiveOneInputCachedRecipe<@NotNull FluidStack, HeatedItemStackToFluidRecipe> itemToFluid(HeatedItemStackToFluidRecipe recipe,
-          BooleanSupplier recheckAllErrors, IInputHandler<@NotNull ItemStack> inputHandler, IOutputHandler<@NotNull FluidStack> outputHandler,
-          TileEntityHeatSmelter smelter) {
-        return new HeatSensitiveOneInputCachedRecipe<>(recipe, recheckAllErrors, inputHandler, outputHandler, recipe::getInput, recipe::getOutput,
-              ConstantPredicates.FLUID_EMPTY, smelter);
-    }
-
     @Override
     public void process() {
         //Tentatively advance the fractional progress by this tick's speed factor; rolled back if no operations are performed

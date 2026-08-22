@@ -1,6 +1,7 @@
 {
   "itemGroup.mekanismheated": "Mekanism Heated",
   "block.mekanismheated.heat_smelter": "Heat Smelter",
+  "container.mekanismheated.heat_smelter": "Heat Smelter",
   "description.mekanismheated.heat_smelter": "A smelter that runs on heat instead of energy.",
   "gui.mekanismheated.heat_smelter.temperature": "Temp: %1$s",
   "gui.mekanismheated.heat_smelter.buffer": "Buffer: %1$s"
