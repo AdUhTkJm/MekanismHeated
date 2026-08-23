@@ -146,7 +146,8 @@ public class FractionationValidator extends CuboidStructureValidator<Fractionati
     }
 
     /**
-     * Computes the sump/bank capacities from the tray layout and configures them on the multiblock data.
+     * Computes the sump/bank capacities from the tray layout and configures the layout (bounds, tray levels and
+     * capacities) on the multiblock data.
      *
      * @param trayLayers Sorted y-levels of full distillation tray layers.
      */
@@ -158,6 +159,6 @@ public class FractionationValidator extends CuboidStructureValidator<Fractionati
             bankCapacities[i] = (boundary - (trayLayers[i] + 1)) * fluidPerLayer;
         }
         int sumpHeight = trayLayers.length == 0 ? maxY - (minY + 1) + 1 : trayLayers[0] - (minY + 1);
-        structure.configureBanks(sumpHeight * fluidPerLayer, bankCapacities);
+        structure.configureBanks(minY, maxY, trayLayers, sumpHeight * fluidPerLayer, bankCapacities);
     }
 }

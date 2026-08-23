@@ -45,6 +45,7 @@ import mekanism.common.tile.component.config.ConfigInfo;
 import mekanism.common.tile.component.config.DataType;
 import mekanism.common.tile.component.config.slot.InventorySlotInfo;
 import mekanism.common.tile.prefab.TileEntityProgressMachine;
+import mekanism.common.util.EnumUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
 import net.minecraft.core.BlockPos;
@@ -103,6 +104,13 @@ public class TileEntityHeatSmelter
         }
         configComponent.setupOutputConfig(TransmissionType.FLUID, fluidTank, RelativeSide.RIGHT);
         configComponent.setupInputConfig(TransmissionType.HEAT, heatCapacitor);
+        //Default to accepting heat from all sides; players can still restrict it via the side config GUI
+        ConfigInfo heatConfig = configComponent.getConfig(TransmissionType.HEAT);
+        if (heatConfig != null) {
+            for (RelativeSide side : EnumUtils.SIDES) {
+                heatConfig.setDataType(DataType.INPUT, side);
+            }
+        }
 
         ejectorComponent = new TileComponentEjector(this);
         ejectorComponent.setOutputData(configComponent, TransmissionType.ITEM);

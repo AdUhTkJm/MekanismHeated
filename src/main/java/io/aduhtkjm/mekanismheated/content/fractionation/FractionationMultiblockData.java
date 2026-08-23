@@ -20,7 +20,6 @@ import mekanism.common.capabilities.fluid.BasicFluidTank;
 import mekanism.common.capabilities.fluid.VariableCapacityFluidTank;
 import mekanism.common.capabilities.heat.VariableHeatCapacitor;
 import mekanism.common.inventory.container.sync.dynamic.ContainerSync;
-import mekanism.common.inventory.slot.FluidInventorySlot;
 import mekanism.common.lib.multiblock.MultiblockData;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
@@ -34,6 +33,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Multiblock data for a Thermal Fractionation Tower.
@@ -61,6 +61,10 @@ public class FractionationMultiblockData extends MultiblockData {
     private final IntList bankCapacities = new IntArrayList();
 
     private int sumpCapacity;
+    /** Layout geometry: y-range of the tower and the sorted y-levels of full distillation tray layers. */
+    private int boundsMinY;
+    private int boundsMaxY;
+    private int[] trayLayers = new int[0];
     private double biomeAmbientTemp;
     private double progress;
     private boolean processing;
@@ -73,17 +77,22 @@ public class FractionationMultiblockData extends MultiblockData {
         super(tile);
         biomeAmbientTemp = HeatAPI.AMBIENT_TEMP;
         inputTank = VariableCapacityFluidTank.input(this, this::getSumpCapacity, ConstantPredicates.alwaysTrue(), createSaveAndComparator(this));
-        heatCapacitor = VariableHeatCapacitor.create(Config.Fractionation.HEAT_CAPACITY_PER_HEIGHT.get() * 3, () -> biomeAmbientTemp, this);
+        //Note: The capacitor must also be registered in the heat capacitors list, otherwise the multiblock exposes
+        // no heat handler at all and neither the valves nor internal conduction see any temperature integration
+        heatCapacitors.add(heatCapacitor = VariableHeatCapacitor.create(Config.Fractionation.HEAT_CAPACITY_PER_HEIGHT.get() * 3, () -> biomeAmbientTemp, this));
         fluidTanks.add(inputTank);
-        inventorySlots.add(FluidInventorySlot.fill(inputTank, this, 28, 12));
-        inventorySlots.add(FluidInventorySlot.drain(inputTank, this, 28, 50));
     }
 
     /**
-     * (Re)builds the feed sump capacity and the output banks. Called server-side during formation validation and
-     * client-side when reading the update tag.
+     * (Re)builds the layout: tower y-range, tray layer positions, feed sump capacity and the output banks. Called
+     * server-side during formation validation and client-side when reading the update tag.
+     *
+     * @param trayLayersIn Sorted (ascending) y-levels of full distillation tray layers.
      */
-    public void configureBanks(int sumpCapacityIn, int[] bankCapacitiesIn) {
+    public void configureBanks(int boundsMinYIn, int boundsMaxYIn, int[] trayLayersIn, int sumpCapacityIn, int[] bankCapacitiesIn) {
+        this.boundsMinY = boundsMinYIn;
+        this.boundsMaxY = boundsMaxYIn;
+        this.trayLayers = trayLayersIn.clone();
         this.sumpCapacity = sumpCapacityIn;
         this.bankCapacities.clear();
         this.banks.clear();
@@ -101,6 +110,37 @@ public class FractionationMultiblockData extends MultiblockData {
 
     public int getSumpCapacity() {
         return sumpCapacity;
+    }
+
+    /**
+     * Resolves which tank a valve at the given y-level interfaces with, following the physical layering of the tower:
+     * levels below the lowest tray belong to the feed sump, each level above a tray belongs to that tray's output bank,
+     * and levels occupied by distillation trays themselves expose no tank at all. Valves in the bottommost (floor) row
+     * count as sump level, and the top row counts as part of the highest bank.
+     *
+     * @return the tank for that level, or {@code null} if the level is outside the tower or on a tray layer.
+     */
+    @Nullable
+    public IExtendedFluidTank getTankForLevel(int y) {
+        if (!isFormed() || y < boundsMinY || y > boundsMaxY) {
+            return null;
+        }
+        if (trayLayers.length == 0) {
+            //No trays: the entire interior is a single feed sump
+            return inputTank;
+        }
+        for (int i = 0; i < trayLayers.length; i++) {
+            if (y == trayLayers[i]) {
+                //A valve embedded in a tray layer has no fluid access
+                return null;
+            }
+            if (y < trayLayers[i]) {
+                //Below this tray: either the sump or the bank of the previous tray
+                return i == 0 ? inputTank : banks.get(i - 1);
+            }
+        }
+        //Above the highest tray: its output bank
+        return banks.get(trayLayers.length - 1);
     }
 
     /** @return unmodifiable view of the output banks, ordered bottom to top. */
@@ -254,7 +294,10 @@ public class FractionationMultiblockData extends MultiblockData {
         if (tag.contains("bank_capacities", Tag.TAG_INT_ARRAY)) {
             int[] capacities = tag.getIntArray("bank_capacities");
             int sumpCap = tag.contains("sump_capacity", Tag.TAG_ANY_NUMERIC) ? tag.getInt("sump_capacity") : 0;
-            configureBanks(sumpCap, capacities);
+            int minY = tag.contains("bounds_min_y", Tag.TAG_ANY_NUMERIC) ? tag.getInt("bounds_min_y") : 0;
+            int maxY = tag.contains("bounds_max_y", Tag.TAG_ANY_NUMERIC) ? tag.getInt("bounds_max_y") : 0;
+            int[] trays = tag.contains("tray_layers", Tag.TAG_INT_ARRAY) ? tag.getIntArray("tray_layers") : new int[0];
+            configureBanks(minY, maxY, trays, sumpCap, capacities);
             ListTag bankFluids = tag.getList("bank_fluids", Tag.TAG_COMPOUND);
             for (int i = 0; i < bankFluids.size() && i < banks.size(); i++) {
                 banks.get(i).setStackUnchecked(FluidStack.parseOptional(provider, bankFluids.getCompound(i)));
@@ -267,6 +310,9 @@ public class FractionationMultiblockData extends MultiblockData {
         super.writeUpdateTag(tag, provider);
         tag.put(SerializationConstants.FLUID, inputTank.getFluid().saveOptional(provider));
         tag.putInt("sump_capacity", sumpCapacity);
+        tag.putInt("bounds_min_y", boundsMinY);
+        tag.putInt("bounds_max_y", boundsMaxY);
+        tag.putIntArray("tray_layers", trayLayers);
         tag.putIntArray("bank_capacities", bankCapacities.toIntArray());
         ListTag bankFluids = new ListTag(banks.size());
         for (IExtendedFluidTank bank : banks) {
