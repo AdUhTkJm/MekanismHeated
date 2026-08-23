@@ -27,7 +27,9 @@ import net.neoforged.neoforge.client.RenderTypeHelper;
 import net.neoforged.neoforge.client.model.data.ModelData;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
+import org.lwjgl.system.NonnullDefault;
 
+@NonnullDefault
 public class TileEntityShakerRenderer implements BlockEntityRenderer<TileEntityShaker> {
 
     public static final net.minecraft.resources.ResourceLocation MODEL_LOCATION =

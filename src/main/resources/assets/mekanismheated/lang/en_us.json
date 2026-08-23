@@ -5,10 +5,17 @@
   "container.mekanismheated.shaker": "Shaker",
   "description.mekanismheated.heat_smelter": "A smelter that runs on heat instead of energy.",
   "description.mekanismheated.shaker": "A powered machine that shakes items from input to output.",
+  "item.mekanismheated.caco3_dust": "Limestone Dust",
   "item.mekanismheated.cuo_dust": "Copper Oxide Dust",
   "item.mekanismheated.fe2o3_dust": "Ferric Oxide Dust",
+  "item.mekanismheated.fes2_dust": "Pyrite Dust",
+  "item.mekanismheated.impure_sn_ingot": "Impure Tin Ingot",
+  "item.mekanismheated.pure_fe2o3_dust": "Pure Ferric Oxide Dust",
   "item.mekanismheated.sno2_dust": "Tin Dioxide Dust",
+  "item.mekanismheated.sponge_iron_ingot": "Sponge Iron Ingot",
   "itemGroup.mekanismheated": "Mekanism Heated",
   "gui.mekanismheated.heat_smelter.temperature": "Temp: %1$s",
-  "gui.mekanismheated.heat_smelter.buffer": "Buffer: %1$s"
+  "gui.mekanismheated.heat_smelter.buffer": "Buffer: %1$s",
+  "tooltip.mekanismheated.pure": "pure",
+  "tooltip.mekanismheated.impure": "impure"
 }

@@ -4,9 +4,7 @@ import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiHeatSmelter;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiShaker;
 import io.aduhtkjm.mekanismheated.client.renderer.TileEntityShakerRenderer;
-import io.aduhtkjm.mekanismheated.item.CuoDustItem;
-import io.aduhtkjm.mekanismheated.item.Fe2O3DustItem;
-import io.aduhtkjm.mekanismheated.item.SnO2DustItem;
+import io.aduhtkjm.mekanismheated.item.*;
 import io.aduhtkjm.mekanismheated.registries.ModContainerTypes;
 import io.aduhtkjm.mekanismheated.registries.ModItems;
 import io.aduhtkjm.mekanismheated.registries.ModTileEntityTypes;
@@ -28,6 +26,12 @@ public class ModClient {
         ClientRegistrationUtil.registerItemColorHandler(event, (stack, tintIndex) -> tintIndex == 1 ? CuoDustItem.TINT : -1, ModItems.CUO_DUST);
         ClientRegistrationUtil.registerItemColorHandler(event, (stack, tintIndex) -> tintIndex == 1 ? Fe2O3DustItem.TINT : -1, ModItems.FE2O3_DUST);
         ClientRegistrationUtil.registerItemColorHandler(event, (stack, tintIndex) -> tintIndex == 1 ? SnO2DustItem.TINT : -1, ModItems.SNO2_DUST);
+        ClientRegistrationUtil.registerItemColorHandler(event, (stack, tintIndex) -> tintIndex == 1 ? CaCO3DustItem.TINT : -1, ModItems.CACO3_DUST);
+        ClientRegistrationUtil.registerItemColorHandler(event, (stack, tintIndex) -> tintIndex == 1 ? PureFe2O3DustItem.TINT : -1, ModItems.PURE_FE2O3_DUST);
+        ClientRegistrationUtil.registerItemColorHandler(event, (stack, tintIndex) -> tintIndex == 1 ? FeS2DustItem.TINT : -1, ModItems.FES2_DUST);
+
+        ClientRegistrationUtil.registerItemColorHandler(event, (stack, tintIndex) -> tintIndex == 1 ? ImpureSnIngotItem.TINT : -1, ModItems.IMPURE_SN_INGOT);
+        ClientRegistrationUtil.registerItemColorHandler(event, (stack, tintIndex) -> tintIndex == 1 ? SpongeIronIngotItem.TINT : -1, ModItems.SPONGE_IRON_INGOT);
     }
 
     @SubscribeEvent

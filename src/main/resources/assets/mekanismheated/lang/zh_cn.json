@@ -5,10 +5,17 @@
   "container.mekanismheated.shaker": "摇床",
   "description.mekanismheated.heat_smelter": "使用热量而非电力的熔炼炉。",
   "description.mekanismheated.shaker": "使用电力将物品从输入槽振荡至输出槽的机器。",
+  "item.mekanismheated.caco3_dust": "石灰石粉",
   "item.mekanismheated.cuo_dust": "氧化铜粉",
   "item.mekanismheated.fe2o3_dust": "氧化铁粉",
+  "item.mekanismheated.fes2_dust": "硫化铁粉",
+  "item.mekanismheated.impure_sn_ingot": "不纯的锡锭",
+  "item.mekanismheated.pure_fe2o3_dust": "纯净的氧化铁粉",
   "item.mekanismheated.sno2_dust": "二氧化锡粉",
+  "item.mekanismheated.sponge_iron_ingot": "海绵铁锭",
   "itemGroup.mekanismheated": "通用机械：热量",
   "gui.mekanismheated.heat_smelter.temperature": "温度：%1$s",
-  "gui.mekanismheated.heat_smelter.buffer": "缓存：%1$s"
+  "gui.mekanismheated.heat_smelter.buffer": "缓存：%1$s",
+  "tooltip.mekanismheated.pure": "纯",
+  "tooltip.mekanismheated.impure": "不纯"
 }

@@ -12,10 +12,10 @@ public class ModRecipeTypes {
     private ModRecipeTypes() {
     }
 
-    public static final ResourceLocation NAME_FUEL_CONVERSION = ResourceLocation.fromNamespaceAndPath(Mod.MODID, "fuel_conversion");
-    public static final ResourceLocation NAME_HEATED_SMELTING = ResourceLocation.fromNamespaceAndPath(Mod.MODID, "heated_smelting");
-    public static final ResourceLocation NAME_HEATED_MELTING = ResourceLocation.fromNamespaceAndPath(Mod.MODID, "heated_melting");
-    public static final ResourceLocation NAME_SHAKING = ResourceLocation.fromNamespaceAndPath(Mod.MODID, "shaking");
+    public static final ResourceLocation NAME_FUEL_CONVERSION = Mod.rl("fuel_conversion");
+    public static final ResourceLocation NAME_HEATED_SMELTING = Mod.rl("heated_smelting");
+    public static final ResourceLocation NAME_HEATED_MELTING = Mod.rl("heated_melting");
+    public static final ResourceLocation NAME_SHAKING = Mod.rl("shaking");
 
     public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, Mod.MODID);
 
