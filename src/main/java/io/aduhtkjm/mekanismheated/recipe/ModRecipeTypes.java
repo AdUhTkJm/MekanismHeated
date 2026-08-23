@@ -16,6 +16,7 @@ public class ModRecipeTypes {
     public static final ResourceLocation NAME_HEATED_SMELTING = Mod.rl("heated_smelting");
     public static final ResourceLocation NAME_HEATED_MELTING = Mod.rl("heated_melting");
     public static final ResourceLocation NAME_SHAKING = Mod.rl("shaking");
+    public static final ResourceLocation NAME_FRACTIONATING = Mod.rl("fractionating");
 
     public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, Mod.MODID);
 
@@ -27,4 +28,6 @@ public class ModRecipeTypes {
         RECIPE_TYPES.register(NAME_HEATED_MELTING.getPath(), () -> new RecipeType<>() {});
     public static final DeferredHolder<RecipeType<?>, RecipeType<ShakerRecipe>> TYPE_SHAKING =
         RECIPE_TYPES.register(NAME_SHAKING.getPath(), () -> new RecipeType<>() {});
+    public static final DeferredHolder<RecipeType<?>, RecipeType<FractionationRecipe>> TYPE_FRACTIONATING =
+        RECIPE_TYPES.register(NAME_FRACTIONATING.getPath(), () -> new RecipeType<>() {});
 }

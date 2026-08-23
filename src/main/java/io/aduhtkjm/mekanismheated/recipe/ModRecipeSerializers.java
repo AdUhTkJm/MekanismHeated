@@ -30,6 +30,17 @@ public class ModRecipeSerializers {
     private static final Codec<Double> TEMPERATURE_THRESHOLD_CODEC = Codec.DOUBLE.validate(value ->
           value <= 0 ? DataResult.error(() -> "Temperature threshold must be greater than zero") : DataResult.success(value));
 
+    /**
+     * Codec for a recipe's minimum temperature (Kelvin); must be greater than zero.
+     */
+    private static final Codec<Double> POSITIVE_TEMPERATURE_CODEC = TEMPERATURE_THRESHOLD_CODEC;
+
+    /**
+     * Codec for a recipe's base temperature (Kelvin); must be greater than zero. The "at least min" cross-validation is done
+     * in {@link BasicFractionationRecipe}'s constructor, which runs after decoding both fields.
+     */
+    private static final Codec<Double> TEMPERATURE_CODEC = TEMPERATURE_THRESHOLD_CODEC;
+
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, Mod.MODID);
 
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BasicItemStackToHeatRecipe>> FUEL_CONVERSION =
@@ -84,5 +95,21 @@ public class ModRecipeSerializers {
                       ByteBufCodecs.optional(FluidStackIngredient.STREAM_CODEC), BasicShakerRecipe::getFluidInput,
                       ItemStack.STREAM_CODEC.apply(ByteBufCodecs.list()), BasicShakerRecipe::getOutputRaw,
                       BasicShakerRecipe::new
+                )));
+
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BasicFractionationRecipe>> FRACTIONATING =
+          RECIPE_SERIALIZERS.register("fractionating", () -> new MekanismRecipeSerializer<>(
+                RecordCodecBuilder.mapCodec(instance -> instance.group(
+                      FluidStackIngredient.CODEC.fieldOf(SerializationConstants.INPUT).forGetter(BasicFractionationRecipe::getInput),
+                      FractionationRecipe.BankOutput.CODEC.listOf().fieldOf("outputs").forGetter(BasicFractionationRecipe::getOutputsRaw),
+                      POSITIVE_TEMPERATURE_CODEC.fieldOf("min_temperature").forGetter(BasicFractionationRecipe::getMinTemperature),
+                      TEMPERATURE_CODEC.fieldOf("base_temperature").forGetter(BasicFractionationRecipe::getBaseTemperature)
+                ).apply(instance, BasicFractionationRecipe::new)),
+                StreamCodec.composite(
+                      FluidStackIngredient.STREAM_CODEC, BasicFractionationRecipe::getInput,
+                      FractionationRecipe.BankOutput.STREAM_CODEC.apply(ByteBufCodecs.list()), BasicFractionationRecipe::getOutputsRaw,
+                      ByteBufCodecs.DOUBLE, BasicFractionationRecipe::getMinTemperature,
+                      ByteBufCodecs.DOUBLE, BasicFractionationRecipe::getBaseTemperature,
+                      BasicFractionationRecipe::new
                 )));
 }

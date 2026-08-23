@@ -26,6 +26,11 @@ public class ModItems {
         output.accept(ModBlocks.HEAT_SMELTER);
         output.accept(ModBlocks.SHAKER);
 
+        output.accept(ModBlocks.THERMAL_FRACTIONATION_CONTROLLER);
+        output.accept(ModBlocks.THERMAL_FRACTIONATION_VALVE);
+        output.accept(ModBlocks.THERMAL_FRACTIONATION_CASING);
+        output.accept(ModBlocks.DISTILLATION_TRAY);
+
         output.accept(ModItems.SPONGE_IRON_INGOT.get());
         output.accept(ModItems.IMPURE_SN_INGOT.get());
         output.accept(ModItems.CUO_DUST.get());

@@ -25,6 +25,12 @@ public class Config {
         public static ModConfigSpec.LongValue MAX_ENERGY;
     }
 
+    public static class Fractionation {
+        public static ModConfigSpec.IntValue FLUID_PER_LAYER;
+        public static ModConfigSpec.DoubleValue HEAT_CAPACITY_PER_HEIGHT;
+        public static ModConfigSpec.DoubleValue HEAT_DISSIPATION;
+    }
+
     public static ModConfigSpec SPEC;
     static {
         BUILDER.push("heatSmelter");
@@ -61,6 +67,19 @@ public class Config {
         Shaker.MAX_ENERGY = BUILDER
             .comment("Maximum amount of energy the shaker can hold.")
             .defineInRange("maxEnergy", 80000, 0, Long.MAX_VALUE);
+        BUILDER.pop();
+
+        BUILDER.push("fractionation");
+        Fractionation.FLUID_PER_LAYER = BUILDER
+            .comment("Fluid capacity in mB each interior block of height contributes to the feed sump or an output bank.")
+            .defineInRange("fluidPerLayer", 10_000, 1, Integer.MAX_VALUE);
+        Fractionation.HEAT_CAPACITY_PER_HEIGHT = BUILDER
+            .comment("Heat capacity in J/K added per block of tower height. Must be at least one.")
+            .defineInRange("heatCapacityPerHeight", 100D, 1D, Double.MAX_VALUE);
+        Fractionation.HEAT_DISSIPATION = BUILDER
+            .comment("Coefficient controlling how quickly the tower loses heat to the environment (larger means faster loss). Must be positive.")
+            .defineInRange("heatDissipation", 1.0E-6D, 0D, Double.MAX_VALUE);
+        BUILDER.pop();
         SPEC = BUILDER.build();
     }
 

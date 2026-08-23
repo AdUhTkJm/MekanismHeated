@@ -3,13 +3,23 @@ package io.aduhtkjm.mekanismheated.registries;
 import io.aduhtkjm.mekanismheated.Config;
 import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.ModLang;
+import io.aduhtkjm.mekanismheated.block.fractionation.DistillationTrayBlock;
 import io.aduhtkjm.mekanismheated.block.shaker.ShakerBlock;
 import io.aduhtkjm.mekanismheated.tile.TileEntityShaker;
 import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
+import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationController;
+import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationValve;
+import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityFractionationBlock;
 import mekanism.common.block.attribute.AttributeSideConfig;
+import mekanism.common.block.attribute.AttributeStateFacing;
+import mekanism.common.block.attribute.Attributes;
+import mekanism.common.block.attribute.Attributes.AttributeCustomResistance;
+import mekanism.common.block.prefab.BlockBasicMultiblock;
 import mekanism.common.block.prefab.BlockTile.BlockTileModel;
 import mekanism.common.content.blocktype.Machine;
 import mekanism.common.content.blocktype.Machine.MachineBuilder;
+import mekanism.common.content.blocktype.BlockTypeTile;
+import mekanism.common.content.blocktype.BlockTypeTile.BlockTileBuilder;
 import mekanism.common.item.block.ItemBlockTooltip;
 import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.registration.impl.BlockDeferredRegister;
@@ -46,4 +56,42 @@ public class ModBlocks {
 
     public static final BlockRegistryObject<ShakerBlock, BlockItem> SHAKER =
           BLOCKS.register("shaker", () -> new ShakerBlock(SHAKER_TYPE, BlockBehaviour.Properties.of().mapColor(MapColor.STONE)));
+
+    // Thermal Fractionation Tower
+    public static final BlockTypeTile<TileEntityThermalFractionationController> THERMAL_FRACTIONATION_CONTROLLER_TYPE = BlockTileBuilder
+          .createBlock(() -> ModTileEntityTypes.THERMAL_FRACTIONATION_CONTROLLER, ModLang.DESCRIPTION_THERMAL_FRACTIONATION_CONTROLLER)
+          .withGui(() -> ModContainerTypes.THERMAL_FRACTIONATION_CONTROLLER)
+          .with(Attributes.ACTIVE, new AttributeStateFacing(), new AttributeCustomResistance(9))
+          .externalMultiblock()
+          .build();
+
+    public static final BlockTypeTile<TileEntityThermalFractionationValve> THERMAL_FRACTIONATION_VALVE_TYPE = BlockTileBuilder
+          .createBlock(() -> ModTileEntityTypes.THERMAL_FRACTIONATION_VALVE, ModLang.DESCRIPTION_THERMAL_FRACTIONATION_VALVE)
+          .with(new AttributeCustomResistance(9))
+          .externalMultiblock()
+          .build();
+
+    public static final BlockTypeTile<TileEntityFractionationBlock> THERMAL_FRACTIONATION_CASING_TYPE = BlockTileBuilder
+          .createBlock(() -> ModTileEntityTypes.THERMAL_FRACTIONATION_CASING, ModLang.DESCRIPTION_THERMAL_FRACTIONATION_CASING)
+          .with(new AttributeCustomResistance(9))
+          .externalMultiblock()
+          .build();
+
+    public static final BlockRegistryObject<BlockBasicMultiblock<TileEntityThermalFractionationController>, ItemBlockTooltip<BlockBasicMultiblock<TileEntityThermalFractionationController>>> THERMAL_FRACTIONATION_CONTROLLER =
+          BLOCKS.register("thermal_fractionation_controller",
+                () -> new BlockBasicMultiblock<>(THERMAL_FRACTIONATION_CONTROLLER_TYPE, properties -> properties.mapColor(MapColor.METAL)),
+                (block, properties) -> new ItemBlockTooltip<>(block, true, properties));
+
+    public static final BlockRegistryObject<BlockBasicMultiblock<TileEntityThermalFractionationValve>, ItemBlockTooltip<BlockBasicMultiblock<TileEntityThermalFractionationValve>>> THERMAL_FRACTIONATION_VALVE =
+          BLOCKS.register("thermal_fractionation_valve",
+                () -> new BlockBasicMultiblock<>(THERMAL_FRACTIONATION_VALVE_TYPE, properties -> properties.mapColor(MapColor.METAL)),
+                (block, properties) -> new ItemBlockTooltip<>(block, true, properties));
+
+    public static final BlockRegistryObject<BlockBasicMultiblock<TileEntityFractionationBlock>, ItemBlockTooltip<BlockBasicMultiblock<TileEntityFractionationBlock>>> THERMAL_FRACTIONATION_CASING =
+          BLOCKS.register("thermal_fractionation_casing",
+                () -> new BlockBasicMultiblock<>(THERMAL_FRACTIONATION_CASING_TYPE, properties -> properties.mapColor(MapColor.METAL)),
+                (block, properties) -> new ItemBlockTooltip<>(block, true, properties));
+
+    public static final BlockRegistryObject<DistillationTrayBlock, BlockItem> DISTILLATION_TRAY =
+          BLOCKS.register("distillation_tray", DistillationTrayBlock::new);
 }
