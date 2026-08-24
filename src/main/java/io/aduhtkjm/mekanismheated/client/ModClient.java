@@ -7,6 +7,7 @@ import io.aduhtkjm.mekanismheated.client.gui.machine.GuiThermalFractionationCont
 import io.aduhtkjm.mekanismheated.client.renderer.TileEntityShakerRenderer;
 import io.aduhtkjm.mekanismheated.item.*;
 import io.aduhtkjm.mekanismheated.registries.ModContainerTypes;
+import io.aduhtkjm.mekanismheated.registries.ModFluids;
 import io.aduhtkjm.mekanismheated.registries.ModItems;
 import io.aduhtkjm.mekanismheated.registries.ModTileEntityTypes;
 import mekanism.client.ClientRegistrationUtil;
@@ -18,6 +19,7 @@ import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 
 @EventBusSubscriber(modid = Mod.MODID, value = Dist.CLIENT)
 public class ModClient {
@@ -33,6 +35,11 @@ public class ModClient {
 
         ClientRegistrationUtil.registerItemColorHandler(event, (stack, tintIndex) -> tintIndex == 1 ? ImpureSnIngotItem.TINT : -1, ModItems.IMPURE_SN_INGOT);
         ClientRegistrationUtil.registerItemColorHandler(event, (stack, tintIndex) -> tintIndex == 1 ? SpongeIronIngotItem.TINT : -1, ModItems.SPONGE_IRON_INGOT);
+    }
+
+    @SubscribeEvent
+    public static void registerClientExtensions(RegisterClientExtensionsEvent event) {
+        ClientRegistrationUtil.registerFluidExtensions(event, ModFluids.FLUIDS);
     }
 
     @SubscribeEvent

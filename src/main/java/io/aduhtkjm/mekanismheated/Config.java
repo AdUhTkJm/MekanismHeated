@@ -26,6 +26,7 @@ public class Config {
     }
 
     public static class Fractionation {
+        public static ModConfigSpec.IntValue TOWER_MAX_HEIGHT;
         public static ModConfigSpec.IntValue FLUID_PER_LAYER;
         public static ModConfigSpec.DoubleValue HEAT_CAPACITY_PER_HEIGHT;
         public static ModConfigSpec.DoubleValue HEAT_DISSIPATION;
@@ -70,6 +71,9 @@ public class Config {
         BUILDER.pop();
 
         BUILDER.push("fractionation");
+        Fractionation.TOWER_MAX_HEIGHT = BUILDER
+            .comment("The maximum height of fractionation tower.")
+            .defineInRange("towerMaxHeight", 27, 4, 127);
         Fractionation.FLUID_PER_LAYER = BUILDER
             .comment("Fluid capacity in mB each interior block of height contributes to the feed sump or an output bank.")
             .defineInRange("fluidPerLayer", 10_000, 1, Integer.MAX_VALUE);

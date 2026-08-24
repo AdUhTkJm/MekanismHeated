@@ -1,0 +1,5 @@
+{
+  "parent": "neoforge:item/bucket",
+  "fluid": "mekanismheated:wood_tar",
+  "loader": "neoforge:fluid_container"
+}

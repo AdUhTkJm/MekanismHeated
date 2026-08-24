@@ -29,7 +29,7 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 public class FractionationValidator extends CuboidStructureValidator<FractionationMultiblockData> {
 
     private static final VoxelCuboid MIN_CUBOID = new VoxelCuboid(4, 3, 4);
-    private static final VoxelCuboid MAX_CUBOID = new VoxelCuboid(4, 18, 4);
+    private static final VoxelCuboid MAX_CUBOID = new VoxelCuboid(4, Config.Fractionation.TOWER_MAX_HEIGHT.get(), 4);
 
     private boolean foundController = false;
 

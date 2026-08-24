@@ -1,5 +1,6 @@
 package io.aduhtkjm.mekanismheated.recipe;
 
+import mekanism.api.heat.ISidedHeatHandler;
 import mekanism.api.recipes.ItemStackToItemStackRecipe;
 import mekanism.api.recipes.ingredients.ItemStackIngredient;
 import net.minecraft.world.item.ItemStack;
@@ -67,6 +68,18 @@ public class HeatSmelterRecipe
 
     public boolean isFluidOutput() {
         return isMelt();
+    }
+
+    /**
+     * Checks if the smelter is hot enough to run this recipe. Only the heated recipe variants have a temperature
+     * threshold; plain smelting can always run.
+     */
+    public boolean canProcess(ISidedHeatHandler machine) {
+        if (isOversmelt())
+            return getOversmelt().canProcess(machine);
+        if (isMelt())
+            return getMelt().canProcess(machine);
+        return true;
     }
 
     public ItemStackIngredient getInput() {

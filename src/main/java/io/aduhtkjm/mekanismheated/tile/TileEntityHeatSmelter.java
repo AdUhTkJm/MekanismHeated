@@ -140,7 +140,9 @@ public class TileEntityHeatSmelter
     }
 
     private boolean checkInputValidity(ItemStack item) {
-        return getRecipe(item) != null;
+        //Accept any item that has some recipe, even while the smelter is too cold to run it yet, so inputs can be
+        // loaded in advance of heating up
+        return findRecipe(item, false) != null;
     }
 
     private boolean checkFuelValidity(ItemStack item) {
@@ -214,17 +216,25 @@ public class TileEntityHeatSmelter
     }
 
     private HeatSmelterRecipe getRecipe(ItemStack input) {
+        return findRecipe(input, true);
+    }
+
+    /**
+     * Finds the recipe for the given input, checking in the order: oversmelt -> melt -> normal smelt. When
+     * {@code enforceTemperature} is set, heated recipes are skipped while the smelter is colder than their threshold,
+     * letting a too-cold smelter fall back to plain smelting.
+     */
+    private HeatSmelterRecipe findRecipe(ItemStack input, boolean enforceTemperature) {
         Level level = getLevel();
         if (level == null || input.isEmpty()) {
             return null;
         }
-        //Check in the order: oversmelt -> melt -> normal smelt.
         var oversmelt = ModRecipeType.findFirstSingleItemRecipe(ModRecipeTypes.TYPE_HEATED_SMELTING, level, input);
-        if (oversmelt != null)
+        if (oversmelt != null && (!enforceTemperature || oversmelt.canProcess(this)))
             return HeatSmelterRecipe.oversmelt(oversmelt);
 
         var melt = ModRecipeType.findFirstSingleItemRecipe(ModRecipeTypes.TYPE_HEATED_MELTING, level, input);
-        if (melt != null)
+        if (melt != null && (!enforceTemperature || melt.canProcess(this)))
             return HeatSmelterRecipe.melt(melt);
 
         var smelt = MekanismRecipeType.SMELTING.getInputCache().findFirstRecipe(level, input);

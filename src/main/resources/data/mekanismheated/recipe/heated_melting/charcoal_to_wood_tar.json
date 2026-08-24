@@ -1,0 +1,12 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "input": {
+    "count": 1,
+    "item": "minecraft:charcoal"
+  },
+  "output": {
+    "amount": 100,
+    "id": "mekanismheated:wood_tar"
+  },
+  "temperature": 800
+}

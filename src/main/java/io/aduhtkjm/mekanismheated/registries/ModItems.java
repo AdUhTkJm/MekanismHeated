@@ -39,5 +39,7 @@ public class ModItems {
         output.accept(ModItems.SNO2_DUST.get());
         output.accept(ModItems.CACO3_DUST.get());
         output.accept(ModItems.FES2_DUST.get());
+
+        output.accept(ModFluids.WOOD_TAR.getBucket());
     }
 }

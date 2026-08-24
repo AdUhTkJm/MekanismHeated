@@ -28,6 +28,8 @@
   "item.mekanismheated.pure_fe2o3_dust": "Pure Ferric Oxide Dust",
   "item.mekanismheated.sno2_dust": "Tin Dioxide Dust",
   "item.mekanismheated.sponge_iron_ingot": "Sponge Iron Ingot",
+  "block.mekanismheated.wood_tar": "Wood Tar",
+  "item.mekanismheated.wood_tar_bucket": "Wood Tar Bucket",
   "itemGroup.mekanismheated": "Mekanism Heated",
   "gui.mekanismheated.heat_smelter.temperature": "Temp: %1$s",
   "gui.mekanismheated.heat_smelter.buffer": "Buffer: %1$s",

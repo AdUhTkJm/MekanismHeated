@@ -24,9 +24,12 @@ public class HeatSmelterRecipeCacheLookupMonitor
         CachedRecipe<HeatSmelterRecipe> cachedRecipe =
               super.createNewCachedRecipe(recipe, cacheIndex);
         if (cachedRecipe != null) {
-            //Don't let the smelter process at all when it is too cold to make any progress. The temperature-dependent
-            // processing speed itself is handled by HeatSensitiveOneInputCachedRecipe
-            cachedRecipe.setBaselineMaxOperations(heatSmelter::getBaselineMaxOperations);
+            //Don't let the smelter process when it is too cold to make any progress or colder than the cached recipe's
+            // own temperature threshold. Returning zero operations (rather than marking a RecipeError) just idles the
+            // recipe for the tick, so it resumes automatically once the smelter is hot enough again. The
+            // temperature-dependent processing speed itself is handled by HeatSensitiveOneInputCachedRecipe
+            cachedRecipe.setBaselineMaxOperations(() ->
+                  recipe.canProcess(heatSmelter) ? heatSmelter.getBaselineMaxOperations() : 0);
         }
         return cachedRecipe;
     }
