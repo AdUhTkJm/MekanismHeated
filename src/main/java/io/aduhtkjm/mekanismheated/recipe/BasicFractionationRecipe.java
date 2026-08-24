@@ -13,6 +13,7 @@ public class BasicFractionationRecipe extends FractionationRecipe {
     private final FluidStackIngredient input;
     private final List<BankOutput> outputs;
     private final double minTemperature;
+    private final double maxTemperature;
     private final double baseTemperature;
 
     /**
@@ -21,7 +22,7 @@ public class BasicFractionationRecipe extends FractionationRecipe {
      * @param minTemperature  Minimum temperature in Kelvin required to process; must be greater than zero.
      * @param baseTemperature Temperature in Kelvin for nominal (one operation per tick) speed; must be at least the minimum.
      */
-    public BasicFractionationRecipe(FluidStackIngredient input, List<BankOutput> outputs, double minTemperature, double baseTemperature) {
+    public BasicFractionationRecipe(FluidStackIngredient input, List<BankOutput> outputs, double minTemperature, double maxTemperature, double baseTemperature) {
         this.input = Objects.requireNonNull(input, "Fluid input cannot be null.");
         Objects.requireNonNull(outputs, "Outputs cannot be null.");
         if (outputs.isEmpty()) {
@@ -50,6 +51,7 @@ public class BasicFractionationRecipe extends FractionationRecipe {
         }
         this.outputs = List.copyOf(outputs);
         this.minTemperature = minTemperature;
+        this.maxTemperature = maxTemperature;
         this.baseTemperature = baseTemperature;
     }
 
@@ -73,6 +75,11 @@ public class BasicFractionationRecipe extends FractionationRecipe {
     @Override
     public double getMinTemperature() {
         return minTemperature;
+    }
+
+    @Override
+    public double getMaxTemperature() {
+        return maxTemperature;
     }
 
     @Override

@@ -1,0 +1,33 @@
+{
+  "type": "mekanismheated:fractionating",
+  "input": {
+    "amount": 10,
+    "tag": "mekanismheated:wood_tar"
+  },
+  "outputs": [
+    {
+      "bank": 0,
+      "fluid": {
+        "amount": 5,
+        "id": "mekanismheated:asphalt"
+      }
+    },
+    {
+      "bank": 1,
+      "fluid": {
+        "amount": 3,
+        "id": "mekanismheated:acetic_acid"
+      }
+    },
+    {
+      "bank": 2,
+      "fluid": {
+        "amount": 2,
+        "id": "mekanismheated:methanol"
+      }
+    }
+  ],
+  "min_temperature": 675,
+  "base_temperature": 900,
+  "max_temperature": 1000
+}

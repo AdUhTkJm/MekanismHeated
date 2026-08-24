@@ -26,6 +26,8 @@ public class ModClient {
 
     @SubscribeEvent
     public static void registerItemColorHandlers(RegisterColorHandlersEvent.Item event) {
+        ClientRegistrationUtil.registerBucketColorHandler(event, ModFluids.FLUIDS);
+
         ClientRegistrationUtil.registerItemColorHandler(event, (stack, tintIndex) -> tintIndex == 1 ? CuoDustItem.TINT : -1, ModItems.CUO_DUST);
         ClientRegistrationUtil.registerItemColorHandler(event, (stack, tintIndex) -> tintIndex == 1 ? Fe2O3DustItem.TINT : -1, ModItems.FE2O3_DUST);
         ClientRegistrationUtil.registerItemColorHandler(event, (stack, tintIndex) -> tintIndex == 1 ? SnO2DustItem.TINT : -1, ModItems.SNO2_DUST);

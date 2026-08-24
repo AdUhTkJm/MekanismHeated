@@ -84,6 +84,11 @@ public abstract class FractionationRecipe extends MekanismRecipe<SingleFluidReci
     public abstract double getMinTemperature();
 
     /**
+     * Maximum temperature in Kelvin; above it the recipe stops processing.
+     */
+    public abstract double getMaxTemperature();
+
+    /**
      * Temperature in Kelvin at which the recipe processes one operation per tick. Between min and base the speed scales
      * linearly from zero to one; above base it keeps scaling proportionally.
      */

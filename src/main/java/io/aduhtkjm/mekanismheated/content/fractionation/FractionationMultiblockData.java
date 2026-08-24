@@ -218,15 +218,15 @@ public class FractionationMultiblockData extends MultiblockData {
             processing = false;
             return wasProcessing != processing;
         }
-        //Speed scales linearly from zero ops at min temperature up to nominal speed at base temperature,
-        // and keeps scaling proportionally beyond it
+        //Speed scales linearly from zero ops at min temperature up to nominal speed at base temperature.
         double span = recipe.getBaseTemperature() - recipe.getMinTemperature();
-        double rate = span <= 0 ? 1 : Math.max(0, (getTemperature() - recipe.getMinTemperature()) / span);
+        double temperature = getTemperature();
+        double rate = span <= 0 ? 1 : temperature > recipe.getMaxTemperature() ? 0 : Math.clamp((temperature - recipe.getMinTemperature()) / span, 0, 1);
         progress += rate;
         int operations = (int) progress;
         if (operations <= 0) {
             processing = false;
-            return wasProcessing != processing;
+            return wasProcessing;
         }
         int performed = 0;
         while (performed < operations && performOperation(recipe)) {

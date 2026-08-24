@@ -103,12 +103,14 @@ public class ModRecipeSerializers {
                       FluidStackIngredient.CODEC.fieldOf(SerializationConstants.INPUT).forGetter(BasicFractionationRecipe::getInput),
                       FractionationRecipe.BankOutput.CODEC.listOf().fieldOf("outputs").forGetter(BasicFractionationRecipe::getOutputsRaw),
                       POSITIVE_TEMPERATURE_CODEC.fieldOf("min_temperature").forGetter(BasicFractionationRecipe::getMinTemperature),
+                      POSITIVE_TEMPERATURE_CODEC.fieldOf("max_temperature").forGetter(BasicFractionationRecipe::getMinTemperature),
                       TEMPERATURE_CODEC.fieldOf("base_temperature").forGetter(BasicFractionationRecipe::getBaseTemperature)
                 ).apply(instance, BasicFractionationRecipe::new)),
                 StreamCodec.composite(
                       FluidStackIngredient.STREAM_CODEC, BasicFractionationRecipe::getInput,
                       FractionationRecipe.BankOutput.STREAM_CODEC.apply(ByteBufCodecs.list()), BasicFractionationRecipe::getOutputsRaw,
                       ByteBufCodecs.DOUBLE, BasicFractionationRecipe::getMinTemperature,
+                      ByteBufCodecs.DOUBLE, BasicFractionationRecipe::getMaxTemperature,
                       ByteBufCodecs.DOUBLE, BasicFractionationRecipe::getBaseTemperature,
                       BasicFractionationRecipe::new
                 )));

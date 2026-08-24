@@ -1,0 +1,5 @@
+{
+  "parent": "neoforge:item/bucket",
+  "fluid": "mekanismheated:acetic_acid",
+  "loader": "neoforge:fluid_container"
+}

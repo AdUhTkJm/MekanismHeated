@@ -41,5 +41,8 @@ public class ModItems {
         output.accept(ModItems.FES2_DUST.get());
 
         output.accept(ModFluids.WOOD_TAR.getBucket());
+        output.accept(ModFluids.ASPHALT.getBucket());
+        output.accept(ModFluids.METHANOL.getBucket());
+        output.accept(ModFluids.ACETIC_ACID.getBucket());
     }
 }
