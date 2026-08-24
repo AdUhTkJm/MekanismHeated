@@ -21,17 +21,6 @@ public class ModRecipeType {
     }
 
     @Nullable
-    public static ItemStackToHeatRecipe findFirstFuelConversion(@Nullable Level level, ItemStack input) {
-        if (level == null || input.isEmpty()) {
-            return null;
-        }
-        return level.getRecipeManager()
-              .getRecipeFor(ModRecipeTypes.TYPE_FUEL_CONVERSION.value(), new SingleRecipeInput(input), level)
-              .map(RecipeHolder::value)
-              .orElse(null);
-    }
-
-    @Nullable
     public static <RECIPE extends MekanismRecipe<SingleRecipeInput>> RECIPE
     findFirstSingleItemRecipe(DeferredHolder<RecipeType<?>, RecipeType<RECIPE>> record, Level level, ItemStack input) {
         if (input.isEmpty()) {

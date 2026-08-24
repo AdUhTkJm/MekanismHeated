@@ -18,6 +18,7 @@ public enum ModLang implements ILangEntry {
     GUI_FRACTIONATION_LAYERS("gui", "fractionation.layers"),
     HEAT_SMELTER_TEMPERATURE("gui", "heat_smelter.temperature"),
     HEAT_SMELTER_BUFFER("gui", "heat_smelter.buffer"),
+    MIN_TEMPERATURE("gui", "min_temperature"),
     PURE("tooltip", "pure"),
     IMPURE("tooltip", "impure");
 

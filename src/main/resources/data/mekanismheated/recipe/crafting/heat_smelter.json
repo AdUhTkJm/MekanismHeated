@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "RBR",
+    "CSC",
+    "RBR"
+  ],
+  "key": {
+    "B": {
+      "item": "mekanism:basic_control_circuit"
+    },
+    "C": {
+      "tag": "minecraft:coals"
+    },
+    "R": {
+      "tag": "c:dusts/redstone"
+    },
+    "S": {
+      "item": "mekanism:steel_casing"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "mekanismheated:heat_smelter"
+  }
+}

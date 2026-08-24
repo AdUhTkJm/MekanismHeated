@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "RBR",
+    "TST",
+    "RBR"
+  ],
+  "key": {
+    "B": {
+      "item": "mekanism:basic_control_circuit"
+    },
+    "R": {
+      "tag": "c:dusts/redstone"
+    },
+    "S": {
+      "item": "mekanism:steel_casing"
+    },
+    "T": {
+      "item": "minecraft:glass_bottle"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "mekanismheated:shaker"
+  }
+}

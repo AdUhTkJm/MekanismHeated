@@ -23,6 +23,7 @@
   "gui.mekanismheated.fractionation.layers": "Output Banks: %1$s",
   "gui.mekanismheated.heat_smelter.buffer": "Buffer: %1$s",
   "gui.mekanismheated.heat_smelter.temperature": "Temp: %1$s",
+  "gui.mekanismheated.min_temperature": "Minimum Temperature: %1$s",
   "item.mekanismheated.acetic_acid_bucket": "Acetic Acid Bucket",
   "item.mekanismheated.asphalt_bucket": "Asphalt Bucket",
   "item.mekanismheated.caco3_dust": "Limestone Dust",

@@ -1,6 +1,7 @@
 package io.aduhtkjm.mekanismheated.tile;
 
 import io.aduhtkjm.mekanismheated.Config;
+import integration.jei.ModRecipeViewerTypes;
 import io.aduhtkjm.mekanismheated.recipe.ModRecipeTypes;
 import io.aduhtkjm.mekanismheated.recipe.ShakerRecipe;
 import io.aduhtkjm.mekanismheated.recipe.cache.ShakerCachedRecipe;
@@ -32,6 +33,7 @@ import mekanism.common.inventory.slot.InputInventorySlot;
 import mekanism.common.inventory.slot.OutputInventorySlot;
 import mekanism.common.inventory.warning.WarningTracker.WarningType;
 import mekanism.common.lib.transmitter.TransmissionType;
+import mekanism.client.recipe_viewer.type.IRecipeViewerRecipeType;
 import mekanism.common.recipe.IMekanismRecipeTypeProvider;
 import mekanism.common.tile.component.TileComponentEjector;
 import mekanism.common.tile.prefab.TileEntityProgressMachine;
@@ -248,6 +250,12 @@ public class TileEntityShaker extends TileEntityProgressMachine<ShakerRecipe> {
     @Override
     public IMekanismRecipeTypeProvider<?, ShakerRecipe, ?> getRecipeType() {
         return null;
+    }
+
+    @NotNull
+    @Override
+    public IRecipeViewerRecipeType<ShakerRecipe> recipeViewerType() {
+        return ModRecipeViewerTypes.SHAKING;
     }
 
     @Override

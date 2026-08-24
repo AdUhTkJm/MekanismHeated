@@ -28,7 +28,7 @@ public class GuiShaker extends GuiConfigurableTile<TileEntityShaker, MekanismTil
     protected void addGuiElements() {
         super.addGuiElements();
         addRenderableWidget(new GuiUpArrow(this, 68, 38));
-        addRenderableWidget(new GuiProgress(tile::getScaledProgress, ProgressType.BAR, this, 86, 38));
+        addRenderableWidget(new GuiProgress(tile::getScaledProgress, ProgressType.BAR, this, 86, 38).recipeViewerCategory(tile));
         addRenderableWidget(new GuiFluidGauge(() -> tile.inputFluidTank, () -> tile.getFluidTanks(null), GaugeType.STANDARD, this, 6, 10))
               .warning(WarningType.NO_MATCHING_RECIPE, tile.getWarningCheck(TileEntityShaker.NOT_ENOUGH_FLUID_INPUT_ERROR));
         addRenderableWidget(new GuiVerticalPowerBar(this, tile.getEnergyContainer(), 164, 16));
