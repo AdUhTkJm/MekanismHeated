@@ -3,6 +3,7 @@ package io.aduhtkjm.mekanismheated.registries;
 import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.tile.TileEntityShaker;
 import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
+import io.aduhtkjm.mekanismheated.tile.TileEntityFusedPipe;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityFractionationBlock;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationController;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationValve;
@@ -49,5 +50,11 @@ public class ModTileEntityTypes {
           .clientTicker(TileEntityMekanism::tickClient)
           .serverTicker(TileEntityMekanism::tickServer)
           .withSimple(Capabilities.CONFIGURABLE)
+          .build();
+
+    public static final TileEntityTypeRegistryObject<TileEntityFusedPipe> FUSED_PIPE = TILE_ENTITY_TYPES
+          .builder(ModBlocks.FUSED_PIPE, TileEntityFusedPipe::new)
+          .serverTicker(TileEntityFusedPipe::tickServer)
+          .with(Capabilities.CONFIGURABLE, TileEntityFusedPipe.CONFIGURABLE_PROVIDER)
           .build();
 }

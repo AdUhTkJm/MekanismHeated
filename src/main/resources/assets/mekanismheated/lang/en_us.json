@@ -2,6 +2,7 @@
   "block.mekanismheated.acetic_acid": "Acetic Acid",
   "block.mekanismheated.asphalt": "Asphalt",
   "block.mekanismheated.distillation_tray": "Distillation Tray",
+  "block.mekanismheated.fused_pipe": "Fused Pipe",
   "block.mekanismheated.heat_smelter": "Heat Smelter",
   "block.mekanismheated.methanol": "Methanol",
   "block.mekanismheated.shaker": "Shaker",
@@ -40,6 +41,7 @@
   "multiblock.mekanismheated.invalid.incomplete_tray_layer": "Distillation trays must fill all interior positions of their layer",
   "multiblock.mekanismheated.invalid.tray_spacing": "Distillation trays must leave at least one open interior layer between each other and above the sump",
   "multiblock.mekanismheated.invalid.tray_top": "A distillation tray cannot be placed directly below the top opening of the tower",
+  "tooltip.mekanismheated.fused_pipe.function": "%s: %s",
   "tooltip.mekanismheated.impure": "impure",
   "tooltip.mekanismheated.pure": "pure"
 }

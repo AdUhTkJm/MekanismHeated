@@ -25,6 +25,7 @@ public class ModItems {
     public static void registerDisplayedItems(CreativeModeTab.ItemDisplayParameters itemDisplayParameters, CreativeModeTab.Output output) {
         output.accept(ModBlocks.HEAT_SMELTER);
         output.accept(ModBlocks.SHAKER);
+        output.accept(ModBlocks.FUSED_PIPE);
 
         output.accept(ModBlocks.THERMAL_FRACTIONATION_CONTROLLER);
         output.accept(ModBlocks.THERMAL_FRACTIONATION_VALVE);

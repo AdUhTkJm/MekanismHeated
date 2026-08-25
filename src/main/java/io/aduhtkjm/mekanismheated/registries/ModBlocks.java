@@ -3,13 +3,16 @@ package io.aduhtkjm.mekanismheated.registries;
 import io.aduhtkjm.mekanismheated.Config;
 import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.ModLang;
+import io.aduhtkjm.mekanismheated.block.BlockFusedPipe;
 import io.aduhtkjm.mekanismheated.block.fractionation.DistillationTrayBlock;
 import io.aduhtkjm.mekanismheated.block.shaker.ShakerBlock;
+import io.aduhtkjm.mekanismheated.item.ItemBlockFusedPipe;
+import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedPipeConfig;
 import io.aduhtkjm.mekanismheated.tile.TileEntityShaker;
 import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
+import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityFractionationBlock;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationController;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationValve;
-import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityFractionationBlock;
 import mekanism.common.block.attribute.AttributeSideConfig;
 import mekanism.common.block.attribute.AttributeStateFacing;
 import mekanism.common.block.attribute.Attributes;
@@ -24,7 +27,9 @@ import mekanism.common.item.block.ItemBlockTooltip;
 import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.registration.impl.BlockDeferredRegister;
 import mekanism.common.registration.impl.BlockRegistryObject;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 
@@ -94,4 +99,10 @@ public class ModBlocks {
 
     public static final BlockRegistryObject<DistillationTrayBlock, BlockItem> DISTILLATION_TRAY =
           BLOCKS.register("distillation_tray", DistillationTrayBlock::new);
+
+    public static final BlockRegistryObject<BlockFusedPipe, ItemBlockFusedPipe> FUSED_PIPE =
+          BLOCKS.register("fused_pipe",
+                () -> new BlockFusedPipe(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_CYAN).strength(1.0F, 6.0F)),
+                (block, properties) -> new ItemBlockFusedPipe(block,
+                      properties.component(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(FusedPipeConfig.createDefaultBlockEntityData()))));
 }

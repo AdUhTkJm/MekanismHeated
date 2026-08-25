@@ -2,6 +2,7 @@
   "block.mekanismheated.acetic_acid": "乙酸",
   "block.mekanismheated.asphalt": "沥青",
   "block.mekanismheated.distillation_tray": "蒸馏托盘",
+  "block.mekanismheated.fused_pipe": "融合管道",
   "block.mekanismheated.heat_smelter": "热力熔炼炉",
   "block.mekanismheated.methanol": "甲醇",
   "block.mekanismheated.shaker": "摇床",
@@ -40,6 +41,7 @@
   "multiblock.mekanismheated.invalid.incomplete_tray_layer": "同一层的蒸馏托盘必须填满所有内部空间",
   "multiblock.mekanismheated.invalid.tray_spacing": "蒸馏托盘之间以及托盘与进料仓之间必须至少留有一个内部空层",
   "multiblock.mekanismheated.invalid.tray_top": "蒸馏托盘不能直接放置在塔顶开口下方",
+  "tooltip.mekanismheated.fused_pipe.function": "%s：%s",
   "tooltip.mekanismheated.impure": "不纯",
   "tooltip.mekanismheated.pure": "纯"
 }
