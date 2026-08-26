@@ -61,7 +61,7 @@ public final class FusedPipeRegistry {
             node.setNetwork(null);
             if (network.getNodes().isEmpty()) {
                 networks.remove(network);
-                network.acceptorCache.clear();
+                network.acceptorCache.invalidate();
             } else {
                 //The graph may be split now; disperse and let the survivors reform
                 networksToDisperse.add(network);
@@ -109,7 +109,7 @@ public final class FusedPipeRegistry {
                 }
             }
             network.getNodes().clear();
-            network.acceptorCache.clear();
+            network.acceptorCache.invalidate();
             networks.remove(network);
         }
     }
@@ -143,7 +143,7 @@ public final class FusedPipeRegistry {
             networks.add(network);
             for (FusedNetwork found : finder.networksFound) {
                 network.adoptFrom(found);
-                found.acceptorCache.clear();
+                found.acceptorCache.invalidate();
                 networks.remove(found);
             }
         } else {

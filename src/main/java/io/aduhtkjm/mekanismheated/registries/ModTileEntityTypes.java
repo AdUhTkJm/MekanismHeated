@@ -10,6 +10,7 @@ import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionation
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.registration.impl.TileEntityTypeDeferredRegister;
 import mekanism.common.registration.impl.TileEntityTypeRegistryObject;
+import mekanism.common.tile.base.CapabilityTileEntity;
 import mekanism.common.tile.base.TileEntityMekanism;
 
 public class ModTileEntityTypes {
@@ -56,5 +57,7 @@ public class ModTileEntityTypes {
           .builder(ModBlocks.FUSED_PIPE, TileEntityFusedPipe::new)
           .serverTicker(TileEntityFusedPipe::tickServer)
           .with(Capabilities.CONFIGURABLE, TileEntityFusedPipe.CONFIGURABLE_PROVIDER)
+          .with(Capabilities.FLUID.block(), CapabilityTileEntity.FLUID_HANDLER_PROVIDER)
+          .with(Capabilities.CHEMICAL.block(), CapabilityTileEntity.CHEMICAL_HANDLER_PROVIDER)
           .build();
 }

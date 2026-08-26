@@ -1,0 +1,105 @@
+{
+ "textures": {
+  "side": "mekanism:block/models/multipart/basic_universal_cable_vertical",
+  "center": "mekanism:block/models/multipart/basic_universal_cable",
+  "particle": "mekanism:block/models/multipart/basic_universal_cable"
+ },
+ "elements": [
+  {
+   "from": [
+    11.0,
+    5.0,
+    11.0
+   ],
+   "to": [
+    11.0,
+    11.0,
+    16.0
+   ],
+   "shade": false,
+   "faces": {
+    "east": {
+     "texture": "#side",
+     "uv": [
+      0.0,
+      1.333,
+      16.0,
+      14.667
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    5.0,
+    5.0,
+    11.0
+   ],
+   "to": [
+    5.0,
+    11.0,
+    16.0
+   ],
+   "shade": false,
+   "faces": {
+    "west": {
+     "texture": "#side",
+     "uv": [
+      0.0,
+      1.333,
+      16.0,
+      14.667
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    5.0,
+    5.0,
+    11.0
+   ],
+   "to": [
+    11.0,
+    5.0,
+    16.0
+   ],
+   "shade": false,
+   "faces": {
+    "down": {
+     "texture": "#side",
+     "uv": [
+      0.0,
+      1.333,
+      16.0,
+      14.667
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    5.0,
+    11.0,
+    11.0
+   ],
+   "to": [
+    11.0,
+    11.0,
+    16.0
+   ],
+   "shade": false,
+   "faces": {
+    "up": {
+     "texture": "#side",
+     "uv": [
+      0.0,
+      1.333,
+      16.0,
+      14.667
+     ]
+    }
+   }
+  }
+ ]
+}

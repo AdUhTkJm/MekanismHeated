@@ -102,7 +102,7 @@ public class ModBlocks {
 
     public static final BlockRegistryObject<BlockFusedPipe, ItemBlockFusedPipe> FUSED_PIPE =
           BLOCKS.register("fused_pipe",
-                () -> new BlockFusedPipe(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_CYAN).strength(1.0F, 6.0F)),
+                () -> new BlockFusedPipe(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_CYAN).strength(1.0F, 6.0F).noOcclusion()),
                 (block, properties) -> new ItemBlockFusedPipe(block,
                       properties.component(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(FusedPipeConfig.createDefaultBlockEntityData()))));
 }

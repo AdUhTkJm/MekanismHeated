@@ -1,6 +1,7 @@
 package io.aduhtkjm.mekanismheated.content.fusedpipe;
 
 import io.aduhtkjm.mekanismheated.tile.TileEntityFusedPipe;
+import mekanism.api.chemical.ChemicalStack;
 import mekanism.common.lib.transmitter.ConnectionType;
 import mekanism.common.tier.CableTier;
 import mekanism.common.tier.ConductorTier;
@@ -10,6 +11,7 @@ import mekanism.common.tier.TubeTier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,6 +32,18 @@ public class FusedPipeNode {
      * when its network dispersed, so that buffered energy survives chunk unloads.
      */
     private long savedEnergy;
+
+    /**
+     * Share of the network's fluid tank distributed to this node, same purpose as {@link #savedEnergy}.
+     */
+    @NotNull
+    private FluidStack savedFluid = FluidStack.EMPTY;
+
+    /**
+     * Share of the network's chemical tank distributed to this node, same purpose as {@link #savedEnergy}.
+     */
+    @NotNull
+    private ChemicalStack savedChemical = ChemicalStack.EMPTY;
 
     public FusedPipeNode(TileEntityFusedPipe tile) {
         this.tile = tile;
@@ -77,7 +91,43 @@ public class FusedPipeNode {
         return savedEnergy;
     }
 
+    @NotNull
+    public FluidStack takeSavedFluid() {
+        FluidStack fluid = savedFluid;
+        savedFluid = FluidStack.EMPTY;
+        return fluid;
+    }
+
+    public void setSavedFluid(@NotNull FluidStack fluid) {
+        this.savedFluid = fluid.isEmpty() ? FluidStack.EMPTY : fluid;
+    }
+
+    @NotNull
+    public FluidStack getSavedFluid() {
+        return savedFluid;
+    }
+
+    @NotNull
+    public ChemicalStack takeSavedChemical() {
+        ChemicalStack chemical = savedChemical;
+        savedChemical = ChemicalStack.EMPTY;
+        return chemical;
+    }
+
+    public void setSavedChemical(@NotNull ChemicalStack chemical) {
+        this.savedChemical = chemical.isEmpty() ? ChemicalStack.EMPTY : chemical;
+    }
+
+    @NotNull
+    public ChemicalStack getSavedChemical() {
+        return savedChemical;
+    }
+
     //Configuration delegation
+
+    public boolean isEnabled(FusedFunction function) {
+        return tile.getConfig().isEnabled(function);
+    }
 
     /**
      * @return The capacity this node contributes to the network's energy buffer,
@@ -108,6 +158,16 @@ public class FusedPipeNode {
     }
 
     /**
+     * @return The maximum amount of fluid in mB this node may pull through a pull side per tick.
+     */
+    public int getFluidPullRate() {
+        if (!tile.getConfig().isEnabled(FusedFunction.FLUID)) {
+            return 0;
+        }
+        return PipeTier.get(tile.getConfig().getTier(FusedFunction.FLUID)).getPipePullAmount();
+    }
+
+    /**
      * @return The chemical capacity this node contributes to the network's chemical tank.
      */
     public long getChemicalCapacity() {
@@ -115,6 +175,16 @@ public class FusedPipeNode {
             return 0L;
         }
         return TubeTier.get(tile.getConfig().getTier(FusedFunction.CHEMICAL)).getTubeCapacity();
+    }
+
+    /**
+     * @return The maximum amount of chemical this node may pull through a pull side per tick.
+     */
+    public long getChemicalPullRate() {
+        if (!tile.getConfig().isEnabled(FusedFunction.CHEMICAL)) {
+            return 0L;
+        }
+        return TubeTier.get(tile.getConfig().getTier(FusedFunction.CHEMICAL)).getTubePullAmount();
     }
 
     public double getHeatCapacity() {
@@ -153,6 +223,37 @@ public class FusedPipeNode {
     public boolean canAcceptFrom(Direction side) {
         ConnectionType type = tile.getConnectionTypeRaw(side);
         return type != null && type.canAccept() && !tile.isRedstoneActivated();
+    }
+
+    /**
+     * Pull sides actively drain their neighbors (vanilla transmitter semantics); NORMAL sides only
+     * accept pushes.
+     */
+    public boolean isPullSide(Direction side) {
+        ConnectionType type = tile.getConnectionTypeRaw(side);
+        return type == ConnectionType.PULL && !tile.isRedstoneActivated();
+    }
+
+    /**
+     * Whether the network may actively drain energy from this side. Energy deliberately follows
+     * Mekanism cable behaviour: NORMAL sides also pull automatically, no PULL configuration needed.
+     */
+    public boolean pullsEnergyFrom(Direction side) {
+        return canAcceptFrom(side);
+    }
+
+    /**
+     * Fluid pulling requires an explicitly configured PULL side (vanilla mechanical pipe behaviour).
+     */
+    public boolean pullsFluidFrom(Direction side) {
+        return isPullSide(side);
+    }
+
+    /**
+     * Chemical pulling requires an explicitly configured PULL side (vanilla pressurized tube behaviour).
+     */
+    public boolean pullsChemicalFrom(Direction side) {
+        return isPullSide(side);
     }
 
     @NotNull

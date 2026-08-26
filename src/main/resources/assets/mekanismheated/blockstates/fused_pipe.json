@@ -1,7 +1,23 @@
 {
-  "variants": {
-    "": {
-      "model": "mekanismheated:block/fused_pipe"
-    }
-  }
+  "multipart": [
+    { "apply": { "model": "mekanismheated:block/fused_pipe/core" } },
+    { "when": { "north": "normal" }, "apply": { "model": "mekanismheated:block/fused_pipe/arm_normal", "y": 180 } },
+    { "when": { "north": "push" },   "apply": { "model": "mekanismheated:block/fused_pipe/arm_push",   "y": 180 } },
+    { "when": { "north": "pull" },   "apply": { "model": "mekanismheated:block/fused_pipe/arm_pull",   "y": 180 } },
+    { "when": { "south": "normal" }, "apply": { "model": "mekanismheated:block/fused_pipe/arm_normal" } },
+    { "when": { "south": "push" },   "apply": { "model": "mekanismheated:block/fused_pipe/arm_push" } },
+    { "when": { "south": "pull" },   "apply": { "model": "mekanismheated:block/fused_pipe/arm_pull" } },
+    { "when": { "west": "normal" },  "apply": { "model": "mekanismheated:block/fused_pipe/arm_normal", "y": 90 } },
+    { "when": { "west": "push" },    "apply": { "model": "mekanismheated:block/fused_pipe/arm_push",   "y": 90 } },
+    { "when": { "west": "pull" },    "apply": { "model": "mekanismheated:block/fused_pipe/arm_pull",   "y": 90 } },
+    { "when": { "east": "normal" },  "apply": { "model": "mekanismheated:block/fused_pipe/arm_normal", "y": 270 } },
+    { "when": { "east": "push" },    "apply": { "model": "mekanismheated:block/fused_pipe/arm_push",   "y": 270 } },
+    { "when": { "east": "pull" },    "apply": { "model": "mekanismheated:block/fused_pipe/arm_pull",   "y": 270 } },
+    { "when": { "up": "normal" },    "apply": { "model": "mekanismheated:block/fused_pipe/arm_normal", "x": 90 } },
+    { "when": { "up": "push" },      "apply": { "model": "mekanismheated:block/fused_pipe/arm_push",   "x": 90 } },
+    { "when": { "up": "pull" },      "apply": { "model": "mekanismheated:block/fused_pipe/arm_pull",   "x": 90 } },
+    { "when": { "down": "normal" },  "apply": { "model": "mekanismheated:block/fused_pipe/arm_normal", "x": -90 } },
+    { "when": { "down": "push" },    "apply": { "model": "mekanismheated:block/fused_pipe/arm_push",   "x": -90 } },
+    { "when": { "down": "pull" },    "apply": { "model": "mekanismheated:block/fused_pipe/arm_pull",   "x": -90 } }
+  ]
 }

@@ -1,0 +1,345 @@
+{
+ "textures": {
+  "side": "mekanism:block/models/multipart/basic_universal_cable_vertical",
+  "center": "mekanism:block/models/multipart/basic_universal_cable",
+  "particle": "mekanism:block/models/multipart/basic_universal_cable"
+ },
+ "elements": [
+  {
+   "from": [
+    5.0,
+    5.0,
+    5.0
+   ],
+   "to": [
+    11.0,
+    5.0,
+    11.0
+   ],
+   "shade": false,
+   "faces": {
+    "down": {
+     "texture": "#center",
+     "uv": [
+      0.0,
+      0.0,
+      16.0,
+      16.0
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    5.0,
+    11.0,
+    5.0
+   ],
+   "to": [
+    11.0,
+    11.0,
+    11.0
+   ],
+   "shade": false,
+   "faces": {
+    "up": {
+     "texture": "#center",
+     "uv": [
+      0.0,
+      0.0,
+      16.0,
+      16.0
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    5.0,
+    5.0,
+    5.0
+   ],
+   "to": [
+    11.0,
+    11.0,
+    5.0
+   ],
+   "shade": false,
+   "faces": {
+    "north": {
+     "texture": "#center",
+     "uv": [
+      0.0,
+      0.0,
+      16.0,
+      16.0
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    5.0,
+    5.0,
+    11.0
+   ],
+   "to": [
+    11.0,
+    11.0,
+    11.0
+   ],
+   "shade": false,
+   "faces": {
+    "south": {
+     "texture": "#center",
+     "uv": [
+      0.0,
+      0.0,
+      16.0,
+      16.0
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    5.0,
+    5.0,
+    5.0
+   ],
+   "to": [
+    5.0,
+    11.0,
+    11.0
+   ],
+   "shade": false,
+   "faces": {
+    "west": {
+     "texture": "#center",
+     "uv": [
+      0.0,
+      0.0,
+      16.0,
+      16.0
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    11.0,
+    5.0,
+    5.0
+   ],
+   "to": [
+    11.0,
+    11.0,
+    11.0
+   ],
+   "shade": false,
+   "faces": {
+    "east": {
+     "texture": "#center",
+     "uv": [
+      0.0,
+      0.0,
+      16.0,
+      16.0
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    0.0,
+    5.0,
+    11.0
+   ],
+   "to": [
+    5.0,
+    11.0,
+    11.0
+   ],
+   "shade": false,
+   "faces": {
+    "south": {
+     "texture": "#side",
+     "uv": [
+      0.0,
+      1.333,
+      16.0,
+      14.667
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    0.0,
+    5.0,
+    5.0
+   ],
+   "to": [
+    5.0,
+    11.0,
+    5.0
+   ],
+   "shade": false,
+   "faces": {
+    "north": {
+     "texture": "#side",
+     "uv": [
+      0.0,
+      1.333,
+      16.0,
+      14.667
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    0.0,
+    5.0,
+    5.0
+   ],
+   "to": [
+    5.0,
+    5.0,
+    11.0
+   ],
+   "shade": false,
+   "faces": {
+    "down": {
+     "texture": "#side",
+     "uv": [
+      0.0,
+      1.333,
+      16.0,
+      14.667
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    0.0,
+    11.0,
+    5.0
+   ],
+   "to": [
+    5.0,
+    11.0,
+    11.0
+   ],
+   "shade": false,
+   "faces": {
+    "up": {
+     "texture": "#side",
+     "uv": [
+      0.0,
+      1.333,
+      16.0,
+      14.667
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    11.0,
+    5.0,
+    5.0
+   ],
+   "to": [
+    16.0,
+    11.0,
+    5.0
+   ],
+   "shade": false,
+   "faces": {
+    "north": {
+     "texture": "#side",
+     "uv": [
+      0.0,
+      1.333,
+      16.0,
+      14.667
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    11.0,
+    5.0,
+    11.0
+   ],
+   "to": [
+    16.0,
+    11.0,
+    11.0
+   ],
+   "shade": false,
+   "faces": {
+    "south": {
+     "texture": "#side",
+     "uv": [
+      0.0,
+      1.333,
+      16.0,
+      14.667
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    11.0,
+    5.0,
+    5.0
+   ],
+   "to": [
+    16.0,
+    5.0,
+    11.0
+   ],
+   "shade": false,
+   "faces": {
+    "down": {
+     "texture": "#side",
+     "uv": [
+      0.0,
+      1.333,
+      16.0,
+      14.667
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    11.0,
+    11.0,
+    5.0
+   ],
+   "to": [
+    16.0,
+    11.0,
+    11.0
+   ],
+   "shade": false,
+   "faces": {
+    "up": {
+     "texture": "#side",
+     "uv": [
+      0.0,
+      1.333,
+      16.0,
+      14.667
+     ]
+    }
+   }
+  }
+ ]
+}

@@ -1,8 +1,10 @@
 package io.aduhtkjm.mekanismheated.tile;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import io.aduhtkjm.mekanismheated.Mod;
+import io.aduhtkjm.mekanismheated.block.BlockFusedPipe;
 import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedFunction;
 import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedNetwork;
 import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedPipeConfig;
@@ -11,14 +13,21 @@ import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedPipeRegistry;
 import io.aduhtkjm.mekanismheated.registries.ModTileEntityTypes;
 import mekanism.api.IConfigurable;
 import mekanism.api.SerializationConstants;
+import mekanism.api.chemical.ChemicalStack;
+import mekanism.api.chemical.IChemicalTank;
 import mekanism.api.energy.IEnergyContainer;
+import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.text.EnumColor;
 import mekanism.common.MekanismLang;
 import mekanism.common.capabilities.Capabilities;
+import mekanism.common.capabilities.chemical.DynamicChemicalHandler;
 import mekanism.common.capabilities.energy.DynamicStrictEnergyHandler;
+import mekanism.common.capabilities.fluid.DynamicFluidHandler;
 import mekanism.common.capabilities.proxy.ProxyConfigurable;
 import mekanism.common.capabilities.resolver.BasicSidedCapabilityResolver;
+import mekanism.common.capabilities.resolver.manager.ChemicalHandlerManager;
 import mekanism.common.capabilities.resolver.manager.EnergyHandlerManager;
+import mekanism.common.capabilities.resolver.manager.FluidHandlerManager;
 import mekanism.common.integration.energy.EnergyCompatUtils;
 import mekanism.common.lib.transmitter.ConnectionType;
 import mekanism.common.tile.base.CapabilityTileEntity;
@@ -34,8 +43,11 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.ICapabilityProvider;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.system.NonnullDefault;
@@ -73,12 +85,17 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
     private boolean loaded;
     private boolean markJoined;
     private boolean forceUpdate = true;
+    private boolean visualDirty = true;
 
     public TileEntityFusedPipe(BlockPos pos, BlockState state) {
         super(ModTileEntityTypes.FUSED_PIPE, pos, state);
         var energyHandlerManager = new EnergyHandlerManager(this::getExposedEnergyContainers,
-            new DynamicStrictEnergyHandler(this::getExposedEnergyContainers, this::canExtractEnergy, this::canInsertEnergy, null));
-        addCapabilityResolvers(List.of(energyHandlerManager));
+            new DynamicStrictEnergyHandler(this::getExposedEnergyContainers, this::canExtractFromSide, this::canInsertIntoSide, null));
+        var fluidHandlerManager = new FluidHandlerManager(this::getExposedFluidTanks,
+            new DynamicFluidHandler(this::getExposedFluidTanks, this::canExtractFromSide, this::canInsertIntoSide, null));
+        var chemicalHandlerManager = new ChemicalHandlerManager(this::getExposedChemicalTanks,
+            new DynamicChemicalHandler(this::getExposedChemicalTanks, this::canExtractFromSide, this::canInsertIntoSide, null));
+        addCapabilityResolvers(List.of(energyHandlerManager, fluidHandlerManager, chemicalHandlerManager));
     }
 
     //Content access
@@ -136,10 +153,26 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
             redstoneSet = false;
             if (previouslyPowered != isRedstoneActivated()) {
                 //Availability of capabilities changed towards the outside
-                invalidateCapabilitiesAll(EnergyCompatUtils.getLoadedEnergyCapabilities());
-                invalidateCapabilities();
+                FusedNetwork network = getNetwork();
+                if (network != null) {
+                    //The set of send/pull sides may have changed
+                    network.acceptorCache.invalidate();
+                }
+                invalidateTransmittedCapabilities();
             }
         }
+    }
+
+    /**
+     * Invalidates every capability we expose for a transmission function, both our cached
+     * instances and the ones the world may have cached about us.
+     */
+    private void invalidateTransmittedCapabilities() {
+        List<BlockCapability<?, @Nullable Direction>> capabilities = new ArrayList<>(EnergyCompatUtils.getLoadedEnergyCapabilities());
+        capabilities.add(Capabilities.FLUID.block());
+        capabilities.add(Capabilities.CHEMICAL.block());
+        invalidateCapabilitiesAll(capabilities);
+        invalidateCapabilities();
     }
 
     //Ticking
@@ -159,6 +192,64 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
         } else if (redstoneReactive) {
             recheckRedstoneState();
         }
+        if (visualDirty) {
+            visualDirty = false;
+            updateVisualState();
+        }
+    }
+
+    /**
+     * Recomputes the rendered connection arms right away instead of waiting for the next tick.
+     */
+    public void refreshVisualState() {
+        visualDirty = false;
+        updateVisualState();
+    }
+
+    /**
+     * Pushes the current side configuration into the blockstate so clients render the matching
+     * connection arms: a side renders an arm only if it is configured to something other than
+     * {@link ConnectionType#NONE} <em>and</em> has a neighbor worth connecting to. Deferred to the
+     * tick when coming out of {@link #loadAdditional}, since {@code setBlock} is not safe
+     * mid-load.
+     */
+    private void updateVisualState() {
+        if (!hasLevel()) {
+            return;
+        }
+        BlockState state = getBlockState();
+        if (!(state.getBlock() instanceof BlockFusedPipe block)) {
+            return;
+        }
+        ConnectionType[] visual = new ConnectionType[EnumUtils.DIRECTIONS.length];
+        for (Direction side : EnumUtils.DIRECTIONS) {
+            ConnectionType configured = connectionTypes[side.ordinal()];
+            visual[side.ordinal()] = configured == ConnectionType.NONE || !connectsTo(side) ? ConnectionType.NONE : configured;
+        }
+        BlockState target = block.applyConnections(state, visual);
+        if (target != state) {
+            getLevel().setBlock(getBlockPos(), target, Block.UPDATE_CLIENTS);
+        }
+    }
+
+    /**
+     * @return true if the neighbor on the given side is another fused pipe with a non-none config
+     * facing us, or a machine that exposes any capability we know how to transmit into.
+     */
+    private boolean connectsTo(Direction side) {
+        Level level = getLevel();
+        BlockPos neighborPos = getBlockPos().relative(side);
+        Direction opposite = side.getOpposite();
+        if (level.getBlockEntity(neighborPos) instanceof TileEntityFusedPipe neighbor) {
+            return neighbor.getConnectionTypeRaw(opposite) != ConnectionType.NONE;
+        }
+        for (BlockCapability<?, @Nullable Direction> capability : EnergyCompatUtils.getLoadedEnergyCapabilities()) {
+            if (level.getCapability(capability, neighborPos, opposite) != null) {
+                return true;
+            }
+        }
+        return level.getCapability(Capabilities.FLUID.block(), neighborPos, opposite) != null
+              || level.getCapability(Capabilities.CHEMICAL.block(), neighborPos, opposite) != null;
     }
 
     //Lifecycle
@@ -175,6 +266,8 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
 
     public void onNeighborBlockChange(@Nullable Direction side) {
         recheckRedstoneState();
+        //A neighbor appeared or disappeared; our rendered arms may need to connect or retract
+        refreshVisualState();
     }
 
     @Override
@@ -230,7 +323,35 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
         return network.getEnergyContainers(side);
     }
 
-    private boolean canExtractEnergy(@Nullable Direction side) {
+    private List<IExtendedFluidTank> getExposedFluidTanks(@Nullable Direction side) {
+        if (!config.isEnabled(FusedFunction.FLUID)) {
+            return Collections.emptyList();
+        }
+        FusedNetwork network = node.getNetwork();
+        if (network == null) {
+            return Collections.emptyList();
+        }
+        if (side != null && (getConnectionTypeRaw(side) == ConnectionType.NONE || isRedstoneActivated())) {
+            return Collections.emptyList();
+        }
+        return network.getFluidTanks(side);
+    }
+
+    private List<IChemicalTank> getExposedChemicalTanks(@Nullable Direction side) {
+        if (!config.isEnabled(FusedFunction.CHEMICAL)) {
+            return Collections.emptyList();
+        }
+        FusedNetwork network = node.getNetwork();
+        if (network == null) {
+            return Collections.emptyList();
+        }
+        if (side != null && (getConnectionTypeRaw(side) == ConnectionType.NONE || isRedstoneActivated())) {
+            return Collections.emptyList();
+        }
+        return network.getChemicalTanks(side);
+    }
+
+    private boolean canExtractFromSide(@Nullable Direction side) {
         if (side == null)
             return true;
 
@@ -240,7 +361,7 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
         return connectionType != ConnectionType.NONE && connectionType.canSendTo();
     }
 
-    private boolean canInsertEnergy(@Nullable Direction side) {
+    private boolean canInsertIntoSide(@Nullable Direction side) {
         var connectionType = getConnectionTypeRaw(side);
         if (connectionType == null)
             return false;
@@ -274,9 +395,15 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
     }
 
     private void sideChanged(Direction side, ConnectionType old, ConnectionType type) {
+        //The set of send/pull sides changed, so the network's acceptor lists are outdated
+        FusedNetwork network = getNetwork();
+        if (network != null) {
+            network.acceptorCache.invalidate();
+        }
         //Make sure the world re-queries our capabilities for that side
-        EnergyCompatUtils.getLoadedEnergyCapabilities().forEach(this::invalidateCapabilityAll);
-        invalidateCapabilities();
+        invalidateTransmittedCapabilities();
+        //Reflect the new configuration in the rendered arms right away
+        refreshVisualState();
     }
 
     //NBT
@@ -294,6 +421,12 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
         });
         redstoneReactive = nbt.getBoolean(SerializationConstants.REDSTONE);
         NBTUtils.setLongIfPresent(nbt, SerializationConstants.ENERGY, node::setSavedEnergy);
+        if (nbt.contains(SerializationConstants.FLUID, Tag.TAG_COMPOUND)) {
+            node.setSavedFluid(FluidStack.parseOptional(provider, nbt.getCompound(SerializationConstants.FLUID)));
+        }
+        if (nbt.contains(SerializationConstants.BOXED_CHEMICAL, Tag.TAG_COMPOUND)) {
+            node.setSavedChemical(ChemicalStack.parseOptional(provider, nbt.getCompound(SerializationConstants.BOXED_CHEMICAL)));
+        }
     }
 
     @Override
@@ -309,6 +442,14 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
         long savedEnergy = node.getSavedEnergy();
         if (savedEnergy > 0L) {
             nbt.putLong(SerializationConstants.ENERGY, savedEnergy);
+        }
+        FluidStack savedFluid = node.getSavedFluid();
+        if (!savedFluid.isEmpty()) {
+            nbt.put(SerializationConstants.FLUID, savedFluid.save(provider));
+        }
+        ChemicalStack savedChemical = node.getSavedChemical();
+        if (!savedChemical.isEmpty()) {
+            nbt.put(SerializationConstants.BOXED_CHEMICAL, savedChemical.save(provider));
         }
     }
 

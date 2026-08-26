@@ -9,8 +9,31 @@
 registrations in `ModBlocks`/`ModTileEntityTypes`/`ModItems`, listeners wired in `Mod`.
 Assets: blockstate/model/item-model (placeholder iron texture), empty loot table
 (config-preserving drop handled in `BlockFusedPipe.playerDestroy`), lang en_us+zh_cn.
-Not yet done (Phases C-F): fluid, chemical, heat, items; connection-arm visuals;
-alloy upgrades; tier-setting GUI/crafting.
+
+**Phase C implemented (2026-08-25):** fluid + chemical handling.
+- Network-wide single-type tanks (`VariableCapacityFluidTank` / `VariableCapacityChemicalTank.createAllValid`),
+  capacity = sum of enabled node capacities; pull + emit mirror vanilla `MechanicalPipe`/`FluidNetwork`
+  and `PressurizedTube`/`ChemicalNetwork`.
+- Capability exposure via `FluidHandlerManager`+`DynamicFluidHandler` and `ChemicalHandlerManager`+
+  `DynamicChemicalHandler`; providers registered on the BE type (`FLUID_HANDLER_PROVIDER`/`CHEMICAL_HANDLER_PROVIDER`).
+- Shares (unload persistence) extended to fluid/chemical stacks, distributed only among nodes with
+  the function enabled; dormant shares stay parked on nodes whose function is disabled.
+- Pull sides are strictly `ConnectionType.PULL` for fluid/chemical (vanilla mechanical pipe /
+  pressurized tube semantics). **Energy deliberately differs**: NORMAL sides also pull automatically
+  (`FusedPipeNode.pullsEnergyFrom` -> `canAcceptFrom`, matching Mekanism cable behaviour).
+
+**Perf refactor (2026-08-25):** `FusedAcceptorCache` no longer keeps a position-keyed map that was
+walked node-by-node every tick. It now holds six flat lists (`energyTargets/Sources`,
+`fluidTargets/Sources`, `chemicalTargets/Sources`) rebuilt only when something relevant changes:
+membership change, side-config edit, redstone flip, or a neighbor capability invalidating
+(NeoForge invalidation callbacks registered on every `BlockCapabilityCache`). Per-tick cost is a
+plain list walk: pre-gated send/pull entries, no map lookups, no per-side config re-checks.
+Positions are used only at rebuild time to create the caches; energy compat adapters persist even
+while resolving to nothing so machines placed later are picked up immediately.
+
+Not yet done (Phases D-F): heat, items, alloy upgrades, tier-setting GUI/crafting. Remaining visual
+work: energy glow, tier-dependent textures (currently always basic cable), minor hand-tuning of the
+converted models/UVs.
 
 A **fused pipe** is a single block that transmits energy, fluid, chemical, heat and items,
 each function having an independent tier (basic/advanced/elite/ultimate) or being disabled,
@@ -24,7 +47,7 @@ Decisions made (2026-08-25):
 | Disabled functions | Yes — function absent from NBT = disabled entirely. |
 | Side config | One shared per-side ConnectionType for all functions (sneak-right-click cycles). |
 | Alloy tier upgrades on placed pipes | Phase 2 (not v1). |
-| Rendering | Plain block model first; no connection arms, no item visuals. |
+| Rendering | Universal Cable look (2026-08-26): arm/core models auto-converted from Mekanism's `transmitter_small.obj.mek` into vanilla JSON elements with their textures (`basic_universal_cable*`). Per-side effective state in blockstate: configured type if a neighbor is worth connecting to, else none (no arm, no hitbox). Push/pull differ via their distinct meshes (push = normal silhouette + inner detail; pull = wider collar), exactly like vanilla. Connectivity probed server-side on place/neighbor-change/config-change; energy glow not replicated. |
 | Tier-setting UX | Deferred — creative/NBT only for now. |
 | Initial scope | Phase A (skeleton) + Phase B (graph + energy) only. |
 
