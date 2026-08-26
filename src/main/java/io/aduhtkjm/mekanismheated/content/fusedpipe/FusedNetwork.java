@@ -18,15 +18,20 @@ import mekanism.api.energy.IEnergyContainer;
 import mekanism.api.energy.IStrictEnergyHandler;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.functions.ConstantPredicates;
+import mekanism.api.heat.HeatAPI;
+import mekanism.api.heat.IHeatCapacitor;
+import mekanism.api.heat.IHeatHandler;
 import mekanism.api.math.MathUtils;
 import mekanism.common.capabilities.chemical.VariableCapacityChemicalTank;
 import mekanism.common.capabilities.energy.VariableCapacityEnergyContainer;
 import mekanism.common.capabilities.fluid.VariableCapacityFluidTank;
+import mekanism.common.capabilities.heat.VariableHeatCapacitor;
 import mekanism.common.content.network.distribution.ChemicalHandlerTarget;
 import mekanism.common.content.network.distribution.EnergyAcceptorTarget;
 import mekanism.common.content.network.distribution.FluidHandlerTarget;
 import mekanism.common.util.ChemicalUtil;
 import mekanism.common.util.EmitUtils;
+import mekanism.common.util.EnumUtils;
 import mekanism.common.util.FluidUtils;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.core.Direction;
@@ -39,9 +44,9 @@ import org.jetbrains.annotations.Nullable;
  * The unified network of a region of fused pipes. Unlike Mekanism's per-type networks there is a
  * single graph for every transmission function; disabled functions simply contribute nothing.
  * <p>
- * Energy, fluid and chemicals use network-wide buffers whose capacity is the sum of the per-node
- * capacities; both tanks hold at most a single type at a time (vanilla transmitter parity).
- * Heat and items keep their state on the nodes themselves.
+ * Energy, fluid, chemicals and heat use network-wide buffers whose capacity is the sum of the
+ * per-node capacities; tanks hold at most a single type at a time (vanilla transmitter parity).
+ * Items keep their state on the nodes themselves.
  */
 public class FusedNetwork {
 
@@ -56,6 +61,8 @@ public class FusedNetwork {
     private final List<IExtendedFluidTank> fluidTanksView;
     public final IChemicalTank chemicalTank;
     private final List<IChemicalTank> chemicalTanksView;
+    private final VariableHeatCapacitor heatCapacitor;
+    private final List<IHeatCapacitor> heatCapacitorsView;
     public final FusedAcceptorCache acceptorCache = new FusedAcceptorCache();
 
     public FusedNetwork(UUID uuid) {
@@ -72,6 +79,10 @@ public class FusedNetwork {
         fluidTanksView = Collections.singletonList(fluidTank);
         chemicalTank = VariableCapacityChemicalTank.createAllValid(chemicalCapacity, dirtyListener);
         chemicalTanksView = Collections.singletonList(chemicalTank);
+        heatCapacitor = VariableHeatCapacitor.create(0,
+              this::getTotalHeatConduction, this::getTotalHeatInsulation,
+              () -> (double) HeatAPI.AMBIENT_TEMP, dirtyListener);
+        heatCapacitorsView = Collections.singletonList(heatCapacitor);
     }
 
     public UUID getUUID() {
@@ -104,12 +115,20 @@ public class FusedNetwork {
             if (node.isEnabled(FusedFunction.CHEMICAL)) {
                 absorbChemical(node.takeSavedChemical());
             }
+            if (node.isEnabled(FusedFunction.HEAT)) {
+                double share = node.takeSavedHeat();
+                if (share > 0) {
+                    heatCapacitor.handleHeat(share);
+                }
+            }
+            updateHeatCapacity();
         }
     }
 
     public void removeNode(FusedPipeNode node) {
         nodes.remove(node);
         acceptorCache.invalidate();
+        updateHeatCapacity();
     }
 
     /**
@@ -131,6 +150,12 @@ public class FusedNetwork {
         other.fluidTank.setEmpty();
         absorbChemical(other.chemicalTank.getStack());
         other.chemicalTank.setEmpty();
+        double theirHeat = other.heatCapacitor.getHeat();
+        if (theirHeat > 0) {
+            heatCapacitor.handleHeat(theirHeat);
+            other.heatCapacitor.setHeat(0);
+        }
+        updateHeatCapacity();
     }
 
     public void clampBuffer() {
@@ -148,6 +173,9 @@ public class FusedNetwork {
             if (chemicalTank.getStored() > capacity) {
                 MekanismUtils.logMismatchedStackSize(chemicalTank.setStackSize(capacity, Action.EXECUTE), capacity);
             }
+        }
+        if (heatCapacitor.getHeat() > getTotalHeatCapacity()) {
+            heatCapacitor.setHeat(getTotalHeatCapacity());
         }
     }
 
@@ -200,6 +228,43 @@ public class FusedNetwork {
         return chemicalTanksView;
     }
 
+    public double getTotalHeatCapacity() {
+        double capacity = 0;
+        for (FusedPipeNode node : nodes) {
+            capacity += node.getHeatCapacity();
+        }
+        return capacity;
+    }
+
+    private double getTotalHeatConduction() {
+        double max = 0;
+        for (FusedPipeNode node : nodes) {
+            max = Math.max(max, node.getHeatConduction());
+        }
+        return max;
+    }
+
+    private double getTotalHeatInsulation() {
+        double max = 0;
+        for (FusedPipeNode node : nodes) {
+            max = Math.max(max, node.getHeatInsulation());
+        }
+        return max;
+    }
+
+    private void updateHeatCapacity() {
+        heatCapacitor.setHeatCapacity(getTotalHeatCapacity(), false);
+    }
+
+    public double getHeat() {
+        return heatCapacitor.getHeat();
+    }
+
+    @NotNull
+    public List<IHeatCapacitor> getHeatCapacitors(@Nullable Direction side) {
+        return heatCapacitorsView;
+    }
+
     /**
      * Distributes the current buffers equally among the nodes that have each function enabled, so
      * that every tile can persist its share; used when chunks unload or a network disperses.
@@ -232,7 +297,6 @@ public class FusedNetwork {
                 long share = base + (index < remainder ? 1L : 0L);
                 if (share > 0L) {
                     FusedPipeNode node = fluidEligible.get(index);
-                    //Fluid amounts are int-bounded so the share always fits
                     FluidStack part = fluid.copyWithAmount((int) share);
                     node.setSavedFluid(node.getSavedFluid().isEmpty() ? part : sumFluids(node.getSavedFluid(), part));
                 }
@@ -255,6 +319,16 @@ public class FusedNetwork {
                 }
             }
             chemicalTank.setEmpty();
+        }
+        //Heat
+        List<FusedPipeNode> heatEligible = eligibleNodes(FusedFunction.HEAT);
+        if (heatCapacitor.getHeat() > 0 && !heatEligible.isEmpty()) {
+            double total = heatCapacitor.getHeat();
+            double base = total / heatEligible.size();
+            for (FusedPipeNode node : heatEligible) {
+                node.setSavedHeat(node.getSavedHeat() + base);
+            }
+            heatCapacitor.setHeat(0);
         }
     }
 
@@ -294,6 +368,10 @@ public class FusedNetwork {
             }
             absorbFluid(node.takeSavedFluid());
             absorbChemical(node.takeSavedChemical());
+            double heatShare = node.takeSavedHeat();
+            if (heatShare > 0) {
+                heatCapacitor.handleHeat(heatShare);
+            }
         }
     }
 
@@ -305,8 +383,6 @@ public class FusedNetwork {
                 int amount = fluid.getAmount();
                 MekanismUtils.logMismatchedStackSize(fluidTank.growStack(amount, Action.EXECUTE), amount);
             }
-            //Mismatching fluids cannot happen for shares that came out of this same network;
-            // if they somehow do, the content is dropped like vanilla does on incompatible merges
         }
     }
 
@@ -322,7 +398,6 @@ public class FusedNetwork {
     }
 
     private void markDirty() {
-        //Mark a single tile dirty so that changes to the network buffer are persisted eventually
         for (FusedPipeNode node : nodes) {
             node.getTile().setChanged();
             break;
@@ -339,7 +414,52 @@ public class FusedNetwork {
         emitEnergy();
         emitFluids();
         emitChemicals();
+        simulateHeat();
     }
+
+    //Heat
+
+    /**
+     * Network-wide heat simulation. The network acts as a single heat object: one temperature,
+     * one capacity. Heat flows to all adjacent blocks with IHeatHandler capability, regardless
+     * of the side's connection type. Environment loss is also computed here.
+     * <p>
+     * Uses the 2-phase approach: Phase 1 calculates transfers via {@code handleHeat} (which queues
+     * into the capacitor's accumulator), Phase 2 commits via {@code update}.
+     */
+    private void simulateHeat() {
+        double totalCapacity = getTotalHeatCapacity();
+        if (totalCapacity <= 0) {
+            return;
+        }
+        double myTemp = heatCapacitor.getTemperature();
+
+        //Phase 1: simulate adjacent transfers
+        for (FusedAcceptorCache.HeatAcceptor entry : acceptorCache.getHeatAcceptors()) {
+            IHeatHandler sink = entry.resolve();
+            if (sink == null) {
+                continue;
+            }
+            double sinkTemp = sink.getTotalTemperature();
+            double invConduction = sink.getTotalInverseConduction() + heatCapacitor.getInverseConduction();
+            double tempToTransfer = (myTemp - sinkTemp) / invConduction;
+            double heatToTransfer = tempToTransfer * totalCapacity;
+            heatCapacitor.handleHeat(-heatToTransfer);
+            sink.handleHeat(heatToTransfer);
+        }
+
+        //Environment loss: 6 sides to air
+        double ambientTemp = HeatAPI.AMBIENT_TEMP;
+        double invConductionEnv = HeatAPI.AIR_INVERSE_COEFFICIENT + heatCapacitor.getInverseInsulation() + heatCapacitor.getInverseConduction();
+        double tempToTransferEnv = (myTemp - ambientTemp) / invConductionEnv;
+        double heatToTransferEnv = tempToTransferEnv * totalCapacity;
+        heatCapacitor.handleHeat(-heatToTransferEnv * 6);
+
+        //Phase 2: commit
+        heatCapacitor.update();
+    }
+
+    //Energy
 
     private void pullEnergy() {
         for (FusedAcceptorCache.EnergySource entry : acceptorCache.getEnergySources()) {
@@ -353,7 +473,6 @@ public class FusedNetwork {
             }
             long received = acceptor.extractEnergy(availablePull, Action.SIMULATE);
             if (received > 0L && energyContainer.insert(received, Action.SIMULATE, AutomationType.INTERNAL) == 0L) {
-                //If we received some energy and are able to insert it all, actually transfer it
                 long remainder = energyContainer.insert(received, Action.EXECUTE, AutomationType.INTERNAL);
                 long extracted = acceptor.extractEnergy(received - remainder, Action.EXECUTE);
                 if (extracted > 0L) {
@@ -373,7 +492,6 @@ public class FusedNetwork {
             if (acceptor == null) {
                 continue;
             }
-            //If the network holds a fluid already, only try to drain that same type
             FluidStack bufferWithFallback = fluidTank.getFluid();
             FluidStack received;
             if (bufferWithFallback.isEmpty()) {
@@ -382,7 +500,6 @@ public class FusedNetwork {
                 received = acceptor.drain(bufferWithFallback.copyWithAmount(availablePull), IFluidHandler.FluidAction.SIMULATE);
             }
             if (!received.isEmpty() && fluidTank.insert(received, Action.SIMULATE, AutomationType.INTERNAL).isEmpty()) {
-                //We are able to insert it all, actually transfer it
                 fluidTank.insert(acceptor.drain(received.copy(), IFluidHandler.FluidAction.EXECUTE), Action.EXECUTE, AutomationType.INTERNAL);
             }
         }

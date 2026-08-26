@@ -45,6 +45,11 @@ public class FusedPipeNode {
     @NotNull
     private ChemicalStack savedChemical = ChemicalStack.EMPTY;
 
+    /**
+     * Share of the network's heat buffer distributed to this node, same purpose as {@link #savedEnergy}.
+     */
+    private double savedHeat;
+
     public FusedPipeNode(TileEntityFusedPipe tile) {
         this.tile = tile;
     }
@@ -123,6 +128,20 @@ public class FusedPipeNode {
         return savedChemical;
     }
 
+    public double takeSavedHeat() {
+        double heat = savedHeat;
+        savedHeat = 0;
+        return heat;
+    }
+
+    public void setSavedHeat(double heat) {
+        this.savedHeat = Math.max(0, heat);
+    }
+
+    public double getSavedHeat() {
+        return savedHeat;
+    }
+
     //Configuration delegation
 
     public boolean isEnabled(FusedFunction function) {
@@ -187,11 +206,34 @@ public class FusedPipeNode {
         return TubeTier.get(tile.getConfig().getTier(FusedFunction.CHEMICAL)).getTubePullAmount();
     }
 
+    /**
+     * @return The heat capacity this node contributes to the network's heat buffer.
+     */
     public double getHeatCapacity() {
         if (!tile.getConfig().isEnabled(FusedFunction.HEAT)) {
             return 0D;
         }
         return ConductorTier.get(tile.getConfig().getTier(FusedFunction.HEAT)).getHeatCapacity();
+    }
+
+    /**
+     * @return The inverse conduction coefficient this node contributes to the network.
+     */
+    public double getHeatConduction() {
+        if (!tile.getConfig().isEnabled(FusedFunction.HEAT)) {
+            return 0D;
+        }
+        return ConductorTier.get(tile.getConfig().getTier(FusedFunction.HEAT)).getInverseConduction();
+    }
+
+    /**
+     * @return The inverse insulation coefficient this node contributes to the network.
+     */
+    public double getHeatInsulation() {
+        if (!tile.getConfig().isEnabled(FusedFunction.HEAT)) {
+            return 0D;
+        }
+        return ConductorTier.get(tile.getConfig().getTier(FusedFunction.HEAT)).getInverseConductionInsulation();
     }
 
     public int getItemPullAmount() {

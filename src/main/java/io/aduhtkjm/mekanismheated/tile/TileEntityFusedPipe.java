@@ -17,8 +17,11 @@ import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IChemicalTank;
 import mekanism.api.energy.IEnergyContainer;
 import mekanism.api.fluid.IExtendedFluidTank;
+import mekanism.api.heat.IHeatCapacitor;
+import mekanism.api.heat.IMekanismHeatHandler;
 import mekanism.api.text.EnumColor;
 import mekanism.common.MekanismLang;
+import mekanism.common.block.transmitter.BlockSmallTransmitter;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.capabilities.chemical.DynamicChemicalHandler;
 import mekanism.common.capabilities.energy.DynamicStrictEnergyHandler;
@@ -28,10 +31,12 @@ import mekanism.common.capabilities.resolver.BasicSidedCapabilityResolver;
 import mekanism.common.capabilities.resolver.manager.ChemicalHandlerManager;
 import mekanism.common.capabilities.resolver.manager.EnergyHandlerManager;
 import mekanism.common.capabilities.resolver.manager.FluidHandlerManager;
+import mekanism.common.capabilities.resolver.manager.HeatHandlerManager;
 import mekanism.common.integration.energy.EnergyCompatUtils;
 import mekanism.common.lib.transmitter.ConnectionType;
 import mekanism.common.tile.base.CapabilityTileEntity;
 import mekanism.common.util.EnumUtils;
+import mekanism.common.util.MultipartUtils;
 import mekanism.common.util.NBTUtils;
 import mekanism.common.util.WorldUtils;
 import mekanism.common.util.text.BooleanStateDisplay.OnOff;
@@ -45,10 +50,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.ICapabilityProvider;
 import net.neoforged.neoforge.fluids.FluidStack;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.system.NonnullDefault;
 
@@ -72,11 +77,11 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
 
     private static final String TAG_CONNECTION_TYPES = "connection_types";
 
-    private final FusedPipeNode node = new FusedPipeNode(this);
-
     private FusedPipeConfig config = FusedPipeConfig.defaults();
+    private final FusedPipeNode node = new FusedPipeNode(this);
     private final ConnectionType[] connectionTypes = {ConnectionType.NORMAL, ConnectionType.NORMAL, ConnectionType.NORMAL, ConnectionType.NORMAL,
                                                       ConnectionType.NORMAL, ConnectionType.NORMAL};
+    private final ConnectionType[] visual = new ConnectionType[EnumUtils.DIRECTIONS.length];
 
     private boolean redstoneReactive;
     private boolean redstonePowered;
@@ -86,6 +91,7 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
     private boolean markJoined;
     private boolean forceUpdate = true;
     private boolean visualDirty = true;
+    private final HeatHandlerManager heatHandlerManager;
 
     public TileEntityFusedPipe(BlockPos pos, BlockState state) {
         super(ModTileEntityTypes.FUSED_PIPE, pos, state);
@@ -95,7 +101,18 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
             new DynamicFluidHandler(this::getExposedFluidTanks, this::canExtractFromSide, this::canInsertIntoSide, null));
         var chemicalHandlerManager = new ChemicalHandlerManager(this::getExposedChemicalTanks,
             new DynamicChemicalHandler(this::getExposedChemicalTanks, this::canExtractFromSide, this::canInsertIntoSide, null));
-        addCapabilityResolvers(List.of(energyHandlerManager, fluidHandlerManager, chemicalHandlerManager));
+        //Since the variable references itself inside its initialization, we have to make it a member.
+        this.heatHandlerManager = new HeatHandlerManager(this::getExposedHeatCapacitors, new IMekanismHeatHandler() {
+            @Override
+            public List<IHeatCapacitor> getHeatCapacitors(@Nullable Direction side) {
+                return heatHandlerManager.getContainers(side);
+            }
+
+            @Override
+            public void onContentsChanged() {
+            }
+        });
+        addCapabilityResolvers(List.of(energyHandlerManager, fluidHandlerManager, chemicalHandlerManager, heatHandlerManager));
     }
 
     //Content access
@@ -119,9 +136,24 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
 
     //Connection configuration
 
+    /**
+     * Returns the configurated connection status.
+     */
     @Nullable
     public ConnectionType getConnectionTypeRaw(@Nullable Direction side) {
         return side == null ? null : connectionTypes[side.ordinal()];
+    }
+
+    /**
+     * Returns the current visual connection status. <p>
+     *
+     * For a side without blocks, this function returns {@link ConnectionType#NONE}, whereas
+     * {@link TileEntityFusedPipe#getConnectionTypeRaw} returns the underlying configuration
+     * type, i.e. the one that would happen if a block were placed.
+     */
+    @Nullable
+    public ConnectionType getConnectionType(@Nullable Direction side) {
+        return side == null ? null : visual[side.ordinal()];
     }
 
     public void setConnectionTypeRaw(Direction side, ConnectionType type) {
@@ -171,6 +203,7 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
         List<BlockCapability<?, @Nullable Direction>> capabilities = new ArrayList<>(EnergyCompatUtils.getLoadedEnergyCapabilities());
         capabilities.add(Capabilities.FLUID.block());
         capabilities.add(Capabilities.CHEMICAL.block());
+        capabilities.add(Capabilities.HEAT);
         invalidateCapabilitiesAll(capabilities);
         invalidateCapabilities();
     }
@@ -193,8 +226,7 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
             recheckRedstoneState();
         }
         if (visualDirty) {
-            visualDirty = false;
-            updateVisualState();
+            refreshVisualState();
         }
     }
 
@@ -214,21 +246,20 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
      * mid-load.
      */
     private void updateVisualState() {
-        if (!hasLevel()) {
+        if (level == null)
             return;
-        }
+
         BlockState state = getBlockState();
-        if (!(state.getBlock() instanceof BlockFusedPipe block)) {
+        if (!(state.getBlock() instanceof BlockFusedPipe block))
             return;
-        }
-        ConnectionType[] visual = new ConnectionType[EnumUtils.DIRECTIONS.length];
+
         for (Direction side : EnumUtils.DIRECTIONS) {
             ConnectionType configured = connectionTypes[side.ordinal()];
             visual[side.ordinal()] = configured == ConnectionType.NONE || !connectsTo(side) ? ConnectionType.NONE : configured;
         }
         BlockState target = block.applyConnections(state, visual);
         if (target != state) {
-            getLevel().setBlock(getBlockPos(), target, Block.UPDATE_CLIENTS);
+            level.setBlock(getBlockPos(), target, Block.UPDATE_CLIENTS);
         }
     }
 
@@ -238,6 +269,9 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
      */
     private boolean connectsTo(Direction side) {
         Level level = getLevel();
+        if (level == null)
+            return false;
+
         BlockPos neighborPos = getBlockPos().relative(side);
         Direction opposite = side.getOpposite();
         if (level.getBlockEntity(neighborPos) instanceof TileEntityFusedPipe neighbor) {
@@ -249,7 +283,8 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
             }
         }
         return level.getCapability(Capabilities.FLUID.block(), neighborPos, opposite) != null
-              || level.getCapability(Capabilities.CHEMICAL.block(), neighborPos, opposite) != null;
+              || level.getCapability(Capabilities.CHEMICAL.block(), neighborPos, opposite) != null
+              || level.getCapability(Capabilities.HEAT, neighborPos, opposite) != null;
     }
 
     //Lifecycle
@@ -351,6 +386,20 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
         return network.getChemicalTanks(side);
     }
 
+    private List<IHeatCapacitor> getExposedHeatCapacitors(@Nullable Direction side) {
+        if (!config.isEnabled(FusedFunction.HEAT)) {
+            return Collections.emptyList();
+        }
+        if (side != null && (getConnectionTypeRaw(side) == ConnectionType.NONE || isRedstoneActivated())) {
+            return Collections.emptyList();
+        }
+        FusedNetwork network = node.getNetwork();
+        if (network == null) {
+            return Collections.emptyList();
+        }
+        return network.getHeatCapacitors(side);
+    }
+
     private boolean canExtractFromSide(@Nullable Direction side) {
         if (side == null)
             return true;
@@ -370,12 +419,49 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
 
     //Side config interaction
 
+    public List<VoxelShape> getCollisionBoxes() {
+        List<VoxelShape> list = new ArrayList<>();
+        for (Direction side : EnumUtils.DIRECTIONS) {
+            var connectionType = getConnectionType(side);
+            //The pipe uses model for universal cable (small pipes).
+            // Hence we reuse Mekanism's BlockSmallTransmitter here.
+            if (connectionType != ConnectionType.NONE) {
+                list.add(BlockSmallTransmitter.getSideForType(connectionType, side));
+            }
+        }
+        //Center position
+        list.add(BlockSmallTransmitter.CENTER);
+        return list;
+    }
+
+    @Nullable
+    public Direction getSideLookingAt(Player player) {
+        MultipartUtils.AdvancedRayTraceResult result = MultipartUtils.collisionRayTrace(player, getBlockPos(), getCollisionBoxes());
+        if (result != null && result.valid()) {
+            List<Direction> list = new ArrayList<>(EnumUtils.DIRECTIONS.length);
+            for (Direction dir : EnumUtils.DIRECTIONS) {
+                if (visual[dir.ordinal()] != ConnectionType.NONE) {
+                    list.add(dir);
+                }
+            }
+            int boxIndex = result.subHit + 1;
+            if (boxIndex < list.size()) {
+                return list.get(boxIndex);
+            }
+        }
+        return null;
+    }
+
     @Override
     public InteractionResult onSneakRightClick(Player player, Direction side) {
+        Direction hitSide = getSideLookingAt(player);
+        if (hitSide == null)
+            hitSide = side;
+
         if (!isRemote()) {
-            ConnectionType current = getConnectionTypeRaw(side);
+            ConnectionType current = getConnectionTypeRaw(hitSide);
             ConnectionType next = current == null ? ConnectionType.NORMAL : current.getNext();
-            setConnectionTypeRaw(side, next);
+            setConnectionTypeRaw(hitSide, next);
             setChanged();
             player.displayClientMessage(MekanismLang.CONNECTION_TYPE.translateColored(EnumColor.GRAY, next), true);
         }
@@ -427,6 +513,9 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
         if (nbt.contains(SerializationConstants.BOXED_CHEMICAL, Tag.TAG_COMPOUND)) {
             node.setSavedChemical(ChemicalStack.parseOptional(provider, nbt.getCompound(SerializationConstants.BOXED_CHEMICAL)));
         }
+        if (nbt.contains(SerializationConstants.HEAT_STORED, Tag.TAG_DOUBLE)) {
+            node.setSavedHeat(nbt.getDouble(SerializationConstants.HEAT_STORED));
+        }
     }
 
     @Override
@@ -450,6 +539,10 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
         ChemicalStack savedChemical = node.getSavedChemical();
         if (!savedChemical.isEmpty()) {
             nbt.put(SerializationConstants.BOXED_CHEMICAL, savedChemical.save(provider));
+        }
+        double savedHeat = node.getSavedHeat();
+        if (savedHeat > 0) {
+            nbt.putDouble(SerializationConstants.HEAT_STORED, savedHeat);
         }
     }
 

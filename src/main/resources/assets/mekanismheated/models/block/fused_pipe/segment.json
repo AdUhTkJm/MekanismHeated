@@ -1,4 +1,5 @@
 {
+ "render_type": "minecraft:cutout",
  "textures": {
   "side": "mekanism:block/models/multipart/basic_universal_cable_vertical",
   "center": "mekanism:block/models/multipart/basic_universal_cable",

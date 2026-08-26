@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.function.BooleanSupplier;
 import mekanism.api.chemical.IChemicalHandler;
 import mekanism.api.energy.IStrictEnergyHandler;
+import mekanism.api.heat.IHeatHandler;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.integration.energy.EnergyCompatUtils;
 import mekanism.common.integration.energy.IEnergyCompat;
@@ -129,12 +130,26 @@ public final class FusedAcceptorCache {
         }
     }
 
+    /**
+     * A neighboring heat handler. Heat is different from energy/fluid/chemical: it flows based on
+     * temperature difference to ALL adjacent blocks with IHeatHandler capability, regardless of
+     * the side's connection type (NONE, NORMAL, PULL, PUSH all conduct heat).
+     */
+    public record HeatAcceptor(BlockCapabilityCache<IHeatHandler, @Nullable Direction> cache) {
+
+        @Nullable
+        public IHeatHandler resolve() {
+            return cache.getCapability();
+        }
+    }
+
     private final List<EnergyTarget> energyTargets = new ArrayList<>();
     private final List<EnergySource> energySources = new ArrayList<>();
     private final List<TankTarget<IFluidHandler>> fluidTargets = new ArrayList<>();
     private final List<TankSource<IFluidHandler>> fluidSources = new ArrayList<>();
     private final List<TankTarget<IChemicalHandler>> chemicalTargets = new ArrayList<>();
     private final List<TankSource<IChemicalHandler>> chemicalSources = new ArrayList<>();
+    private final List<HeatAcceptor> heatAcceptors = new ArrayList<>();
     private boolean dirty = true;
 
     /**
@@ -169,8 +184,14 @@ public final class FusedAcceptorCache {
         return chemicalSources;
     }
 
+    public List<HeatAcceptor> getHeatAcceptors() {
+        return heatAcceptors;
+    }
+
     /**
      * Rebuilds all acceptor lists if anything changed since the last build.
+     * Heat acceptors are NOT gated by connection type — heat flows to all adjacent blocks
+     * with IHeatHandler capability.
      */
     public void rebuildIfNeeded(Collection<FusedPipeNode> nodes) {
         if (!dirty) {
@@ -205,6 +226,10 @@ public final class FusedAcceptorCache {
                 if (node.pullsChemicalFrom(side)) {
                     addSource(chemicalSources, node, Capabilities.CHEMICAL.block(), level, neighborPos, context);
                 }
+                //Heat: always add if heat is enabled on this node — heat flows regardless of connection type
+                if (node.isEnabled(FusedFunction.HEAT)) {
+                    addHeatAcceptor(level, neighborPos, context);
+                }
             }
         }
     }
@@ -216,6 +241,7 @@ public final class FusedAcceptorCache {
         fluidSources.clear();
         chemicalTargets.clear();
         chemicalSources.clear();
+        heatAcceptors.clear();
     }
 
     private <H> void addTarget(List<TankTarget<H>> targets, BlockCapability<H, @Nullable Direction> capability,
@@ -226,5 +252,9 @@ public final class FusedAcceptorCache {
     private <H> void addSource(List<TankSource<H>> sources, FusedPipeNode origin, BlockCapability<H, @Nullable Direction> capability,
           ServerLevel level, BlockPos pos, Direction context) {
         sources.add(new TankSource<>(origin, BlockCapabilityCache.create(capability, level, pos, context, ALWAYS_VALID, this::invalidate)));
+    }
+
+    private void addHeatAcceptor(ServerLevel level, BlockPos pos, Direction context) {
+        heatAcceptors.add(new HeatAcceptor(BlockCapabilityCache.create(Capabilities.HEAT, level, pos, context, ALWAYS_VALID, this::invalidate)));
     }
 }

@@ -31,7 +31,24 @@ plain list walk: pre-gated send/pull entries, no map lookups, no per-side config
 Positions are used only at rebuild time to create the caches; energy compat adapters persist even
 while resolving to nothing so machines placed later are picked up immediately.
 
-Not yet done (Phases D-F): heat, items, alloy upgrades, tier-setting GUI/crafting. Remaining visual
+**Phase D implemented (2026-08-26, refactored 2026-08-26):** heat handling.
+- **Network-wide buffer** (`VariableHeatCapacitor` on `FusedNetwork`): single temperature for the
+  entire network, capacity = sum of enabled node capacities. Conduction/insulation coefficients
+  are sums of node tier values. Matches energy/fluid/chemical pattern.
+- 2-phase simulate pass in `FusedNetwork.simulateHeat()`: Phase 1 calculates transfers queuing
+  into capacitor's `heatToHandle`; Phase 2 commits via `update()`.
+- Adjacent transfer: `invConduction = sink.getTotalInverseConduction() + network.getInverseConduction()`;
+  `tempToTransfer = (networkTemp - ambientTemp) / invConduction`.
+- Environment loss: 6 sides to air with `AIR_INVERSE_COEFFICIENT + insulation + conduction`.
+- Heat flows to ALL adjacent blocks with `IHeatHandler` regardless of connection type.
+- `connectsTo()` checks `Capabilities.HEAT` so pipes visually connect to heat-accepting machines.
+- `invalidateTransmittedCapabilities()` includes `Capabilities.HEAT` for proper cache invalidation.
+- Persistence: `savedHeat` on nodes, distributed/absorbed like energy on unload/reload.
+- NBT key: `SerializationConstants.HEAT` (double), replacing the old `ContainerType.HEAT` serialization.
+- Capability exposure via `HeatHandlerManager` + `IMekanismHeatHandler`; `getExposedHeatCapacitors`
+  returns the network's capacitor.
+
+Not yet done (Phases E-F): items, alloy upgrades, tier-setting GUI/crafting. Remaining visual
 work: energy glow, tier-dependent textures (currently always basic cable), minor hand-tuning of the
 converted models/UVs.
 
@@ -70,21 +87,21 @@ latency and buffers at the boundary. No network merging with vanilla pipes.
 
 ```
 TileEntityFusedPipe (1 BE per position)
- +- FusedPipeNode            (per-position content: config ref, heat capacitor, item transit queue, saved shares)
+ +- FusedPipeNode            (per-position content: config ref, saved shares)
      +- member of FusedNetwork  (unified graph over many nodes)
           |- energy:    VariableCapacityEnergyContainer   (network buffer = sum of enabled node capacities)
           |- fluid:     VariableCapacityFluidTank         (single-fluid like vanilla)
           |- chemical:  VariableCapacityChemicalTank      (single-chemical like vanilla)
-          |- heat:      NO buffer - per-node VariableHeatCapacitor; network drives 2-phase simulate pass
+          |- heat:      VariableHeatCapacitor             (network buffer = sum of enabled node capacities)
           |- items:     transit entries live on nodes; network supplies routing (BFS)
-          +- AcceptorCache: Map<pos, EnumMap<Direction, per-type BlockCapabilityCache>>  (built ONCE, shared by all types)
+          +- AcceptorCache: flat lists (energy/fluid/chemical targets+sources, heat acceptors)
 
 FusedPipeRegistry: static; ServerTickEvent.Post -> process joins/splits -> tick networks
 ```
 
 Per-tick pipeline per network (server post): pull sides -> buffers -> fair-split emission
-(`EmitUtils`) per enabled function -> heat simulate pass -> advance item transit & deliver.
-Disabled functions are skipped everywhere (no caches, no NBT, no capability).
+(`EmitUtils`) per enabled function -> heat simulate pass (network-wide single buffer) ->
+advance item transit & deliver. Disabled functions are skipped everywhere (no caches, no NBT, no capability).
 
 ## 2. Files
 
@@ -144,7 +161,8 @@ All under `src/main/java/io/aduhtkjm/mekanismheated/`.
 2. **B — Graph + energy**: registry, network merge/split, acceptor cache, energy pull/emit via
    `EmitUtils`. Verify: generator -> fused -> machine; merge/split correctness; FE interop both ways.
 3. **C — Fluid + chemical**: buffers, single-type lock, boundary interop with pipes/tubes.
-4. **D — Heat**: capacitor + simulate pass; Fuelwood Heater <-> fused <-> machine chain.
+4. **D — Heat** ✅: per-node capacitor + 2-phase simulate pass; adjacent transfer + environment loss;
+   heat flows regardless of connection type; NBT persistence; capability exposure.
 5. **E — Items**: router + insertion handler + transit lifecycle; routing, inventory-full deferral,
    drop-on-break.
 6. **F — Polish**: share persistence across unload/reload, redstone edge cases, perf pass, game tests.
