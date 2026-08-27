@@ -36,6 +36,7 @@ import mekanism.common.util.FluidUtils;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -71,6 +72,7 @@ public class FusedNetwork {
     private boolean itemCapacityDirty = true;
     private final ItemHandler itemHandler = new ItemHandler();
     public final FusedAcceptorCache acceptorCache = new FusedAcceptorCache();
+    private long lastSaveShareWriteTime = -1;
 
     public FusedNetwork(UUID uuid) {
         this.uuid = uuid;
@@ -362,6 +364,19 @@ public class FusedNetwork {
             itemCount = 0;
         }
 
+    }
+
+    /**
+     * Flushes the network's distributed buffer back to each node's saved-share fields before
+     * NBT serialization. The {@code lastSaveShareWriteTime} guard ensures this only happens once
+     * per game tick even if multiple nodes in the same network request it.
+     */
+    public void validateSaveShares(FusedPipeNode triggerNode) {
+        Level level = triggerNode.getLevel();
+        if (level != null && level.getGameTime() != lastSaveShareWriteTime) {
+            lastSaveShareWriteTime = level.getGameTime();
+            distributeSharesToNodes();
+        }
     }
 
     /**

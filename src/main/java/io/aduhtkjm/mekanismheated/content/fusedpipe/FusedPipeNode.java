@@ -86,7 +86,11 @@ public class FusedPipeNode {
     }
 
     public void setNetwork(@Nullable FusedNetwork network) {
+        FusedNetwork old = this.network;
         this.network = network;
+        if (old != network) {
+            tile.invalidateTransmittedCapabilities();
+        }
     }
 
     //Shares

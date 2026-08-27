@@ -110,7 +110,6 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
     private boolean redstoneSet;
 
     private boolean loaded;
-    private boolean markJoined;
     private boolean forceUpdate = true;
     private boolean visualDirty = true;
     private final HeatHandlerManager heatHandlerManager;
@@ -221,7 +220,7 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
      * Invalidates every capability we expose for a transmission function, both our cached
      * instances and the ones the world may have cached about us.
      */
-    private void invalidateTransmittedCapabilities() {
+    public void invalidateTransmittedCapabilities() {
         List<BlockCapability<?, @Nullable Direction>> capabilities = new ArrayList<>(EnergyCompatUtils.getLoadedEnergyCapabilities());
         capabilities.add(Capabilities.FLUID.block());
         capabilities.add(Capabilities.CHEMICAL.block());
@@ -238,10 +237,6 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
     }
 
     protected void onUpdateServer() {
-        if (markJoined) {
-            onWorldJoin();
-            markJoined = false;
-        }
         if (forceUpdate) {
             recheckRedstoneState();
             forceUpdate = false;
@@ -335,8 +330,7 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
         if (isRemote()) {
             loaded = true;
         } else {
-            //Deferred until the first tick so that neighboring tiles are all present
-            markJoined = true;
+            onWorldJoin();
         }
     }
 
@@ -553,6 +547,10 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
     @Override
     public void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
         super.saveAdditional(nbt, provider);
+        FusedNetwork network = node.getNetwork();
+        if (network != null) {
+            network.validateSaveShares(node);
+        }
         nbt.put(FusedPipeConfig.TAG_CONFIG, config.write(provider, new CompoundTag()));
         int[] raw = new int[EnumUtils.DIRECTIONS.length];
         for (int i = 0; i < EnumUtils.DIRECTIONS.length; i++) {

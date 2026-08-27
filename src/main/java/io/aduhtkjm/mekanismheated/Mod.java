@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 @net.neoforged.fml.common.Mod(Mod.MODID)
 public class Mod {
     public static final String MODID = "mekanismheated";
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
 
