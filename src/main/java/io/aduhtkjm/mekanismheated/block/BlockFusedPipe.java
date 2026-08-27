@@ -62,10 +62,17 @@ public class BlockFusedPipe extends Block implements EntityBlock {
 
     public BlockFusedPipe(Properties properties) {
         super(properties.pushReaction(PushReaction.BLOCK));
+        //Avoid flickering.
+        // The default state here does not affect any logic or connection features of the pipe;
+        // these are solely computed inside the tile entity.
+        //
+        // The pipe's visual state updates on the next tick after it's placed by `onUpdateServer`.
+        // It would transition more smoothly if we start from no arm rather than all arms,
+        // hence these NONEs.
         registerDefaultState(defaultBlockState()
-              .setValue(NORTH, ConnectionType.NORMAL).setValue(SOUTH, ConnectionType.NORMAL)
-              .setValue(WEST, ConnectionType.NORMAL).setValue(EAST, ConnectionType.NORMAL)
-              .setValue(UP, ConnectionType.NORMAL).setValue(DOWN, ConnectionType.NORMAL));
+              .setValue(NORTH, ConnectionType.NONE).setValue(SOUTH, ConnectionType.NONE)
+              .setValue(WEST, ConnectionType.NONE).setValue(EAST, ConnectionType.NONE)
+              .setValue(UP, ConnectionType.NONE).setValue(DOWN, ConnectionType.NONE));
     }
 
     @Override
@@ -139,9 +146,10 @@ public class BlockFusedPipe extends Block implements EntityBlock {
 
     @Nullable
     @Override
+    @SuppressWarnings("all") // Unchecked class cast
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return type == ModTileEntityTypes.FUSED_PIPE.get()
-              ? (BlockEntityTicker<T>) ModTileEntityTypes.FUSED_PIPE.getTicker(!level.isClientSide)
+              ? (BlockEntityTicker<T>) ModTileEntityTypes.FUSED_PIPE.getTicker(level.isClientSide)
               : null;
     }
 
