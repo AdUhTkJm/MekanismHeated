@@ -16,6 +16,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -109,7 +110,7 @@ public final class FusedAcceptorCache {
     }
 
     /**
-     * A neighboring capability the network may push fluids/chemicals into.
+     * A neighboring capability the network may push fluids/chemicals/items into.
      */
     public record TankTarget<H>(BlockCapabilityCache<H, @Nullable Direction> cache) {
 
@@ -120,7 +121,7 @@ public final class FusedAcceptorCache {
     }
 
     /**
-     * A neighboring capability the network may actively drain fluids/chemicals from.
+     * A neighboring capability the network may actively drain fluids/chemicals/items from.
      */
     public record TankSource<H>(FusedPipeNode origin, BlockCapabilityCache<H, @Nullable Direction> cache) {
 
@@ -149,6 +150,8 @@ public final class FusedAcceptorCache {
     private final List<TankSource<IFluidHandler>> fluidSources = new ArrayList<>();
     private final List<TankTarget<IChemicalHandler>> chemicalTargets = new ArrayList<>();
     private final List<TankSource<IChemicalHandler>> chemicalSources = new ArrayList<>();
+    private final List<TankTarget<IItemHandler>> itemTargets = new ArrayList<>();
+    private final List<TankSource<IItemHandler>> itemSources = new ArrayList<>();
     private final List<HeatAcceptor> heatAcceptors = new ArrayList<>();
     private boolean dirty = true;
 
@@ -182,6 +185,14 @@ public final class FusedAcceptorCache {
 
     public List<TankSource<IChemicalHandler>> getChemicalSources() {
         return chemicalSources;
+    }
+
+    public List<TankTarget<IItemHandler>> getItemTargets() {
+        return itemTargets;
+    }
+
+    public List<TankSource<IItemHandler>> getItemSources() {
+        return itemSources;
     }
 
     public List<HeatAcceptor> getHeatAcceptors() {
@@ -219,12 +230,16 @@ public final class FusedAcceptorCache {
                     }
                     addTarget(fluidTargets, Capabilities.FLUID.block(), level, neighborPos, context);
                     addTarget(chemicalTargets, Capabilities.CHEMICAL.block(), level, neighborPos, context);
+                    addTarget(itemTargets, Capabilities.ITEM.block(), level, neighborPos, context);
                 }
                 if (node.pullsFluidFrom(side)) {
                     addSource(fluidSources, node, Capabilities.FLUID.block(), level, neighborPos, context);
                 }
                 if (node.pullsChemicalFrom(side)) {
                     addSource(chemicalSources, node, Capabilities.CHEMICAL.block(), level, neighborPos, context);
+                }
+                if (node.pullsItemsFrom(side)) {
+                    addSource(itemSources, node, Capabilities.ITEM.block(), level, neighborPos, context);
                 }
                 //Heat: always add if heat is enabled on this node — heat flows regardless of connection type
                 if (node.isEnabled(FusedFunction.HEAT)) {
@@ -241,6 +256,8 @@ public final class FusedAcceptorCache {
         fluidSources.clear();
         chemicalTargets.clear();
         chemicalSources.clear();
+        itemTargets.clear();
+        itemSources.clear();
         heatAcceptors.clear();
     }
 

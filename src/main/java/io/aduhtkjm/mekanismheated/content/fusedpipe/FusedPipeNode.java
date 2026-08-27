@@ -1,8 +1,11 @@
 package io.aduhtkjm.mekanismheated.content.fusedpipe;
 
+import java.util.ArrayList;
+import java.util.List;
 import io.aduhtkjm.mekanismheated.tile.TileEntityFusedPipe;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.common.lib.transmitter.ConnectionType;
+import net.minecraft.world.item.ItemStack;
 import mekanism.common.tier.CableTier;
 import mekanism.common.tier.ConductorTier;
 import mekanism.common.tier.PipeTier;
@@ -49,6 +52,12 @@ public class FusedPipeNode {
      * Share of the network's heat buffer distributed to this node, same purpose as {@link #savedEnergy}.
      */
     private double savedHeat;
+
+    /**
+     * Share of the network's item buffer distributed to this node, same purpose as {@link #savedEnergy}.
+     */
+    @NotNull
+    private List<ItemStack> savedItems = new ArrayList<>();
 
     public FusedPipeNode(TileEntityFusedPipe tile) {
         this.tile = tile;
@@ -140,6 +149,22 @@ public class FusedPipeNode {
 
     public double getSavedHeat() {
         return savedHeat;
+    }
+
+    @NotNull
+    public List<ItemStack> takeSavedItems() {
+        List<ItemStack> items = savedItems;
+        savedItems = new ArrayList<>();
+        return items;
+    }
+
+    public void setSavedItems(@NotNull List<ItemStack> items) {
+        this.savedItems = items;
+    }
+
+    @NotNull
+    public List<ItemStack> getSavedItems() {
+        return savedItems;
     }
 
     //Configuration delegation
@@ -295,6 +320,13 @@ public class FusedPipeNode {
      * Chemical pulling requires an explicitly configured PULL side (vanilla pressurized tube behaviour).
      */
     public boolean pullsChemicalFrom(Direction side) {
+        return isPullSide(side);
+    }
+
+    /**
+     * Item pulling requires an explicitly configured PULL side (vanilla logistical transporter behaviour).
+     */
+    public boolean pullsItemsFrom(Direction side) {
         return isPullSide(side);
     }
 

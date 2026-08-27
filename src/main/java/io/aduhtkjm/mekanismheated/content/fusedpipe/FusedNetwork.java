@@ -2,6 +2,7 @@ package io.aduhtkjm.mekanismheated.content.fusedpipe;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -31,12 +32,13 @@ import mekanism.common.content.network.distribution.EnergyAcceptorTarget;
 import mekanism.common.content.network.distribution.FluidHandlerTarget;
 import mekanism.common.util.ChemicalUtil;
 import mekanism.common.util.EmitUtils;
-import mekanism.common.util.EnumUtils;
 import mekanism.common.util.FluidUtils;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -63,6 +65,11 @@ public class FusedNetwork {
     private final List<IChemicalTank> chemicalTanksView;
     private final VariableHeatCapacitor heatCapacitor;
     private final List<IHeatCapacitor> heatCapacitorsView;
+    private final List<ItemStack> itemBuffer = new ArrayList<>();
+    private int itemCount;
+    private int itemBufferCapacity;
+    private boolean itemCapacityDirty = true;
+    private final ItemHandler itemHandler = new ItemHandler();
     public final FusedAcceptorCache acceptorCache = new FusedAcceptorCache();
 
     public FusedNetwork(UUID uuid) {
@@ -103,6 +110,7 @@ public class FusedNetwork {
         if (nodes.add(node)) {
             node.setNetwork(this);
             acceptorCache.invalidate();
+            itemCapacityDirty = true;
             if (node.isEnabled(FusedFunction.ENERGY)) {
                 long share = node.takeSavedEnergy();
                 if (share > 0L) {
@@ -121,6 +129,11 @@ public class FusedNetwork {
                     heatCapacitor.handleHeat(share);
                 }
             }
+            if (node.isEnabled(FusedFunction.ITEM)) {
+                for (ItemStack stack : node.takeSavedItems()) {
+                    insertIntoBuffer(stack);
+                }
+            }
             updateHeatCapacity();
         }
     }
@@ -128,6 +141,7 @@ public class FusedNetwork {
     public void removeNode(FusedPipeNode node) {
         nodes.remove(node);
         acceptorCache.invalidate();
+        itemCapacityDirty = true;
         updateHeatCapacity();
     }
 
@@ -141,6 +155,7 @@ public class FusedNetwork {
         }
         other.nodes.clear();
         acceptorCache.invalidate();
+        itemCapacityDirty = true;
         long theirEnergy = other.getEnergy();
         if (theirEnergy > 0L) {
             energyContainer.setEnergy(MathUtils.addClamped(energyContainer.getEnergy(), theirEnergy));
@@ -155,6 +170,11 @@ public class FusedNetwork {
             heatCapacitor.handleHeat(theirHeat);
             other.heatCapacitor.setHeat(0);
         }
+        for (ItemStack stack : other.itemBuffer) {
+            insertIntoBuffer(stack);
+        }
+        other.itemBuffer.clear();
+        other.itemCount = 0;
         updateHeatCapacity();
     }
 
@@ -330,6 +350,212 @@ public class FusedNetwork {
             }
             heatCapacitor.setHeat(0);
         }
+        //Items
+        List<FusedPipeNode> itemEligible = eligibleNodes(FusedFunction.ITEM);
+        if (!itemBuffer.isEmpty() && !itemEligible.isEmpty()) {
+            //Distribute items round-robin across eligible nodes
+            for (int index = 0; index < itemBuffer.size(); index++) {
+                FusedPipeNode node = itemEligible.get(index % itemEligible.size());
+                node.getSavedItems().add(itemBuffer.get(index));
+            }
+            itemBuffer.clear();
+            itemCount = 0;
+        }
+
+    }
+
+    /**
+     * Items transfer instantly — no travel speed. Pull from PULL sources into the buffer, then
+     * emit from the buffer to NORMAL/PUSH targets. No markDirty() during normal operation —
+     * persistence is handled by distributeSharesToNodes on unload.
+     */
+    public IItemHandler getItemHandler() {
+        return itemHandler;
+    }
+
+    private int getItemBufferCapacity() {
+        if (itemCapacityDirty) {
+            itemBufferCapacity = 0;
+            for (FusedAcceptorCache.TankSource<IItemHandler> entry : acceptorCache.getItemSources()) {
+                itemBufferCapacity += entry.origin().getItemPullAmount();
+            }
+            itemCapacityDirty = false;
+        }
+        return itemBufferCapacity;
+    }
+
+    private void pullItems() {
+        for (FusedAcceptorCache.TankSource<IItemHandler> entry : acceptorCache.getItemSources()) {
+            int pullRate = entry.origin().getItemPullAmount();
+            if (pullRate <= 0) {
+                continue;
+            }
+            IItemHandler source = entry.resolve();
+            if (source == null) {
+                continue;
+            }
+            for (int slot = 0; slot < source.getSlots(); slot++) {
+                if (pullRate <= 0) {
+                    break;
+                }
+                int capacity = getItemBufferCapacity();
+                if (itemCount >= capacity) {
+                    break;
+                }
+                int space = capacity - itemCount;
+                ItemStack stackInSlot = source.getStackInSlot(slot);
+                if (stackInSlot.isEmpty()) {
+                    continue;
+                }
+                int extract = Math.min(pullRate, Math.min(space, stackInSlot.getMaxStackSize()));
+                ItemStack extracted = source.extractItem(slot, extract, true);
+                if (extracted.isEmpty()) {
+                    continue;
+                }
+                int actuallyExtracted = extracted.getCount();
+                source.extractItem(slot, actuallyExtracted, false);
+                insertIntoBuffer(stackInSlot.copyWithCount(actuallyExtracted));
+                pullRate -= actuallyExtracted;
+            }
+        }
+    }
+
+    private void emitItems() {
+        if (itemBuffer.isEmpty()) {
+            return;
+        }
+        List<FusedAcceptorCache.TankTarget<IItemHandler>> targets = acceptorCache.getItemTargets();
+        Iterator<ItemStack> iterator = itemBuffer.iterator();
+        while (iterator.hasNext()) {
+            ItemStack stack = iterator.next();
+            if (stack.isEmpty()) {
+                iterator.remove();
+                continue;
+            }
+            for (FusedAcceptorCache.TankTarget<IItemHandler> entry : targets) {
+                IItemHandler acceptor = entry.resolve();
+                if (acceptor == null || stack.isEmpty()) {
+                    continue;
+                }
+                for (int slot = 0; slot < acceptor.getSlots(); slot++) {
+                    if (stack.isEmpty()) {
+                        break;
+                    }
+                    ItemStack remaining = acceptor.insertItem(slot, stack, true);
+                    int accepted = stack.getCount() - remaining.getCount();
+                    if (accepted > 0) {
+                        ItemStack toInsert = stack.copyWithCount(accepted);
+                        acceptor.insertItem(slot, toInsert, false);
+                        stack.shrink(accepted);
+                        itemCount -= accepted;
+                    }
+                }
+            }
+            if (stack.isEmpty()) {
+                iterator.remove();
+            }
+        }
+    }
+
+    /**
+     * Returns the remaining part of the stack that isn't inserted.
+     */
+    private ItemStack insertIntoBuffer(@NotNull ItemStack stack) {
+        int capacity = getItemBufferCapacity();
+        if (itemCount >= capacity) {
+            return stack;
+        }
+        int remaining = capacity - itemCount;
+        //Try to merge with existing stacks first
+        for (ItemStack existing : itemBuffer) {
+            if (remaining <= 0) {
+                break;
+            }
+            if (ItemStack.isSameItemSameComponents(existing, stack) && existing.getCount() < existing.getMaxStackSize()) {
+                int space = Math.min(existing.getMaxStackSize() - existing.getCount(), remaining);
+                int toAdd = Math.min(space, stack.getCount());
+                existing.grow(toAdd);
+                stack.shrink(toAdd);
+                remaining -= toAdd;
+                itemCount += toAdd;
+                if (stack.isEmpty()) {
+                    return ItemStack.EMPTY;
+                }
+            }
+        }
+        //Add as new stack
+        if (!stack.isEmpty() && remaining > 0) {
+            int toAdd = Math.min(remaining, stack.getCount());
+            if (toAdd < stack.getCount()) {
+                itemBuffer.add(stack.copyWithCount(toAdd));
+            } else {
+                itemBuffer.add(stack.copy());
+            }
+            stack.shrink(toAdd);
+            itemCount += toAdd;
+        }
+        return stack.isEmpty() ? ItemStack.EMPTY : stack;
+    }
+
+    /**
+     * Simple IItemHandler backed by the item buffer. Machines can push items into the pipe;
+     * the network then emits them to targets on the next tick.
+     */
+    private class ItemHandler implements IItemHandler {
+        @Override
+        public int getSlots() {
+            return itemBuffer.size();
+        }
+
+        @NotNull
+        @Override
+        public ItemStack getStackInSlot(int slot) {
+            return itemBuffer.get(slot);
+        }
+
+        @NotNull
+        @Override
+        public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
+            if (stack.isEmpty()) {
+                return ItemStack.EMPTY;
+            }
+            return insertIntoBuffer(stack.copy());
+        }
+
+        @NotNull
+        @Override
+        public ItemStack extractItem(int slot, int amount, boolean simulate) {
+            if (slot < 0 || slot >= itemBuffer.size()) {
+                return ItemStack.EMPTY;
+            }
+            ItemStack stack = itemBuffer.get(slot);
+            if (stack.isEmpty()) {
+                return ItemStack.EMPTY;
+            }
+            int extracted = Math.min(amount, stack.getCount());
+            ItemStack result = stack.copyWithCount(extracted);
+            if (!simulate) {
+                stack.shrink(extracted);
+                itemCount -= extracted;
+                if (stack.isEmpty()) {
+                    itemBuffer.remove(slot);
+                }
+            }
+            return result;
+        }
+
+        @Override
+        public int getSlotLimit(int slot) {
+            if (slot < 0 || slot >= itemBuffer.size()) {
+                return 0;
+            }
+            return itemBuffer.get(slot).getMaxStackSize();
+        }
+
+        @Override
+        public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+            return true;
+        }
     }
 
     @NotNull
@@ -372,6 +598,9 @@ public class FusedNetwork {
             if (heatShare > 0) {
                 heatCapacitor.handleHeat(heatShare);
             }
+            for (ItemStack stack : node.takeSavedItems()) {
+                insertIntoBuffer(stack);
+            }
         }
     }
 
@@ -411,9 +640,11 @@ public class FusedNetwork {
         pullEnergy();
         pullFluids();
         pullChemicals();
+        pullItems();
         emitEnergy();
         emitFluids();
         emitChemicals();
+        emitItems();
         simulateHeat();
     }
 

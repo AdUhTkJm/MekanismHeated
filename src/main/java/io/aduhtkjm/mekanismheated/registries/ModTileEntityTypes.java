@@ -60,5 +60,6 @@ public class ModTileEntityTypes {
           .with(Capabilities.FLUID.block(), CapabilityTileEntity.FLUID_HANDLER_PROVIDER)
           .with(Capabilities.CHEMICAL.block(), CapabilityTileEntity.CHEMICAL_HANDLER_PROVIDER)
           .with(Capabilities.HEAT, CapabilityTileEntity.HEAT_HANDLER_PROVIDER)
+          .with(Capabilities.ITEM.block(), TileEntityFusedPipe.ITEM_HANDLER_PROVIDER)
           .build();
 }

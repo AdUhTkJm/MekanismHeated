@@ -44,9 +44,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -54,6 +56,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.ICapabilityProvider;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.system.NonnullDefault;
 
@@ -75,7 +78,26 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
           CapabilityTileEntity.capabilityProvider(Capabilities.CONFIGURABLE,
                 (tile, cap) -> new BasicSidedCapabilityResolver<>(tile, cap, ProxyConfigurable::new));
 
+    /**
+     * Exposes the item handler for adjacent blocks to push/pull items. Items transfer instantly.
+     */
+    public static final ICapabilityProvider<TileEntityFusedPipe, @Nullable Direction, IItemHandler> ITEM_HANDLER_PROVIDER =
+          (tile, context) -> {
+              if (!tile.config.isEnabled(FusedFunction.ITEM)) {
+                  return null;
+              }
+              if (context != null && (tile.getConnectionTypeRaw(context) == ConnectionType.NONE || tile.isRedstoneActivated())) {
+                  return null;
+              }
+              FusedNetwork network = tile.node.getNetwork();
+              if (network == null) {
+                  return null;
+              }
+              return network.getItemHandler();
+          };
+
     private static final String TAG_CONNECTION_TYPES = "connection_types";
+    private static final String TAG_ITEMS = "items";
 
     private FusedPipeConfig config = FusedPipeConfig.defaults();
     private final FusedPipeNode node = new FusedPipeNode(this);
@@ -204,6 +226,7 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
         capabilities.add(Capabilities.FLUID.block());
         capabilities.add(Capabilities.CHEMICAL.block());
         capabilities.add(Capabilities.HEAT);
+        capabilities.add(Capabilities.ITEM.block());
         invalidateCapabilitiesAll(capabilities);
         invalidateCapabilities();
     }
@@ -284,7 +307,8 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
         }
         return level.getCapability(Capabilities.FLUID.block(), neighborPos, opposite) != null
               || level.getCapability(Capabilities.CHEMICAL.block(), neighborPos, opposite) != null
-              || level.getCapability(Capabilities.HEAT, neighborPos, opposite) != null;
+              || level.getCapability(Capabilities.HEAT, neighborPos, opposite) != null
+              || level.getCapability(Capabilities.ITEM.block(), neighborPos, opposite) != null;
     }
 
     //Lifecycle
@@ -516,6 +540,14 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
         if (nbt.contains(SerializationConstants.HEAT_STORED, Tag.TAG_DOUBLE)) {
             node.setSavedHeat(nbt.getDouble(SerializationConstants.HEAT_STORED));
         }
+        if (nbt.contains(TAG_ITEMS, Tag.TAG_LIST)) {
+            ListTag itemTag = nbt.getList(TAG_ITEMS, Tag.TAG_COMPOUND);
+            List<ItemStack> items = new ArrayList<>();
+            for (int i = 0; i < itemTag.size(); i++) {
+                items.add(ItemStack.parseOptional(provider, itemTag.getCompound(i)));
+            }
+            node.setSavedItems(items);
+        }
     }
 
     @Override
@@ -543,6 +575,14 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
         double savedHeat = node.getSavedHeat();
         if (savedHeat > 0) {
             nbt.putDouble(SerializationConstants.HEAT_STORED, savedHeat);
+        }
+        List<ItemStack> savedItems = node.getSavedItems();
+        if (!savedItems.isEmpty()) {
+            ListTag itemTag = new ListTag();
+            for (ItemStack stack : savedItems) {
+                itemTag.add(stack.save(provider));
+            }
+            nbt.put(TAG_ITEMS, itemTag);
         }
     }
 

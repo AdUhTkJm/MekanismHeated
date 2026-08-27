@@ -48,7 +48,20 @@ while resolving to nothing so machines placed later are picked up immediately.
 - Capability exposure via `HeatHandlerManager` + `IMekanismHeatHandler`; `getExposedHeatCapacitors`
   returns the network's capacitor.
 
-Not yet done (Phases E-F): items, alloy upgrades, tier-setting GUI/crafting. Remaining visual
+**Phase E implemented (2026-08-26):** item handling — instant transfer (no travel time).
+- Items transfer instantly like fluid/chemical — no travel speed modeling.
+- Network-wide `ItemHandler` (inner class backed by `List<ItemStack>` buffer) exposed via
+  `ITEM_HANDLER_PROVIDER` on the tile.
+- Pull from PULL-side inventories up to tier-based `TransporterTier.getPullAmount()` per tick.
+- Emit to NORMAL/PUSH-side inventories; items that can't be placed stay in the buffer.
+- `FusedAcceptorCache` has `itemTargets`/`itemSources` lists using `Capabilities.ITEM.block()`.
+- `connectsTo()` checks `Capabilities.ITEM.block()` so pipes visually connect to item inventories.
+- `invalidateTransmittedCapabilities()` includes `Capabilities.ITEM.block()`.
+- `pullsItemsFrom(side)` = PULL-only (vanilla logistical transporter semantics).
+- Items from adopted networks absorbed into buffer; buffer items distributed to nodes on unload
+  via `savedItems` on `FusedPipeNode` (List of ItemStack).
+
+Not yet done (Phase F): alloy upgrades, tier-setting GUI/crafting. Remaining visual
 work: energy glow, tier-dependent textures (currently always basic cable), minor hand-tuning of the
 converted models/UVs.
 
@@ -93,7 +106,7 @@ TileEntityFusedPipe (1 BE per position)
           |- fluid:     VariableCapacityFluidTank         (single-fluid like vanilla)
           |- chemical:  VariableCapacityChemicalTank      (single-chemical like vanilla)
           |- heat:      VariableHeatCapacitor             (network buffer = sum of enabled node capacities)
-          |- items:     transit entries live on nodes; network supplies routing (BFS)
+          |- items:     List<ItemStack> buffer; instant transfer, no travel time
           +- AcceptorCache: flat lists (energy/fluid/chemical targets+sources, heat acceptors)
 
 FusedPipeRegistry: static; ServerTickEvent.Post -> process joins/splits -> tick networks
@@ -101,7 +114,7 @@ FusedPipeRegistry: static; ServerTickEvent.Post -> process joins/splits -> tick 
 
 Per-tick pipeline per network (server post): pull sides -> buffers -> fair-split emission
 (`EmitUtils`) per enabled function -> heat simulate pass (network-wide single buffer) ->
-advance item transit & deliver. Disabled functions are skipped everywhere (no caches, no NBT, no capability).
+item pull/emit (instant, no travel time). Disabled functions are skipped everywhere (no caches, no NBT, no capability).
 
 ## 2. Files
 
@@ -163,8 +176,8 @@ All under `src/main/java/io/aduhtkjm/mekanismheated/`.
 3. **C — Fluid + chemical**: buffers, single-type lock, boundary interop with pipes/tubes.
 4. **D — Heat** ✅: per-node capacitor + 2-phase simulate pass; adjacent transfer + environment loss;
    heat flows regardless of connection type; NBT persistence; capability exposure.
-5. **E — Items**: router + insertion handler + transit lifecycle; routing, inventory-full deferral,
-   drop-on-break.
+5. **E — Items** ✅: instant transfer via network-wide ItemHandler buffer; pull from PULL sides,
+   emit to NORMAL/PUSH sides; tier-based pull rate via TransporterTier; capability exposure.
 6. **F — Polish**: share persistence across unload/reload, redstone edge cases, perf pass, game tests.
 
 ## 5. Risks / notes
