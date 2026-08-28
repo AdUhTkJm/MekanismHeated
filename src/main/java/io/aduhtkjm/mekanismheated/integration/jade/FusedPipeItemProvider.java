@@ -5,7 +5,7 @@ import java.util.List;
 import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedFunction;
 import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedNetwork;
 import io.aduhtkjm.mekanismheated.tile.TileEntityFusedPipe;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
 import snownee.jade.api.Accessor;
@@ -16,8 +16,8 @@ public enum FusedPipeItemProvider implements IServerExtensionProvider<ItemStack>
     INSTANCE;
 
     @Override
-    public Identifier getUid() {
-        return Identifier.fromNamespaceAndPath("mekanismheated", "fused_pipe_items");
+    public ResourceLocation getUid() {
+        return ResourceLocation.fromNamespaceAndPath("mekanismheated", "fused_pipe_items");
     }
 
     @Override
