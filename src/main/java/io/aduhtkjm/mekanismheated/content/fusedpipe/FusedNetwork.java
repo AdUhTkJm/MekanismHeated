@@ -8,10 +8,13 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.IntSupplier;
 import java.util.function.LongSupplier;
+
+import io.aduhtkjm.mekanismheated.Mod;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
+import mekanism.api.SerializationConstants;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IChemicalHandler;
 import mekanism.api.chemical.IChemicalTank;
@@ -35,6 +38,11 @@ import mekanism.common.util.EmitUtils;
 import mekanism.common.util.FluidUtils;
 import mekanism.common.util.MekanismUtils;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -49,7 +57,13 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * Energy, fluid, chemicals and heat use network-wide buffers whose capacity is the sum of the
  * per-node capacities; tanks hold at most a single type at a time (vanilla transmitter parity).
- * Items keep their state on the nodes themselves.
+ * Items keep their state in the network item buffer.
+ * <p>
+ * Persistence is handled by {@link FusedNetworkSavedData}: the full buffer state is serialised
+ * once per network (not per node) into world-level saved data, keyed by the network's UUID.
+ * Each tile entity only persists its network UUID. On load, the first node to join the network
+ * restores the buffers from saved data. Per-node shares are only used during network dispersal
+ * and chunk unloads where the network graph must be split.
  */
 public class FusedNetwork {
 
@@ -72,7 +86,7 @@ public class FusedNetwork {
     private boolean itemCapacityDirty = true;
     private final ItemHandler itemHandler = new ItemHandler();
     public final FusedAcceptorCache acceptorCache = new FusedAcceptorCache();
-    private long lastSaveShareWriteTime = -1;
+    private long lastSavedTime = -1;
 
     public FusedNetwork(UUID uuid) {
         this.uuid = uuid;
@@ -107,12 +121,22 @@ public class FusedNetwork {
     /**
      * Adds a node to this network and absorbs its saved shares into the buffers. Shares of
      * functions that are disabled on the node stay parked on it until the function is enabled.
+     * <p>
+     * When the very first node joins, the network attempts to restore its buffer state from
+     * the world-level {@link FusedNetworkSavedData}.
      */
     public void addNode(FusedPipeNode node) {
         if (nodes.add(node)) {
             node.setNetwork(this);
             acceptorCache.invalidate();
             itemCapacityDirty = true;
+            //First node: try to restore from saved data
+            if (nodes.size() == 1) {
+                Level level = node.getLevel();
+                if (level instanceof ServerLevel serverLevel) {
+                    loadFromSavedData(serverLevel, level.registryAccess());
+                }
+            }
             if (node.isEnabled(FusedFunction.ENERGY)) {
                 long share = node.takeSavedEnergy();
                 if (share > 0L) {
@@ -288,8 +312,94 @@ public class FusedNetwork {
     }
 
     /**
-     * Distributes the current buffers equally among the nodes that have each function enabled, so
-     * that every tile can persist its share; used when chunks unload or a network disperses.
+     * Serialises the network's buffer state into the world-level {@link FusedNetworkSavedData},
+     * keyed by this network's UUID. Called during background saves so that tile entities only
+     * need to persist their network UUID rather than distributing shares to every node.
+     * The {@code lastSavedTime} guard ensures this only happens once per game tick even
+     * if multiple tiles in the same network call it.
+     */
+    public void saveToSavedData(@NotNull ServerLevel level, @NotNull HolderLookup.Provider provider) {
+        long now = level.getGameTime();
+        if (now == lastSavedTime) {
+            return;
+        }
+        lastSavedTime = now;
+        CompoundTag tag = new CompoundTag();
+        //Energy
+        tag.putLong(SerializationConstants.ENERGY, energyContainer.getEnergy());
+        //Fluid
+        if (!fluidTank.isEmpty()) {
+            tag.put(SerializationConstants.FLUID, fluidTank.getFluid().save(provider));
+        }
+        //Chemical
+        if (!chemicalTank.isEmpty()) {
+            tag.put(SerializationConstants.BOXED_CHEMICAL, chemicalTank.getStack().save(provider));
+        }
+        //Heat
+        if (heatCapacitor.getHeat() > 0) {
+            tag.putDouble(SerializationConstants.HEAT_STORED, heatCapacitor.getHeat());
+        }
+        //Items
+        if (!itemBuffer.isEmpty()) {
+            ListTag itemTag = new ListTag();
+            for (ItemStack stack : itemBuffer) {
+                itemTag.add(stack.save(provider));
+            }
+            tag.put("Items", itemTag);
+        }
+        Mod.LOGGER.debug("network saved: {}", tag);
+        FusedNetworkSavedData.get(level).putNetwork(uuid, tag);
+    }
+
+    /**
+     * Restores the network's buffer state from the world-level {@link FusedNetworkSavedData}.
+     * If no saved data exists for this UUID, the buffers remain empty.
+     */
+    public void loadFromSavedData(@NotNull ServerLevel level, @NotNull HolderLookup.Provider provider) {
+        CompoundTag tag = FusedNetworkSavedData.get(level).consumeNetwork(uuid);
+        Mod.LOGGER.debug("network loaded: {}", tag);
+        if (tag == null) {
+            return;
+        }
+        //Energy
+        energyContainer.setEnergy(tag.getLong(SerializationConstants.ENERGY));
+        //Fluid
+        if (tag.contains(SerializationConstants.FLUID, Tag.TAG_COMPOUND)) {
+            fluidTank.setStack(FluidStack.parseOptional(provider, tag.getCompound(SerializationConstants.FLUID)));
+        }
+        //Chemical
+        if (tag.contains(SerializationConstants.BOXED_CHEMICAL, Tag.TAG_COMPOUND)) {
+            chemicalTank.setStack(ChemicalStack.parseOptional(provider, tag.getCompound(SerializationConstants.BOXED_CHEMICAL)));
+        }
+        //Heat
+        if (tag.contains(SerializationConstants.HEAT_STORED, Tag.TAG_DOUBLE)) {
+            heatCapacitor.setHeat(tag.getDouble(SerializationConstants.HEAT_STORED));
+        }
+        //Items
+        itemBuffer.clear();
+        itemCount = 0;
+        if (tag.contains("Items", Tag.TAG_LIST)) {
+            ListTag itemTag = tag.getList("Items", Tag.TAG_COMPOUND);
+            for (int i = 0; i < itemTag.size(); i++) {
+                ItemStack stack = ItemStack.parseOptional(provider, itemTag.getCompound(i));
+                if (!stack.isEmpty()) {
+                    itemBuffer.add(stack);
+                    itemCount += stack.getCount();
+                }
+            }
+        }
+    }
+
+    /**
+     * Removes this network's entry from the world-level {@link FusedNetworkSavedData}.
+     */
+    public void removeFromSavedData(@NotNull ServerLevel level) {
+        FusedNetworkSavedData.get(level).removeNetwork(uuid);
+    }
+
+    /**
+     * Distributes the current buffers equally among the nodes that have each function enabled and
+     * empties the network buffers; used when chunks unload or a network disperses.
      */
     public void distributeSharesToNodes() {
         if (nodes.isEmpty()) {
@@ -303,8 +413,7 @@ public class FusedNetwork {
             long remainder = total % energyEligible.size();
             for (int index = 0; index < energyEligible.size(); index++) {
                 long share = base + (index < remainder ? 1L : 0L);
-                FusedPipeNode node = energyEligible.get(index);
-                node.setSavedEnergy(MathUtils.addClamped(node.getSavedEnergy(), share));
+                energyEligible.get(index).setSavedEnergy(share);
             }
             energyContainer.setEmpty();
         }
@@ -318,9 +427,7 @@ public class FusedNetwork {
             for (int index = 0; index < fluidEligible.size(); index++) {
                 long share = base + (index < remainder ? 1L : 0L);
                 if (share > 0L) {
-                    FusedPipeNode node = fluidEligible.get(index);
-                    FluidStack part = fluid.copyWithAmount((int) share);
-                    node.setSavedFluid(node.getSavedFluid().isEmpty() ? part : sumFluids(node.getSavedFluid(), part));
+                    fluidEligible.get(index).setSavedFluid(fluid.copyWithAmount((int) share));
                 }
             }
             fluidTank.setEmpty();
@@ -335,9 +442,7 @@ public class FusedNetwork {
             for (int index = 0; index < chemicalEligible.size(); index++) {
                 long share = base + (index < remainder ? 1L : 0L);
                 if (share > 0L) {
-                    FusedPipeNode node = chemicalEligible.get(index);
-                    ChemicalStack part = chemical.copyWithAmount(share);
-                    node.setSavedChemical(node.getSavedChemical().isEmpty() ? part : sumChemicals(node.getSavedChemical(), part));
+                    chemicalEligible.get(index).setSavedChemical(chemical.copyWithAmount(share));
                 }
             }
             chemicalTank.setEmpty();
@@ -348,14 +453,16 @@ public class FusedNetwork {
             double total = heatCapacitor.getHeat();
             double base = total / heatEligible.size();
             for (FusedPipeNode node : heatEligible) {
-                node.setSavedHeat(node.getSavedHeat() + base);
+                node.setSavedHeat(base);
             }
             heatCapacitor.setHeat(0);
         }
         //Items
         List<FusedPipeNode> itemEligible = eligibleNodes(FusedFunction.ITEM);
         if (!itemBuffer.isEmpty() && !itemEligible.isEmpty()) {
-            //Distribute items round-robin across eligible nodes
+            for (FusedPipeNode node : itemEligible) {
+                node.setSavedItems(new ArrayList<>());
+            }
             for (int index = 0; index < itemBuffer.size(); index++) {
                 FusedPipeNode node = itemEligible.get(index % itemEligible.size());
                 node.getSavedItems().add(itemBuffer.get(index));
@@ -363,26 +470,12 @@ public class FusedNetwork {
             itemBuffer.clear();
             itemCount = 0;
         }
-
-    }
-
-    /**
-     * Flushes the network's distributed buffer back to each node's saved-share fields before
-     * NBT serialization. The {@code lastSaveShareWriteTime} guard ensures this only happens once
-     * per game tick even if multiple nodes in the same network request it.
-     */
-    public void validateSaveShares(FusedPipeNode triggerNode) {
-        Level level = triggerNode.getLevel();
-        if (level != null && level.getGameTime() != lastSaveShareWriteTime) {
-            lastSaveShareWriteTime = level.getGameTime();
-            distributeSharesToNodes();
-        }
     }
 
     /**
      * Items transfer instantly — no travel speed. Pull from PULL sources into the buffer, then
-     * emit from the buffer to NORMAL/PUSH targets. No markDirty() during normal operation —
-     * persistence is handled by distributeSharesToNodes on unload.
+     * emit from the buffer to NORMAL/PUSH targets. Persistence is handled by
+     * {@link FusedNetworkSavedData} during background saves.
      */
     public IItemHandler getItemHandler() {
         return itemHandler;

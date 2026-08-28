@@ -2,6 +2,7 @@ package io.aduhtkjm.mekanismheated.content.fusedpipe;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import io.aduhtkjm.mekanismheated.tile.TileEntityFusedPipe;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.common.lib.transmitter.ConnectionType;
@@ -29,6 +30,14 @@ public class FusedPipeNode {
 
     @Nullable
     private FusedNetwork network;
+
+    /**
+     * The network UUID persisted in this node's tile NBT. Set during {@code loadAdditional} so
+     * that {@link FusedPipeRegistry} can re-associate the node with its network when the network
+     * is formed after a world load.
+     */
+    @Nullable
+    private UUID networkId;
 
     /**
      * Share of the network's energy buffer that was distributed to this node when it unloaded or
@@ -91,6 +100,23 @@ public class FusedPipeNode {
         if (old != network) {
             tile.invalidateTransmittedCapabilities();
         }
+    }
+
+    /**
+     * Returns the network UUID that was persisted in this node's tile NBT during the last save,
+     * or {@code null} if this node was not part of a network when saved.
+     */
+    @Nullable
+    public UUID getNetworkId() {
+        return networkId;
+    }
+
+    /**
+     * Stores the network UUID read from this node's tile NBT so that {@link FusedPipeRegistry}
+     * can re-associate the node with its network on world load.
+     */
+    public void setNetworkId(@Nullable UUID networkId) {
+        this.networkId = networkId;
     }
 
     //Shares

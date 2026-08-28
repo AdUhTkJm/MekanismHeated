@@ -53,13 +53,19 @@ public final class FusedPipeRegistry {
      * receives its share of the buffer via {@link FusedNetwork#distributeSharesToNodes()}.
      */
     public static void untrack(FusedPipeNode node) {
-        trackedNodes.remove(node);
+        if (!trackedNodes.remove(node)) {
+            return;
+        }
         orphanNodes.remove(node);
         FusedNetwork network = node.getNetwork();
         if (network != null) {
             network.removeNode(node);
             node.setNetwork(null);
             if (network.getNodes().isEmpty()) {
+                //Clean up the SavedData entry for a network that no longer has any members
+                if (node.getLevel() instanceof ServerLevel serverLevel) {
+                    network.removeFromSavedData(serverLevel);
+                }
                 networks.remove(network);
                 network.acceptorCache.invalidate();
             } else {
@@ -70,10 +76,16 @@ public final class FusedPipeRegistry {
     }
 
     public static void onServerStopping(ServerStoppingEvent event) {
-        //Persist all buffers into the tiles before the world saves
+        //Persist every network's buffers into the world-level SavedData so tiles only need
+        //their UUID on reload; no per-node share distribution required.
         List<FusedNetwork> allNetworks = new ArrayList<>(networks);
         for (FusedNetwork network : allNetworks) {
-            network.distributeSharesToNodes();
+            for (FusedPipeNode node : network.getNodes()) {
+                if (node.getLevel() instanceof ServerLevel serverLevel) {
+                    network.saveToSavedData(serverLevel, serverLevel.registryAccess());
+                    break;
+                }
+            }
         }
         reset();
     }
@@ -98,6 +110,13 @@ public final class FusedPipeRegistry {
         for (FusedNetwork network : toDisperse) {
             if (!networks.contains(network)) {
                 continue;
+            }
+            //Stale the SavedData entry so nodes that rejoin with the old UUID don't double-count
+            for (FusedPipeNode node : network.getNodes()) {
+                if (node.getLevel() instanceof ServerLevel serverLevel) {
+                    network.removeFromSavedData(serverLevel);
+                    break;
+                }
             }
             //Hand every valid node its share of the buffer; they will re-absorb it when reforming
             network.distributeSharesToNodes();
@@ -142,12 +161,28 @@ public final class FusedPipeRegistry {
             network = new FusedNetwork(UUID.randomUUID());
             networks.add(network);
             for (FusedNetwork found : finder.networksFound) {
+                //Clear stale SavedData entries for the absorbed networks
+                for (FusedPipeNode member : found.getNodes()) {
+                    if (member.getLevel() instanceof ServerLevel sl) {
+                        found.removeFromSavedData(sl);
+                        break;
+                    }
+                }
                 network.adoptFrom(found);
                 found.acceptorCache.invalidate();
                 networks.remove(found);
             }
         } else {
-            network = new FusedNetwork(UUID.randomUUID());
+            //No existing network found; try to reuse the UUID persisted by the first node
+            UUID savedId = null;
+            for (FusedPipeNode connected : finder.connectedNodes) {
+                UUID id = connected.getNetworkId();
+                if (id != null) {
+                    savedId = id;
+                    break;
+                }
+            }
+            network = new FusedNetwork(savedId != null ? savedId : UUID.randomUUID());
             networks.add(network);
         }
 
@@ -155,7 +190,6 @@ public final class FusedPipeRegistry {
             network.addNode(connected);
             orphanNodes.remove(connected);
         }
-        network.clampBuffer();
     }
 
     private static void tickNetworks() {

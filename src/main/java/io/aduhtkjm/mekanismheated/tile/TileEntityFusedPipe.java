@@ -13,7 +13,6 @@ import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedPipeRegistry;
 import io.aduhtkjm.mekanismheated.registries.ModTileEntityTypes;
 import mekanism.api.IConfigurable;
 import mekanism.api.SerializationConstants;
-import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IChemicalTank;
 import mekanism.api.energy.IEnergyContainer;
 import mekanism.api.fluid.IExtendedFluidTank;
@@ -44,18 +43,16 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.ICapabilityProvider;
-import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.system.NonnullDefault;
@@ -530,23 +527,8 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
             }
         });
         redstoneReactive = nbt.getBoolean(SerializationConstants.REDSTONE);
-        NBTUtils.setLongIfPresent(nbt, SerializationConstants.ENERGY, node::setSavedEnergy);
-        if (nbt.contains(SerializationConstants.FLUID, Tag.TAG_COMPOUND)) {
-            node.setSavedFluid(FluidStack.parseOptional(provider, nbt.getCompound(SerializationConstants.FLUID)));
-        }
-        if (nbt.contains(SerializationConstants.BOXED_CHEMICAL, Tag.TAG_COMPOUND)) {
-            node.setSavedChemical(ChemicalStack.parseOptional(provider, nbt.getCompound(SerializationConstants.BOXED_CHEMICAL)));
-        }
-        if (nbt.contains(SerializationConstants.HEAT_STORED, Tag.TAG_DOUBLE)) {
-            node.setSavedHeat(nbt.getDouble(SerializationConstants.HEAT_STORED));
-        }
-        if (nbt.contains(TAG_ITEMS, Tag.TAG_LIST)) {
-            ListTag itemTag = nbt.getList(TAG_ITEMS, Tag.TAG_COMPOUND);
-            List<ItemStack> items = new ArrayList<>();
-            for (int i = 0; i < itemTag.size(); i++) {
-                items.add(ItemStack.parseOptional(provider, itemTag.getCompound(i)));
-            }
-            node.setSavedItems(items);
+        if (nbt.hasUUID("NetworkId")) {
+            node.setNetworkId(nbt.getUUID("NetworkId"));
         }
     }
 
@@ -555,7 +537,11 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
         super.saveAdditional(nbt, provider);
         FusedNetwork network = node.getNetwork();
         if (network != null) {
-            network.validateSaveShares(node);
+            nbt.putUUID("NetworkId", network.getUUID());
+            //Persist the full buffer state to the world-level SavedData (once per network per tick)
+            if (level instanceof ServerLevel serverLevel) {
+                network.saveToSavedData(serverLevel, provider);
+            }
         }
         nbt.put(FusedPipeConfig.TAG_CONFIG, config.write(provider, new CompoundTag()));
         int[] raw = new int[EnumUtils.DIRECTIONS.length];
@@ -564,30 +550,6 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
         }
         nbt.putIntArray(TAG_CONNECTION_TYPES, raw);
         nbt.putBoolean(SerializationConstants.REDSTONE, redstoneReactive);
-        long savedEnergy = node.getSavedEnergy();
-        if (savedEnergy > 0L) {
-            nbt.putLong(SerializationConstants.ENERGY, savedEnergy);
-        }
-        FluidStack savedFluid = node.getSavedFluid();
-        if (!savedFluid.isEmpty()) {
-            nbt.put(SerializationConstants.FLUID, savedFluid.save(provider));
-        }
-        ChemicalStack savedChemical = node.getSavedChemical();
-        if (!savedChemical.isEmpty()) {
-            nbt.put(SerializationConstants.BOXED_CHEMICAL, savedChemical.save(provider));
-        }
-        double savedHeat = node.getSavedHeat();
-        if (savedHeat > 0) {
-            nbt.putDouble(SerializationConstants.HEAT_STORED, savedHeat);
-        }
-        List<ItemStack> savedItems = node.getSavedItems();
-        if (!savedItems.isEmpty()) {
-            ListTag itemTag = new ListTag();
-            for (ItemStack stack : savedItems) {
-                itemTag.add(stack.save(provider));
-            }
-            nbt.put(TAG_ITEMS, itemTag);
-        }
     }
 
     /**
