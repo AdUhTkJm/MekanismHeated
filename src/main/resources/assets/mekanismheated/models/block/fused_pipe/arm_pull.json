@@ -1,9 +1,9 @@
 {
  "render_type": "minecraft:cutout",
  "textures": {
-  "side": "mekanism:block/models/multipart/basic_universal_cable_vertical",
-  "center": "mekanism:block/models/multipart/basic_universal_cable",
-  "particle": "mekanism:block/models/multipart/basic_universal_cable"
+  "side": "mekanismheated:block/fused_pipe/basic_fused_pipe_vertical",
+  "center": "mekanismheated:block/fused_pipe/basic_fused_pipe",
+  "particle": "mekanismheated:block/fused_pipe/basic_fused_pipe"
  },
  "elements": [
   {

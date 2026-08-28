@@ -172,6 +172,17 @@ public class FusedNetwork {
     }
 
     /**
+     * Called after one or more pipes in this network were upgraded in place with an alloy, so
+     * network-wide cached values (heat capacity, item buffer capacity) are recomputed from the
+     * nodes' new tiers. The energy/fluid/chemical container capacities are lazy and pick the new
+     * tiers up on their own.
+     */
+    public void onPipeUpgraded() {
+        itemCapacityDirty = true;
+        updateHeatCapacity();
+    }
+
+    /**
      * Moves all nodes and the buffers of another network into this one.
      */
     public void adoptFrom(FusedNetwork other) {

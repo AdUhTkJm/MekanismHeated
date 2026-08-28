@@ -4,6 +4,7 @@ import io.aduhtkjm.mekanismheated.registries.ModTileEntityTypes;
 import io.aduhtkjm.mekanismheated.tile.TileEntityFusedPipe;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.util.Map;
+import mekanism.api.tier.BaseTier;
 import mekanism.common.lib.transmitter.ConnectionType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -32,13 +33,14 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.system.NonnullDefault;
 
 /**
- * The fused pipe block. Renders exactly like a universal cable: the center core plus one arm per
- * side, using Mekanism's transmitter textures and geometry (the arm models were converted from
- * their {@code transmitter_small.obj.mek}). Arms reflect the *effective* per-side state pushed
- * into the blockstate by the tile: {@code none} when the side is unconfigured or has nothing to
- * connect to, otherwise the configured {@link ConnectionType} (push and pull have slightly
- * different arm meshes, just like vanilla transmitters). The energy glow of vanilla cables is not
- * replicated.
+ * The fused pipe block. Renders like a universal cable: the center core plus one arm per
+ * side, using the mod's own fused pipe textures and geometry (the arm models were converted
+ * from Mekanism's {@code transmitter_small.obj.mek}). Arms reflect the *effective* per-side
+ * state pushed into the blockstate by the tile: {@code none} when the side is unconfigured or
+ * has nothing to connect to, otherwise the configured {@link ConnectionType} (push and pull
+ * have slightly different arm meshes, just like vanilla transmitters). The {@link #TIER}
+ * property selects the texture set, matching the highest tier among the enabled functions
+ * (basic when none is enabled). The energy glow of vanilla cables is not replicated.
  */
 @NonnullDefault
 public class BlockFusedPipe extends Block implements EntityBlock {
@@ -49,6 +51,13 @@ public class BlockFusedPipe extends Block implements EntityBlock {
     public static final EnumProperty<ConnectionType> EAST = EnumProperty.create("east", ConnectionType.class);
     public static final EnumProperty<ConnectionType> UP = EnumProperty.create("up", ConnectionType.class);
     public static final EnumProperty<ConnectionType> DOWN = EnumProperty.create("down", ConnectionType.class);
+
+    /**
+     * The texture tier to render. Only the four non-creative tiers are valid, since the pipe
+     * never displays the creative tier (a creative function is clamped to ultimate).
+     */
+    public static final EnumProperty<BaseTier> TIER = EnumProperty.create("tier", BaseTier.class,
+          BaseTier.BASIC, BaseTier.ADVANCED, BaseTier.ELITE, BaseTier.ULTIMATE);
 
     private static final Direction[] PROPERTY_ORDER = {Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST, Direction.UP, Direction.DOWN};
 
@@ -72,13 +81,14 @@ public class BlockFusedPipe extends Block implements EntityBlock {
         registerDefaultState(defaultBlockState()
               .setValue(NORTH, ConnectionType.NONE).setValue(SOUTH, ConnectionType.NONE)
               .setValue(WEST, ConnectionType.NONE).setValue(EAST, ConnectionType.NONE)
-              .setValue(UP, ConnectionType.NONE).setValue(DOWN, ConnectionType.NONE));
+              .setValue(UP, ConnectionType.NONE).setValue(DOWN, ConnectionType.NONE)
+              .setValue(TIER, BaseTier.BASIC));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(NORTH, SOUTH, WEST, EAST, UP, DOWN);
+        builder.add(NORTH, SOUTH, WEST, EAST, UP, DOWN, TIER);
     }
 
     @Override
@@ -117,14 +127,14 @@ public class BlockFusedPipe extends Block implements EntityBlock {
 
     /**
      * Packs the given config into the matching blockstate properties so clients can render the
-     * current side configuration. No-op if nothing changed.
+     * current side configuration and texture tier. No-op if nothing changed.
      */
-    public BlockState applyConnections(BlockState state, ConnectionType[] connectionTypes) {
+    public BlockState applyVisualState(BlockState state, ConnectionType[] connectionTypes, BaseTier tier) {
         BlockState changed = state;
         for (Direction side : PROPERTY_ORDER) {
             changed = changed.setValue(propertyFor(side), connectionTypes[side.ordinal()]);
         }
-        return changed;
+        return changed.setValue(TIER, tier);
     }
 
     public static EnumProperty<ConnectionType> propertyFor(Direction side) {

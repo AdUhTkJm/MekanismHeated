@@ -1,0 +1,8 @@
+{
+ "parent": "mekanismheated:block/fused_pipe/core",
+ "textures": {
+  "side": "mekanismheated:block/fused_pipe/ultimate_fused_pipe_vertical",
+  "center": "mekanismheated:block/fused_pipe/ultimate_fused_pipe",
+  "particle": "mekanismheated:block/fused_pipe/ultimate_fused_pipe"
+ }
+}

@@ -2,6 +2,7 @@ package io.aduhtkjm.mekanismheated.tile;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.block.BlockFusedPipe;
@@ -12,14 +13,18 @@ import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedPipeNode;
 import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedPipeRegistry;
 import io.aduhtkjm.mekanismheated.registries.ModTileEntityTypes;
 import mekanism.api.IConfigurable;
+import mekanism.api.IAlloyInteraction;
 import mekanism.api.SerializationConstants;
 import mekanism.api.chemical.IChemicalTank;
 import mekanism.api.energy.IEnergyContainer;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.heat.IHeatCapacitor;
 import mekanism.api.heat.IMekanismHeatHandler;
+import mekanism.api.tier.BaseTier;
+import mekanism.api.tier.IAlloyTier;
 import mekanism.api.text.EnumColor;
 import mekanism.common.MekanismLang;
+import mekanism.common.advancements.MekanismCriteriaTriggers;
 import mekanism.common.block.transmitter.BlockSmallTransmitter;
 import mekanism.common.capabilities.Capabilities;
 import mekanism.common.capabilities.chemical.DynamicChemicalHandler;
@@ -45,8 +50,10 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -54,6 +61,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.ICapabilityProvider;
 import net.neoforged.neoforge.items.IItemHandler;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.system.NonnullDefault;
 
@@ -66,7 +74,7 @@ import org.lwjgl.system.NonnullDefault;
  * through standard capabilities backed by the network's buffers.
  */
 @NonnullDefault
-public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyConfigurable.ISidedConfigurable {
+public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyConfigurable.ISidedConfigurable, IAlloyInteraction {
 
     /**
      * Exposes the wrench side-config interface ({@link IConfigurable}) to Mekanism's configurator.
@@ -254,11 +262,11 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
     }
 
     /**
-     * Pushes the current side configuration into the blockstate so clients render the matching
-     * connection arms: a side renders an arm only if it is configured to something other than
-     * {@link ConnectionType#NONE} <em>and</em> has a neighbor worth connecting to. Deferred to the
-     * tick when coming out of {@link #loadAdditional}, since {@code setBlock} is not safe
-     * mid-load.
+     * Pushes the current side configuration and texture tier into the blockstate so clients
+     * render the matching connection arms and tier: a side renders an arm only if it is
+     * configured to something other than {@link ConnectionType#NONE} <em>and</em> has a
+     * neighbor worth connecting to. Deferred to the tick when coming out of
+     * {@link #loadAdditional}, since {@code setBlock} is not safe mid-load.
      */
     private void updateVisualState() {
         if (level == null)
@@ -272,7 +280,7 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
             ConnectionType configured = connectionTypes[side.ordinal()];
             visual[side.ordinal()] = configured == ConnectionType.NONE || !connectsTo(side) ? ConnectionType.NONE : configured;
         }
-        BlockState target = block.applyConnections(state, visual);
+        BlockState target = block.applyVisualState(state, visual, config.displayTier());
         if (target != state) {
             level.setBlock(getBlockPos(), target, Block.UPDATE_CLIENTS);
         }
@@ -499,6 +507,75 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
             player.displayClientMessage(MekanismLang.REDSTONE_SENSITIVITY.translateColored(EnumColor.GRAY, EnumColor.INDIGO, OnOff.of(redstoneReactive)), true);
         }
         return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    public void onAlloyInteraction(Player player, ItemStack stack, IAlloyTier alloyTier) {
+        if (level == null || isRemote()) {
+            return;
+        }
+        FusedNetwork network = node.getNetwork();
+        if (network == null) {
+            return;
+        }
+        BaseTier target = BaseTier.getTier(alloyTier.getBaseTierLevel());
+        if (target == null) {
+            return;
+        }
+        int enabled = 0;
+        for (FusedFunction function : FusedFunction.VALUES) {
+            if (config.isEnabled(function)) {
+                enabled++;
+            }
+        }
+        if (enabled == 0) {
+            return;
+        }
+        //A single fused pipe provides several functions, so an alloy converts fewer consecutive
+        //pipes than a vanilla single-function transmitter would (ceiling of 8 / enabled functions).
+        int limit = (int) Math.ceil(8.0 / enabled);
+        List<FusedPipeNode> candidates = new ArrayList<>(network.getNodes());
+        candidates.sort(Comparator.comparingDouble(node -> node.getBlockPos().distSqr(getBlockPos())));
+        int upgraded = 0;
+        for (FusedPipeNode candidate : candidates) {
+            TileEntityFusedPipe tile = candidate.getTile();
+            if (tile != null && tile.tryUpgradeTo(target)) {
+                upgraded++;
+                if (upgraded >= limit) {
+                    break;
+                }
+            }
+        }
+        if (upgraded > 0) {
+            //Network-wide cached values (heat capacity, item buffer) depend on per-pipe tiers
+            network.onPipeUpgraded();
+            if (!player.isCreative()) {
+                stack.shrink(1);
+            }
+            if (player instanceof ServerPlayer serverPlayer) {
+                MekanismCriteriaTriggers.ALLOY_UPGRADE.value().trigger(serverPlayer);
+            }
+        }
+    }
+
+    /**
+     * Raises each enabled function that sits below the given tier up to it, leaving functions that
+     * are already at-or-above it and disabled functions untouched. @return true if anything changed.
+     */
+    private boolean tryUpgradeTo(BaseTier target) {
+        boolean changed = false;
+        for (FusedFunction function : FusedFunction.VALUES) {
+            BaseTier current = config.getTier(function);
+            if (current != null && current.ordinal() < target.ordinal()) {
+                config.setTier(function, target);
+                changed = true;
+            }
+        }
+        if (changed) {
+            setChanged();
+            refreshVisualState();
+        }
+        return changed;
     }
 
     private void sideChanged(Direction side, ConnectionType old, ConnectionType type) {

@@ -5,16 +5,25 @@ import io.aduhtkjm.mekanismheated.client.gui.machine.GuiHeatSmelter;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiShaker;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiThermalFractionationController;
 import io.aduhtkjm.mekanismheated.client.renderer.TileEntityShakerRenderer;
+import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedPipeConfig;
 import io.aduhtkjm.mekanismheated.item.*;
+import io.aduhtkjm.mekanismheated.registries.ModBlocks;
 import io.aduhtkjm.mekanismheated.registries.ModContainerTypes;
 import io.aduhtkjm.mekanismheated.registries.ModFluids;
 import io.aduhtkjm.mekanismheated.registries.ModItems;
 import io.aduhtkjm.mekanismheated.registries.ModTileEntityTypes;
 import mekanism.client.ClientRegistrationUtil;
+import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.component.CustomData;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
@@ -60,5 +69,22 @@ public class ModClient {
     public static void registerAdditionalModels(ModelEvent.RegisterAdditional event) {
         event.register(ModelResourceLocation.standalone(TileEntityShakerRenderer.MODEL_LOCATION));
         event.register(ModelResourceLocation.standalone(TileEntityShakerRenderer.GLASS_MODEL_LOCATION));
+    }
+
+    @SubscribeEvent
+    public static void registerItemProperties(FMLClientSetupEvent event) {
+        event.enqueueWork(() -> ItemProperties.register(ModBlocks.FUSED_PIPE.asItem(),
+              ResourceLocation.fromNamespaceAndPath(Mod.MODID, "tier"),
+              (stack, level, entity, seed) -> {
+                  CustomData data = stack.get(DataComponents.BLOCK_ENTITY_DATA);
+                  if (data == null) {
+                      return 0;
+                  }
+                  CompoundTag tag = data.copyTag();
+                  if (!tag.contains(FusedPipeConfig.TAG_CONFIG, Tag.TAG_COMPOUND)) {
+                      return 0;
+                  }
+                  return FusedPipeConfig.displayTier(tag.getCompound(FusedPipeConfig.TAG_CONFIG)).ordinal();
+              }));
     }
 }

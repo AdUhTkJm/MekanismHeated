@@ -1,3 +1,23 @@
 {
-  "parent": "mekanismheated:block/fused_pipe/segment"
+  "parent": "mekanismheated:block/fused_pipe/segment",
+  "overrides": [
+    {
+      "predicate": {
+        "mekanismheated:tier": 1
+      },
+      "model": "mekanismheated:block/fused_pipe/segment_advanced"
+    },
+    {
+      "predicate": {
+        "mekanismheated:tier": 2
+      },
+      "model": "mekanismheated:block/fused_pipe/segment_elite"
+    },
+    {
+      "predicate": {
+        "mekanismheated:tier": 3
+      },
+      "model": "mekanismheated:block/fused_pipe/segment_ultimate"
+    }
+  ]
 }

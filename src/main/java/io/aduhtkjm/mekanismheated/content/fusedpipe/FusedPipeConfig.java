@@ -49,6 +49,44 @@ public final class FusedPipeConfig {
         return tiers.containsKey(function);
     }
 
+    /**
+     * @return The highest tier among the enabled functions, or {@link BaseTier#BASIC} if no
+     * function is enabled. The creative tier never occurs (it is clamped to ultimate on read).
+     */
+    public BaseTier displayTier() {
+        BaseTier highest = BaseTier.BASIC;
+        for (BaseTier tier : tiers.values()) {
+            if (tier.ordinal() > highest.ordinal()) {
+                highest = tier;
+            }
+        }
+        return highest;
+    }
+
+    /**
+     * Variant of {@link #displayTier()} for a raw config compound, e.g. read directly from an
+     * item's BLOCK_ENTITY_DATA component where no registry provider is at hand.
+     */
+    public static BaseTier displayTier(CompoundTag tag) {
+        BaseTier highest = BaseTier.BASIC;
+        for (FusedFunction function : FusedFunction.VALUES) {
+            String key = function.getSerializedName();
+            if (tag.contains(key, Tag.TAG_STRING)) {
+                BaseTier tier = parseTier(tag.getString(key));
+                if (tier != null) {
+                    //Creative tier has no transmitter equivalent; clamp it to ultimate
+                    if (tier == BaseTier.CREATIVE) {
+                        tier = BaseTier.ULTIMATE;
+                    }
+                    if (tier.ordinal() > highest.ordinal()) {
+                        highest = tier;
+                    }
+                }
+            }
+        }
+        return highest;
+    }
+
     @Nullable
     public BaseTier getTier(FusedFunction function) {
         return tiers.get(function);

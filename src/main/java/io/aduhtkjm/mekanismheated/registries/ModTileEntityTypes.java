@@ -61,5 +61,6 @@ public class ModTileEntityTypes {
           .with(Capabilities.CHEMICAL.block(), CapabilityTileEntity.CHEMICAL_HANDLER_PROVIDER)
           .with(Capabilities.HEAT, CapabilityTileEntity.HEAT_HANDLER_PROVIDER)
           .with(Capabilities.ITEM.block(), TileEntityFusedPipe.ITEM_HANDLER_PROVIDER)
+          .withSimple(Capabilities.ALLOY_INTERACTION)
           .build();
 }
