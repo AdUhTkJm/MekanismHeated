@@ -15,6 +15,18 @@ repositories {
         name = "ModMaven"
         url = "https://modmaven.dev/"
     }
+
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
 }
 
 base {
@@ -94,6 +106,10 @@ dependencies {
     compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
     runtimeOnly "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+
+    // Jade Integration, similar to JEI. Jade is a mod that displays tile information when you look at it.
+    compileOnly "maven.modrinth:nvQzSEkH:eYz2YBGT"
+    runtimeOnly "maven.modrinth:nvQzSEkH:eYz2YBGT"
 
     // Example mod dependency using a mod jar from ./libs with a flat dir repository
     // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar

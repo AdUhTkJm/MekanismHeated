@@ -1,5 +1,6 @@
 package io.aduhtkjm.mekanismheated.content.fusedpipe;
 
+import io.aduhtkjm.mekanismheated.tile.TileEntityFusedPipe;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -24,21 +25,20 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * Instead of a position-keyed map, this keeps flat lists of acceptor entries that are rebuilt only
  * when something relevant changes: network membership, side configuration, the redstone state, or a
- * neighbor losing/regaining a capability (NeoForge fires our invalidation callback for the latter).
+ * neighbor gaining/losing a capability (NeoForge fires our invalidation callback for the latter).
  * Between rebuilds the per-tick cost is a plain list walk with no lookups and no side checks.
  * <p>
- * Block positions are needed only while building the lists, to create the underlying
- * {@link BlockCapabilityCache}s pointing at the neighbors; afterwards only the handlers matter.
- * Capability caches persist even while their neighbor currently exposes nothing, so machines
- * placed later are picked up without any rebuild.
+ * Entries are only created when the neighbor actually exposes the corresponding capability from
+ * the relevant side; same-network pipes are excluded. The underlying {@link BlockCapabilityCache}s
+ * are registered with invalidation callbacks so that a machine placed or removed later triggers a
+ * rebuild, at which point the capability check is re-evaluated.
  */
 public final class FusedAcceptorCache {
 
     /**
-     * Per-side bundle of all loaded energy-compat capability caches. Persists even while no
-     * capability resolves, so a machine placed later is picked up immediately; whenever any of
-     * the underlying capabilities changes, {@link #invalidate()} fires through the invalidation
-     * callbacks.
+     * Per-side bundle of all loaded energy-compat capability caches. Only created when the neighbor
+     * exposes at least one energy capability; whenever any of the underlying capabilities changes,
+     * {@link #invalidate()} fires through the invalidation callbacks.
      */
     private static final class EnergyAdaptor {
 
@@ -200,15 +200,17 @@ public final class FusedAcceptorCache {
     }
 
     /**
-     * Rebuilds all acceptor lists if anything changed since the last build.
-     * Heat acceptors are NOT gated by connection type — heat flows to all adjacent blocks
-     * with IHeatHandler capability.
+     * Rebuilds all acceptor lists if anything changed since the last build. Entries are only added
+     * when the neighbor actually exposes the corresponding capability from the relevant side;
+     * same-network pipes are always excluded. Heat acceptors are NOT gated by connection type —
+     * heat flows to all adjacent blocks with IHeatHandler capability.
      */
     public void rebuildIfNeeded(Collection<FusedPipeNode> nodes) {
         if (!dirty) {
             return;
         }
         dirty = false;
+        clearLists();
         for (FusedPipeNode node : nodes) {
             if (!(node.getLevel() instanceof ServerLevel level)) {
                 continue;
@@ -217,36 +219,74 @@ public final class FusedAcceptorCache {
             for (Direction side : Direction.values()) {
                 BlockPos neighborPos = pos.relative(side);
                 Direction context = side.getOpposite();
+                //Skip same-network pipes — they share buffers with us and would be circular
+                if (isSameNetworkPipe(level, neighborPos, node)) {
+                    continue;
+                }
                 boolean sends = node.canSendTo(side);
                 boolean pullsEnergy = node.pullsEnergyFrom(side);
+                //Only add entries when the neighbor actually exposes the capability from this side
                 if (sends || pullsEnergy) {
-                    //One adaptor per side so NORMAL sides (both send and pull) share it
-                    EnergyAdaptor adaptor = new EnergyAdaptor(level, neighborPos, context, this::invalidate);
-                    if (sends) {
-                        energyTargets.add(new EnergyTarget(adaptor));
+                    boolean hasEnergy = false;
+                    for (BlockCapability<?, @Nullable Direction> energyCap : EnergyCompatUtils.getLoadedEnergyCapabilities()) {
+                        if (level.getCapability(energyCap, neighborPos, context) != null) {
+                            hasEnergy = true;
+                            break;
+                        }
                     }
-                    if (pullsEnergy) {
-                        energySources.add(new EnergySource(node, adaptor));
+                    if (hasEnergy) {
+                        //One adaptor per side so NORMAL sides (both send and pull) share it
+                        EnergyAdaptor adaptor = new EnergyAdaptor(level, neighborPos, context, this::invalidate);
+                        if (sends) {
+                            energyTargets.add(new EnergyTarget(adaptor));
+                        }
+                        if (pullsEnergy) {
+                            energySources.add(new EnergySource(node, adaptor));
+                        }
                     }
-                    addTarget(fluidTargets, Capabilities.FLUID.block(), level, neighborPos, context);
-                    addTarget(chemicalTargets, Capabilities.CHEMICAL.block(), level, neighborPos, context);
-                    addTarget(itemTargets, Capabilities.ITEM.block(), level, neighborPos, context);
                 }
-                if (node.pullsFluidFrom(side)) {
+                if (sends) {
+                    if (level.getCapability(Capabilities.FLUID.block(), neighborPos, context) != null) {
+                        addTarget(fluidTargets, Capabilities.FLUID.block(), level, neighborPos, context);
+                    }
+                    if (level.getCapability(Capabilities.CHEMICAL.block(), neighborPos, context) != null) {
+                        addTarget(chemicalTargets, Capabilities.CHEMICAL.block(), level, neighborPos, context);
+                    }
+                    if (level.getCapability(Capabilities.ITEM.block(), neighborPos, context) != null) {
+                        addTarget(itemTargets, Capabilities.ITEM.block(), level, neighborPos, context);
+                    }
+                }
+                if (node.pullsFluidFrom(side) && level.getCapability(Capabilities.FLUID.block(), neighborPos, context) != null) {
                     addSource(fluidSources, node, Capabilities.FLUID.block(), level, neighborPos, context);
                 }
-                if (node.pullsChemicalFrom(side)) {
+                if (node.pullsChemicalFrom(side) && level.getCapability(Capabilities.CHEMICAL.block(), neighborPos, context) != null) {
                     addSource(chemicalSources, node, Capabilities.CHEMICAL.block(), level, neighborPos, context);
                 }
-                if (node.pullsItemsFrom(side)) {
+                if (node.pullsItemsFrom(side) && level.getCapability(Capabilities.ITEM.block(), neighborPos, context) != null) {
                     addSource(itemSources, node, Capabilities.ITEM.block(), level, neighborPos, context);
                 }
                 //Heat: always add if heat is enabled on this node — heat flows regardless of connection type
-                if (node.isEnabled(FusedFunction.HEAT)) {
+                if (node.isEnabled(FusedFunction.HEAT) && level.getCapability(Capabilities.HEAT, neighborPos, context) != null) {
                     addHeatAcceptor(level, neighborPos, context);
                 }
             }
         }
+    }
+
+    /**
+     * Returns true if the block at {@code pos} is a fused pipe belonging to the same network as
+     * the node being rebuilt. Same-network pipes share buffers and must not be added as targets or
+     * sources — that would create circular references and waste ticks on no-op resolves.
+     */
+    private boolean isSameNetworkPipe(ServerLevel level, BlockPos pos, FusedPipeNode node) {
+        FusedNetwork network = node.getNetwork();
+        if (network == null) {
+            return false;
+        }
+        if (level.getBlockEntity(pos) instanceof TileEntityFusedPipe tile) {
+            return tile.getNode().getNetwork() == network;
+        }
+        return false;
     }
 
     private void clearLists() {

@@ -320,7 +320,13 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
 
     public void onNeighborBlockChange(@Nullable Direction side) {
         recheckRedstoneState();
-        //A neighbor appeared or disappeared; our rendered arms may need to connect or retract
+        //A neighbor appeared or disappeared; rebuild the acceptor cache so new machines are
+        //picked up and removed ones are dropped
+        FusedNetwork network = getNetwork();
+        if (network != null) {
+            network.acceptorCache.invalidate();
+        }
+        //Our rendered arms may need to connect or retract
         refreshVisualState();
     }
 
