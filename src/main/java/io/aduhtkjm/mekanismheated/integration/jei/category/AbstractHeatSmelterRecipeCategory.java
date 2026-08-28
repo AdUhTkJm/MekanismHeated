@@ -1,4 +1,4 @@
-package integration.jei.category;
+package io.aduhtkjm.mekanismheated.integration.jei.category;
 
 import io.aduhtkjm.mekanismheated.ModLang;
 import mekanism.client.gui.element.GuiUpArrow;

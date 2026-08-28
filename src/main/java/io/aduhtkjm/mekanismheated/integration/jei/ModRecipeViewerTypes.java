@@ -1,4 +1,4 @@
-package integration.jei;
+package io.aduhtkjm.mekanismheated.integration.jei;
 
 import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.recipe.HeatedItemStackToFluidRecipe;

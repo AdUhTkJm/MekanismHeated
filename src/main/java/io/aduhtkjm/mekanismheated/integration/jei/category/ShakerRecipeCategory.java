@@ -1,4 +1,4 @@
-package integration.jei.category;
+package io.aduhtkjm.mekanismheated.integration.jei.category;
 
 import io.aduhtkjm.mekanismheated.recipe.ShakerRecipe;
 import java.util.ArrayList;

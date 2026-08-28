@@ -1,9 +1,9 @@
-package integration.jei;
+package io.aduhtkjm.mekanismheated.integration.jei;
 
 import io.aduhtkjm.mekanismheated.Mod;
-import integration.jei.category.HeatedMeltingRecipeCategory;
-import integration.jei.category.HeatedSmeltingRecipeCategory;
-import integration.jei.category.ShakerRecipeCategory;
+import io.aduhtkjm.mekanismheated.integration.jei.category.HeatedMeltingRecipeCategory;
+import io.aduhtkjm.mekanismheated.integration.jei.category.HeatedSmeltingRecipeCategory;
+import io.aduhtkjm.mekanismheated.integration.jei.category.ShakerRecipeCategory;
 import io.aduhtkjm.mekanismheated.recipe.ModRecipeTypes;
 import java.util.List;
 import mekanism.client.recipe_viewer.jei.CatalystRegistryHelper;
@@ -23,7 +23,6 @@ import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.registries.DeferredHolder;
-import org.jetbrains.annotations.NotNull;
 import org.lwjgl.system.NonnullDefault;
 
 /**

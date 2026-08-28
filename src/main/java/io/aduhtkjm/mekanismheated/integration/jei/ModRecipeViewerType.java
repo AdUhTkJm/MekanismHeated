@@ -1,8 +1,7 @@
-package integration.jei;
+package io.aduhtkjm.mekanismheated.integration.jei;
 
 import java.util.List;
 import mekanism.client.recipe_viewer.type.IRecipeViewerRecipeType;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;

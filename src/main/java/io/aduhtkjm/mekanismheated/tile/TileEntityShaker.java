@@ -1,7 +1,7 @@
 package io.aduhtkjm.mekanismheated.tile;
 
 import io.aduhtkjm.mekanismheated.Config;
-import integration.jei.ModRecipeViewerTypes;
+import io.aduhtkjm.mekanismheated.integration.jei.ModRecipeViewerTypes;
 import io.aduhtkjm.mekanismheated.recipe.ModRecipeTypes;
 import io.aduhtkjm.mekanismheated.recipe.ShakerRecipe;
 import io.aduhtkjm.mekanismheated.recipe.cache.ShakerCachedRecipe;

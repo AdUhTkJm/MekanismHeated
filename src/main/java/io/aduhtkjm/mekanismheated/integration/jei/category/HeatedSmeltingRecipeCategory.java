@@ -1,4 +1,4 @@
-package integration.jei.category;
+package io.aduhtkjm.mekanismheated.integration.jei.category;
 
 import io.aduhtkjm.mekanismheated.recipe.HeatedItemStackToItemStackRecipe;
 import mekanism.client.gui.element.slot.GuiSlot;
