@@ -99,9 +99,18 @@ public enum FusedPipeMekRenderer implements IComponentProvider<BlockAccessor> {
         public void render(GuiGraphics guiGraphics, float rawX, float rawY, float maxX, float maxY) {
             int x = Mth.floor(rawX);
             int y = Mth.floor(rawY);
-            element.drawScrollingString(guiGraphics, text, x, y + 3, TextAlignment.LEFT, 0xFFFFFF, 4, false);
-            y += 13;
-            element.render(guiGraphics, x, y + 1);
+            //Jade passes the element's position in as render coordinates rather than as a pose
+            //translation. Mekanism's drawScrollingString computes its scissor rectangle from the
+            //pose translation, so unless we set it (by translating the pose to the element's origin)
+            //the scissor is misplaced and any *scrolling* text (i.e. a value string longer than the
+            //element, which upgraded pipes' large summed capacities produce) gets clipped away and
+            //vanishes. Short strings (like fluid) never scroll, which is why only energy/chemical
+            //text was disappearing.
+            guiGraphics.pose().pushPose();
+            guiGraphics.pose().translate(x, y, 0);
+            element.drawScrollingString(guiGraphics, text, 0, 3, TextAlignment.LEFT, 0xFFFFFF, 4, false);
+            element.render(guiGraphics, 0, 14);
+            guiGraphics.pose().popPose();
         }
     }
 }
