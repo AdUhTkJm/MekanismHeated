@@ -43,6 +43,11 @@ public class ModRecipeSerializers {
 
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, Mod.MODID);
 
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<FusedPipeRecipe>> FUSED_PIPE =
+          RECIPE_SERIALIZERS.register("fused_pipe", () -> new MekanismRecipeSerializer<>(
+                FusedPipeRecipe.CODEC,
+                FusedPipeRecipe.STREAM_CODEC));
+
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BasicItemStackToHeatRecipe>> FUEL_CONVERSION =
           RECIPE_SERIALIZERS.register("fuel_conversion", () -> new MekanismRecipeSerializer<>(
                 RecordCodecBuilder.mapCodec(instance -> instance.group(

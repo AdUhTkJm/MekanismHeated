@@ -1,0 +1,44 @@
+{
+  "type": "mekanismheated:fused_pipe",
+  "category": "misc",
+  "base": {
+    "tag": "c:ingots/steel"
+  },
+  "base_count": 2,
+  "functions": [
+    {
+      "function": "energy",
+      "item": {
+        "tag": "c:dusts/redstone"
+      }
+    },
+    {
+      "function": "fluid",
+      "item": {
+        "item": "minecraft:bucket"
+      }
+    },
+    {
+      "function": "chemical",
+      "item": {
+        "tag": "c:glass_blocks/cheap"
+      }
+    },
+    {
+      "function": "heat",
+      "item": {
+        "tag": "c:ingots/copper"
+      }
+    },
+    {
+      "function": "item",
+      "item": {
+        "tag": "c:circuits/basic"
+      }
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "mekanismheated:fused_pipe"
+  }
+}

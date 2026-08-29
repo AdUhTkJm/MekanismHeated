@@ -2,6 +2,7 @@ package io.aduhtkjm.mekanismheated.content.fusedpipe;
 
 import io.aduhtkjm.mekanismheated.Mod;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import mekanism.api.tier.BaseTier;
 import net.minecraft.core.HolderLookup;
@@ -35,10 +36,19 @@ public final class FusedPipeConfig {
      * vanilla applies to the placed block entity automatically.
      */
     public static CompoundTag createDefaultBlockEntityData() {
+        return createBlockEntityData(List.of(FusedFunction.VALUES));
+    }
+
+    /**
+     * @param enabled The functions to enable, each at basic tier.
+     * @return A BLOCK_ENTITY_DATA payload carrying only the given functions, used by the fused
+     * pipe recipe to encode which functions the crafted pipe supports.
+     */
+    public static CompoundTag createBlockEntityData(Iterable<FusedFunction> enabled) {
         CompoundTag tag = new CompoundTag();
         tag.putString("id", Mod.MODID + ":fused_pipe");
         CompoundTag configTag = new CompoundTag();
-        for (FusedFunction function : FusedFunction.VALUES) {
+        for (FusedFunction function : enabled) {
             configTag.putString(function.getSerializedName(), BaseTier.BASIC.name());
         }
         tag.put(TAG_CONFIG, configTag);
