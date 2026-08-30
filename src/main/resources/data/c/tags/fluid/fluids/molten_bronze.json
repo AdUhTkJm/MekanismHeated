@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "mekanismheated:molten_bronze",
+    "mekanismheated:flowing_molten_bronze"
+  ]
+}

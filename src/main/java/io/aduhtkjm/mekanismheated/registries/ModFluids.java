@@ -28,4 +28,21 @@ public class ModFluids {
     public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ChemicalFormulaBucketItem> ACETIC_ACID =
         FLUIDS.register("acetic_acid", (fluid, properties) -> new ChemicalFormulaBucketItem(fluid, properties, "CH\u2083COOH"),
             UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFFEEF0C7));
+
+    // Molten fluids
+    public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ChemicalFormulaBucketItem> MOLTEN_IRON =
+        FLUIDS.register("molten_iron", (fluid, properties) -> new ChemicalFormulaBucketItem(fluid, properties, "Fe"),
+            UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFFCECECE));
+    public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ChemicalFormulaBucketItem> MOLTEN_COPPER =
+        FLUIDS.register("molten_copper", (fluid, properties) -> new ChemicalFormulaBucketItem(fluid, properties, "Cu"),
+            UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFFEBAD41));
+    public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ChemicalFormulaBucketItem> MOLTEN_TIN =
+        FLUIDS.register("molten_tin", (fluid, properties) -> new ChemicalFormulaBucketItem(fluid, properties, "Sn"),
+            UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFFEBAD41));
+    public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ChemicalFormulaBucketItem> MOLTEN_BRONZE =
+        FLUIDS.register("molten_bronze", (fluid, properties) -> new ChemicalFormulaBucketItem(fluid, properties, "Cu-Sn"),
+            UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFFEBAD41));
+    public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ChemicalFormulaBucketItem> MOLTEN_THERMOENERGETIC_ALLOY =
+        FLUIDS.register("molten_thermoenergetic_alloy", (fluid, properties) -> new ChemicalFormulaBucketItem(fluid, properties, "Fe-Cu"),
+            UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFFFC7E11));
 }

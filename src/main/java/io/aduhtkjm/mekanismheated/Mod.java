@@ -12,15 +12,20 @@ import io.aduhtkjm.mekanismheated.registries.ModTileEntityTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.fluids.capability.wrappers.FluidBucketWrapper;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.slf4j.Logger;
@@ -50,6 +55,7 @@ public class Mod {
         CREATIVE_MODE_TABS.register(modEventBus);
 
         modEventBus.addListener(this::commonSetup);
+        modEventBus.addListener(this::registerBucketCapabilities);
 
         // Register ourselves for server and other game events we are interested in.
         NeoForge.EVENT_BUS.register(this);
@@ -66,6 +72,15 @@ public class Mod {
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         event.enqueueWork(ModFluids.FLUIDS::registerBucketDispenserBehavior);
+    }
+
+    private void registerBucketCapabilities(final RegisterCapabilitiesEvent event) {
+        for (var bucket : ModFluids.FLUIDS.getBucketEntries()) {
+            Item item = bucket.value();
+            if (item instanceof BucketItem && item.getClass() != BucketItem.class) {
+                event.registerItem(Capabilities.FluidHandler.ITEM, (stack, ctx) -> new FluidBucketWrapper(stack), item);
+            }
+        }
     }
 
     @SubscribeEvent

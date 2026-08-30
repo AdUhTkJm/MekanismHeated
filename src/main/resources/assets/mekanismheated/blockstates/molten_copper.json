@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "mekanismheated:block/molten_copper"
+    }
+  }
+}

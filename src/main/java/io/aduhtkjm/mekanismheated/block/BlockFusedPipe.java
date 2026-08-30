@@ -3,6 +3,7 @@ package io.aduhtkjm.mekanismheated.block;
 import io.aduhtkjm.mekanismheated.registries.ModTileEntityTypes;
 import io.aduhtkjm.mekanismheated.tile.TileEntityFusedPipe;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import java.util.List;
 import java.util.Map;
 import mekanism.api.tier.BaseTier;
 import mekanism.common.lib.transmitter.ConnectionType;
@@ -11,8 +12,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -28,6 +27,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.item.component.CustomData;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.system.NonnullDefault;
@@ -182,16 +183,21 @@ public class BlockFusedPipe extends Block implements EntityBlock {
         }
     }
 
+    /**
+     * Drops the block item carrying this pipe's config so it is preserved on break. Every
+     * destruction path (player, explosion, ...) funnels through here, and the loot params carry
+     * the block entity when one is present. On placement vanilla applies the BLOCK_ENTITY_DATA
+     * component back into the created block entity.
+     */
     @Override
-    public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
-        if (!level.isClientSide && blockEntity instanceof TileEntityFusedPipe pipe && !pipe.isRemoved()) {
-            //Drop ourselves with the config preserved; on placement vanilla applies the
-            // BLOCK_ENTITY_DATA component back into the created block entity
+    protected List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
+        BlockEntity blockEntity = params.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
+        if (blockEntity instanceof TileEntityFusedPipe pipe && !pipe.isRemoved()) {
             ItemStack drop = new ItemStack(this);
-            CompoundTag data = pipe.saveForDrop(new CompoundTag(), level.registryAccess());
+            CompoundTag data = pipe.saveForDrop(new CompoundTag(), params.getLevel().registryAccess());
             drop.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(data));
-            level.addFreshEntity(new ItemEntity(level, pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D, drop));
+            return List.of(drop);
         }
-        super.playerDestroy(level, player, pos, state, blockEntity, tool);
+        return List.of(new ItemStack(this));
     }
 }

@@ -45,5 +45,10 @@ public class ModItems {
         output.accept(ModFluids.ASPHALT.getBucket());
         output.accept(ModFluids.METHANOL.getBucket());
         output.accept(ModFluids.ACETIC_ACID.getBucket());
+        output.accept(ModFluids.MOLTEN_IRON.getBucket());
+        output.accept(ModFluids.MOLTEN_COPPER.getBucket());
+        output.accept(ModFluids.MOLTEN_TIN.getBucket());
+        output.accept(ModFluids.MOLTEN_BRONZE.getBucket());
+        output.accept(ModFluids.MOLTEN_THERMOENERGETIC_ALLOY.getBucket());
     }
 }
