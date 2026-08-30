@@ -135,7 +135,13 @@ public class TileEntityHeatSmelter
     protected IFluidTankHolder getInitialFluidTanks(IContentsListener listener, IContentsListener recipeCacheListener, IContentsListener recipeCacheUnpauseListener) {
         FluidTankHelper builder = FluidTankHelper.forSideWithConfig(this);
         //The tank is an output only; changes to it unpause the melting recipe cache so it can notice freed-up space
-        builder.addTank(fluidTank = BasicFluidTank.output(MAX_FLUID, listener));
+        builder.addTank(fluidTank = BasicFluidTank.output(MAX_FLUID,
+              () -> {
+                  listener.onContentsChanged();
+                  //The tank's contents are rendered through the glass in-world, so they must reach clients even when
+                  // no player currently has the GUI open
+                  onContentsChanged();
+              }));
         return builder.build();
     }
 
@@ -340,6 +346,16 @@ public class TileEntityHeatSmelter
     public void handleUpdateTag(@NotNull CompoundTag tag, @NotNull HolderLookup.Provider provider) {
         super.handleUpdateTag(tag, provider);
         NBTUtils.setCompoundIfPresent(tag, SerializationConstants.FLUID, nbt -> fluidTank.deserializeNBT(provider, nbt));
+    }
+
+    @Override
+    public void onContentsChanged() {
+        super.onContentsChanged();
+        //The output tank's contents are rendered through the glass in-world, so changes need to reach clients even
+        // when no player currently has the GUI open
+        if (level != null && !level.isClientSide) {
+            sendUpdatePacket();
+        }
     }
 
     public BasicHeatCapacitor getHeatCapacitor() {

@@ -4,6 +4,7 @@ import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiHeatSmelter;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiShaker;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiThermalFractionationController;
+import io.aduhtkjm.mekanismheated.client.renderer.TileEntityHeatSmelterRenderer;
 import io.aduhtkjm.mekanismheated.client.renderer.TileEntityShakerRenderer;
 import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedPipeConfig;
 import io.aduhtkjm.mekanismheated.item.*;
@@ -13,6 +14,8 @@ import io.aduhtkjm.mekanismheated.registries.ModFluids;
 import io.aduhtkjm.mekanismheated.registries.ModItems;
 import io.aduhtkjm.mekanismheated.registries.ModTileEntityTypes;
 import mekanism.client.ClientRegistrationUtil;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.component.DataComponents;
@@ -62,7 +65,13 @@ public class ModClient {
 
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerBlockEntityRenderer(ModTileEntityTypes.HEAT_SMELTER.get(), TileEntityHeatSmelterRenderer::new);
         event.registerBlockEntityRenderer(ModTileEntityTypes.SHAKER.get(), TileEntityShakerRenderer::new);
+    }
+
+    @SubscribeEvent
+    public static void registerRenderTypes(FMLClientSetupEvent event) {
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.HEAT_SMELTER.get(), RenderType.cutout());
     }
 
     @SubscribeEvent

@@ -5,6 +5,7 @@ import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.ModLang;
 import io.aduhtkjm.mekanismheated.block.BlockFusedPipe;
 import io.aduhtkjm.mekanismheated.block.fractionation.DistillationTrayBlock;
+import io.aduhtkjm.mekanismheated.block.heatsmelter.HeatSmelterBlock;
 import io.aduhtkjm.mekanismheated.block.shaker.ShakerBlock;
 import io.aduhtkjm.mekanismheated.item.ItemBlockFusedPipe;
 import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedPipeConfig;
@@ -18,7 +19,6 @@ import mekanism.common.block.attribute.AttributeStateFacing;
 import mekanism.common.block.attribute.Attributes;
 import mekanism.common.block.attribute.Attributes.AttributeCustomResistance;
 import mekanism.common.block.prefab.BlockBasicMultiblock;
-import mekanism.common.block.prefab.BlockTile.BlockTileModel;
 import mekanism.common.content.blocktype.Machine;
 import mekanism.common.content.blocktype.Machine.MachineBuilder;
 import mekanism.common.content.blocktype.BlockTypeTile;
@@ -48,8 +48,8 @@ public class ModBlocks {
           .with(AttributeSideConfig.create(TransmissionType.ITEM, TransmissionType.FLUID, TransmissionType.HEAT))
           .build();
 
-    public static final BlockRegistryObject<BlockTileModel<TileEntityHeatSmelter, Machine<TileEntityHeatSmelter>>, ItemBlockTooltip<BlockTileModel<TileEntityHeatSmelter, Machine<TileEntityHeatSmelter>>>> HEAT_SMELTER =
-          BLOCKS.register("heat_smelter", () -> new BlockTileModel<>(HEAT_SMELTER_TYPE, properties -> properties.mapColor(MapColor.METAL)),
+    public static final BlockRegistryObject<HeatSmelterBlock, ItemBlockTooltip<HeatSmelterBlock>> HEAT_SMELTER =
+          BLOCKS.register("heat_smelter", () -> new HeatSmelterBlock(HEAT_SMELTER_TYPE, BlockBehaviour.Properties.of().mapColor(MapColor.METAL)),
                 (block, properties) -> new ItemBlockTooltip<>(block, true, properties));
 
     public static final Machine<TileEntityShaker> SHAKER_TYPE = MachineBuilder
@@ -60,7 +60,7 @@ public class ModBlocks {
           .build();
 
     public static final BlockRegistryObject<ShakerBlock, BlockItem> SHAKER =
-          BLOCKS.register("shaker", () -> new ShakerBlock(SHAKER_TYPE, BlockBehaviour.Properties.of().mapColor(MapColor.STONE)));
+          BLOCKS.register("shaker", () -> new ShakerBlock(SHAKER_TYPE, BlockBehaviour.Properties.of().mapColor(MapColor.METAL)));
 
     // Thermal Fractionation Tower
     public static final BlockTypeTile<TileEntityThermalFractionationController> THERMAL_FRACTIONATION_CONTROLLER_TYPE = BlockTileBuilder
