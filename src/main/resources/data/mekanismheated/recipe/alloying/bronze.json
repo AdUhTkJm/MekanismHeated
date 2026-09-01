@@ -1,0 +1,17 @@
+{
+  "type": "mekanismheated:alloying",
+  "inputs": [
+    {
+      "amount": 30,
+      "tag": "c:fluids/molten_copper"
+    },
+    {
+      "amount": 10,
+      "tag": "c:fluids/molten_tin"
+    }
+  ],
+  "output": {
+    "amount": 40,
+    "tag": "c:fluids/molten_bronze"
+  }
+}

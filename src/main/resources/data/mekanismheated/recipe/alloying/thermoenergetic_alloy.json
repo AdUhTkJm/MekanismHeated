@@ -1,0 +1,17 @@
+{
+  "type": "mekanismheated:alloying",
+  "inputs": [
+    {
+      "amount": 10,
+      "tag": "c:fluids/molten_iron"
+    },
+    {
+      "amount": 10,
+      "tag": "c:fluids/molten_copper"
+    }
+  ],
+  "output": {
+    "amount": 20,
+    "tag": "c:fluids/molten_thermoenergetic_alloy"
+  }
+}

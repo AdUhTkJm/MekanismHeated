@@ -2,11 +2,11 @@
   "type": "mekanismheated:heated_melting",
   "input": {
     "count": 1,
-    "item": "minecraft:iron_ingot"
+    "item": "mekanism:ingot_tin"
   },
   "output": {
     "amount": 90,
-    "id": "mekanismheated:molten_iron"
+    "id": "mekanismheated:molten_tin"
   },
-  "temperature": 1808
+  "temperature": 778
 }

@@ -116,7 +116,20 @@ public class ModRecipeSerializers {
                       FractionationRecipe.BankOutput.STREAM_CODEC.apply(ByteBufCodecs.list()), BasicFractionationRecipe::getOutputsRaw,
                       ByteBufCodecs.DOUBLE, BasicFractionationRecipe::getMinTemperature,
                       ByteBufCodecs.DOUBLE, BasicFractionationRecipe::getMaxTemperature,
-                      ByteBufCodecs.DOUBLE, BasicFractionationRecipe::getBaseTemperature,
-                      BasicFractionationRecipe::new
+                       ByteBufCodecs.DOUBLE, BasicFractionationRecipe::getBaseTemperature,
+                       BasicFractionationRecipe::new
+                 )));
+
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BasicAlloyRecipe>> ALLOYING =
+          RECIPE_SERIALIZERS.register("alloying", () -> new MekanismRecipeSerializer<>(
+                RecordCodecBuilder.mapCodec(instance -> instance.group(
+                      FluidStackIngredient.CODEC.listOf(2).fieldOf("inputs").forGetter(BasicAlloyRecipe::getInputsRaw),
+                      FluidStackIngredient.CODEC.fieldOf(SerializationConstants.OUTPUT).forGetter(BasicAlloyRecipe::getOutputRaw)
+                ).apply(instance, (inputs, output) -> new BasicAlloyRecipe(inputs.get(0), inputs.get(1), output))),
+                StreamCodec.composite(
+                      FluidStackIngredient.STREAM_CODEC, BasicAlloyRecipe::getInput1,
+                      FluidStackIngredient.STREAM_CODEC, BasicAlloyRecipe::getInput2,
+                      FluidStackIngredient.STREAM_CODEC, BasicAlloyRecipe::getOutput,
+                      BasicAlloyRecipe::new
                 )));
 }
