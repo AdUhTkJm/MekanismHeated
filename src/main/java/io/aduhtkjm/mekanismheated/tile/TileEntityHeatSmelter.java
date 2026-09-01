@@ -5,10 +5,13 @@ import io.aduhtkjm.mekanismheated.recipe.*;
 import io.aduhtkjm.mekanismheated.recipe.cache.HeatSensitiveOneInputCachedRecipe;
 import io.aduhtkjm.mekanismheated.recipe.lookup.monitor.HeatSmelterRecipeCacheLookupMonitor;
 import io.aduhtkjm.mekanismheated.registries.ModBlocks;
+import io.aduhtkjm.mekanismheated.tank.MultiFluidTank;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 
 import mekanism.api.Action;
+import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
 import mekanism.api.RelativeSide;
 import mekanism.api.SerializationConstants;
@@ -16,12 +19,12 @@ import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.functions.ConstantPredicates;
 import mekanism.api.heat.HeatAPI.HeatTransfer;
 import mekanism.api.recipes.cache.CachedRecipe;
+import mekanism.api.recipes.cache.CachedRecipe.OperationTracker;
 import mekanism.api.recipes.cache.CachedRecipe.OperationTracker.RecipeError;
 import mekanism.api.recipes.inputs.IInputHandler;
 import mekanism.api.recipes.inputs.InputHelper;
 import mekanism.api.recipes.outputs.IOutputHandler;
 import mekanism.api.recipes.outputs.OutputHelper;
-import mekanism.common.capabilities.fluid.BasicFluidTank;
 import mekanism.common.capabilities.heat.BasicHeatCapacitor;
 import mekanism.common.capabilities.heat.CachedAmbientTemperature;
 import mekanism.common.capabilities.holder.fluid.FluidTankHelper;
@@ -40,6 +43,7 @@ import mekanism.common.recipe.IMekanismRecipeTypeProvider;
 import mekanism.common.recipe.MekanismRecipeType;
 import mekanism.common.recipe.lookup.IRecipeLookupHandler;
 import mekanism.common.recipe.lookup.monitor.RecipeCacheLookupMonitor;
+import mekanism.common.tile.component.TileComponentConfig;
 import mekanism.common.tile.component.TileComponentEjector;
 import mekanism.common.tile.component.config.ConfigInfo;
 import mekanism.common.tile.component.config.DataType;
@@ -92,7 +96,7 @@ public class TileEntityHeatSmelter
     InputInventorySlot inputSlot;
     InputInventorySlot fuelSlot;
     OutputInventorySlot outputSlot;
-    public IExtendedFluidTank fluidTank;
+    public MultiFluidTank fluidTank;
 
     public TileEntityHeatSmelter(BlockPos pos, BlockState state) {
         super(ModBlocks.HEAT_SMELTER, pos, state, TRACKED_ERROR_TYPES, Config.HeatSmelter.BASE_SPEED.get());
@@ -102,7 +106,14 @@ public class TileEntityHeatSmelter
             itemConfig.addSlotInfo(DataType.OUTPUT, new InventorySlotInfo(false, true, outputSlot));
             itemConfig.addSlotInfo(DataType.INPUT_OUTPUT, new InventorySlotInfo(true, true, inputSlot, outputSlot));
         }
-        configComponent.setupOutputConfig(TransmissionType.FLUID, fluidTank, RelativeSide.RIGHT);
+        ConfigInfo fluidConfig = configComponent.getConfig(TransmissionType.FLUID);
+        if (fluidConfig != null) {
+            List<IExtendedFluidTank> slotTanks = new ArrayList<>();
+            for (MultiFluidTank.Slot slot : fluidTank.getSlots()) {
+                slotTanks.add(slot);
+            }
+            fluidConfig.addSlotInfo(DataType.OUTPUT, TileComponentConfig.createInfo(TransmissionType.FLUID, false, true, slotTanks));
+        }
         configComponent.setupInputConfig(TransmissionType.HEAT, heatCapacitor);
         //Default to accepting heat from all sides; players can still restrict it via the side config GUI
         ConfigInfo heatConfig = configComponent.getConfig(TransmissionType.HEAT);
@@ -118,7 +129,30 @@ public class TileEntityHeatSmelter
 
         inputHandler = InputHelper.getInputHandler(inputSlot, RecipeError.NOT_ENOUGH_INPUT);
         outputHandler = OutputHelper.getOutputHandler(outputSlot, RecipeError.NOT_ENOUGH_OUTPUT_SPACE);
-        fluidOutputHandler = OutputHelper.getOutputHandler(fluidTank, NOT_ENOUGH_FLUID_OUTPUT_SPACE_ERROR);
+        fluidOutputHandler = new IOutputHandler<>() {
+            @Override
+            public void handleOutput(FluidStack toOutput, int operations) {
+                fluidTank.insert(toOutput.copyWithAmount(toOutput.getAmount() * operations), Action.EXECUTE, AutomationType.INTERNAL);
+            }
+
+            @Override
+            public void calculateOperationsCanSupport(OperationTracker tracker, FluidStack toOutput) {
+                if (!toOutput.isEmpty()) {
+                    FluidStack maxOutput = toOutput.copyWithAmount(Integer.MAX_VALUE);
+                    FluidStack remainder = fluidTank.insert(maxOutput, Action.SIMULATE, AutomationType.INTERNAL);
+                    int amountUsed = maxOutput.getAmount() - remainder.getAmount();
+                    int operations = amountUsed / toOutput.getAmount();
+                    tracker.updateOperations(operations);
+                    if (operations == 0) {
+                        if (amountUsed == 0 && fluidTank.getTotalNeeded() > 0) {
+                            tracker.addError(RecipeError.INPUT_DOESNT_PRODUCE_OUTPUT);
+                        } else {
+                            tracker.addError(NOT_ENOUGH_FLUID_OUTPUT_SPACE_ERROR);
+                        }
+                    }
+                }
+            }
+        };
     }
 
     @NotNull
@@ -134,14 +168,14 @@ public class TileEntityHeatSmelter
     @Override
     protected IFluidTankHolder getInitialFluidTanks(IContentsListener listener, IContentsListener recipeCacheListener, IContentsListener recipeCacheUnpauseListener) {
         FluidTankHelper builder = FluidTankHelper.forSideWithConfig(this);
-        //The tank is an output only; changes to it unpause the melting recipe cache so it can notice freed-up space
-        builder.addTank(fluidTank = BasicFluidTank.output(MAX_FLUID,
+        fluidTank = MultiFluidTank.output(MAX_FLUID,
               () -> {
                   listener.onContentsChanged();
-                  //The tank's contents are rendered through the glass in-world, so they must reach clients even when
-                  // no player currently has the GUI open
                   onContentsChanged();
-              }));
+              });
+        for (MultiFluidTank.Slot slot : fluidTank.getSlots()) {
+            builder.addTank(slot);
+        }
         return builder.build();
     }
 

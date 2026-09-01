@@ -1,12 +1,12 @@
 package io.aduhtkjm.mekanismheated.client.gui.machine;
 
+import io.aduhtkjm.mekanismheated.client.gui.element.GuiStackedFluidGauge;
 import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
 import java.util.List;
 import mekanism.api.recipes.cache.CachedRecipe.OperationTracker.RecipeError;
 import mekanism.client.gui.GuiConfigurableTile;
 import mekanism.client.gui.element.GuiUpArrow;
 import mekanism.client.gui.element.gauge.GaugeType;
-import mekanism.client.gui.element.gauge.GuiFluidGauge;
 import mekanism.client.gui.element.progress.GuiProgress;
 import mekanism.client.gui.element.progress.ProgressType;
 import mekanism.client.gui.element.tab.GuiHeatTab;
@@ -35,7 +35,7 @@ public class GuiHeatSmelter extends GuiConfigurableTile<TileEntityHeatSmelter, M
         addRenderableWidget(new GuiUpArrow(this, 68, 38));
         addRenderableWidget(new GuiProgress(tile::getScaledProgress, ProgressType.BAR, this, 86, 38).recipeViewerCategory(tile))
               .warning(WarningType.INPUT_DOESNT_PRODUCE_OUTPUT, tile.getWarningCheck(RecipeError.INPUT_DOESNT_PRODUCE_OUTPUT));
-        addRenderableWidget(new GuiFluidGauge(() -> tile.fluidTank, () -> tile.getFluidTanks(null), GaugeType.STANDARD, this, 139, 13))
+        addRenderableWidget(new GuiStackedFluidGauge(() -> tile.fluidTank, GaugeType.STANDARD, this, 139, 13))
               .warning(WarningType.NO_SPACE_IN_OUTPUT, tile.getWarningCheck(TileEntityHeatSmelter.NOT_ENOUGH_FLUID_OUTPUT_SPACE_ERROR));
         addRenderableWidget(new GuiHeatTab(this, () -> {
             Component temp = MekanismUtils.getTemperatureDisplay(tile.getTotalTemperature(), TemperatureUnit.KELVIN, true);

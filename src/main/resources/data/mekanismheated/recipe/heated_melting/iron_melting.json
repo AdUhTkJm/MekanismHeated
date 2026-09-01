@@ -5,8 +5,8 @@
     "item": "minecraft:cobblestone"
   },
   "output": {
-    "amount": 250,
-    "id": "minecraft:lava"
+    "amount": 90,
+    "id": "mekanism_heated:molten_iron"
   },
   "temperature": 1500
 }

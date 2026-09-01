@@ -2,6 +2,7 @@ package io.aduhtkjm.mekanismheated;
 
 import com.mojang.logging.LogUtils;
 import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedPipeRegistry;
+import io.aduhtkjm.mekanismheated.content.moltenfluid.MoltenFluidHandler;
 import io.aduhtkjm.mekanismheated.recipe.ModRecipeSerializers;
 import io.aduhtkjm.mekanismheated.recipe.ModRecipeTypes;
 import io.aduhtkjm.mekanismheated.registries.ModBlocks;
@@ -61,6 +62,7 @@ public class Mod {
         NeoForge.EVENT_BUS.register(this);
         NeoForge.EVENT_BUS.addListener(FusedPipeRegistry::onServerTickPost);
         NeoForge.EVENT_BUS.addListener(FusedPipeRegistry::onServerStopping);
+        NeoForge.EVENT_BUS.addListener(MoltenFluidHandler::onEntityTickPost);
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
@@ -72,6 +74,7 @@ public class Mod {
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         event.enqueueWork(ModFluids.FLUIDS::registerBucketDispenserBehavior);
+        event.enqueueWork(MoltenFluidHandler::init);
     }
 
     private void registerBucketCapabilities(final RegisterCapabilitiesEvent event) {

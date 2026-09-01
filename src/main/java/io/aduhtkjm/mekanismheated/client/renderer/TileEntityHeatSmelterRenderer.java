@@ -54,23 +54,45 @@ public class TileEntityHeatSmelterRenderer implements BlockEntityRenderer<TileEn
         if (blockEntity.fluidTank == null || blockEntity.fluidTank.isEmpty()) {
             return;
         }
-        float ratio = (float) blockEntity.fluidTank.getFluidAmount() / blockEntity.fluidTank.getCapacity();
-        if (ratio <= 0.0F) {
+        int totalCapacity = blockEntity.fluidTank.getTotalCapacity();
+        if (totalCapacity <= 0) {
             return;
         }
-        FluidStack fluid = blockEntity.fluidTank.getFluid();
-        ResourceLocation fluidId = fluid.getFluid().builtInRegistryHolder().key().location();
-        FluidModelEntry entry = modelCache.computeIfAbsent(fluidId, id -> buildFluidModel(fluid));
+        List<FluidStack> fluids = blockEntity.fluidTank.getFluids();
+        if (fluids.isEmpty()) {
+            return;
+        }
 
-        int tint = IClientFluidTypeExtensions.of(fluid.getFluid()).getTintColor();
         BlockState blockState = blockEntity.getBlockState();
+        float glassHeight = GLASS_MAX_Y - GLASS_MIN_Y;
 
         poseStack.pushPose();
         applyFacingTransform(poseStack, blockState);
-        poseStack.translate(FLUID_INSET, GLASS_MIN_Y, FLUID_INSET);
-        poseStack.scale(FLUID_SIZE, (GLASS_MAX_Y - GLASS_MIN_Y) * ratio, FLUID_SIZE);
-        renderModel(entry.model, entry.renderType, blockState, poseStack, bufferSource, packedLight, packedOverlay,
-              ((tint >> 16) & 0xFF) / 255.0F, ((tint >> 8) & 0xFF) / 255.0F, (tint & 0xFF) / 255.0F);
+
+        //Render each fluid as a layer stacked from the bottom
+        float yCursor = GLASS_MIN_Y;
+        for (FluidStack fluid : fluids) {
+            float ratio = (float) fluid.getAmount() / totalCapacity;
+            if (ratio <= 0.0F) {
+                continue;
+            }
+            float layerHeight = glassHeight * ratio;
+
+            ResourceLocation fluidId = fluid.getFluid().builtInRegistryHolder().key().location();
+            FluidModelEntry entry = modelCache.computeIfAbsent(fluidId, id -> buildFluidModel(fluid));
+
+            int tint = IClientFluidTypeExtensions.of(fluid.getFluid()).getTintColor();
+
+            poseStack.pushPose();
+            poseStack.translate(FLUID_INSET, yCursor, FLUID_INSET);
+            poseStack.scale(FLUID_SIZE, layerHeight, FLUID_SIZE);
+            renderModel(entry.model, entry.renderType, blockState, poseStack, bufferSource, packedLight, packedOverlay,
+                  ((tint >> 16) & 0xFF) / 255.0F, ((tint >> 8) & 0xFF) / 255.0F, (tint & 0xFF) / 255.0F);
+            poseStack.popPose();
+
+            yCursor += layerHeight;
+        }
+
         poseStack.popPose();
     }
 
