@@ -112,7 +112,7 @@ dependencies {
     runtimeOnly "maven.modrinth:jade:${jade_version}"
 
     // Spark. For easier performance test, but no API reference, so only runtime.
-    runtimeOnly "me.lucko.spark:spark-neoforge:${spark_version}"
+    runtimeOnly "maven.modrinth:l6YH9Als:v5qtqRQi"
 
     // Example mod dependency using a mod jar from ./libs with a flat dir repository
     // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar

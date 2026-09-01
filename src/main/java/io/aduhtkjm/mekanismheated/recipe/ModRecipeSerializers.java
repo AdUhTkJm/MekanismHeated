@@ -123,7 +123,7 @@ public class ModRecipeSerializers {
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BasicAlloyRecipe>> ALLOYING =
           RECIPE_SERIALIZERS.register("alloying", () -> new MekanismRecipeSerializer<>(
                 RecordCodecBuilder.mapCodec(instance -> instance.group(
-                      FluidStackIngredient.CODEC.listOf(2).fieldOf("inputs").forGetter(BasicAlloyRecipe::getInputsRaw),
+                      FluidStackIngredient.CODEC.listOf().fieldOf("inputs").forGetter(BasicAlloyRecipe::getInputsRaw),
                       FluidStackIngredient.CODEC.fieldOf(SerializationConstants.OUTPUT).forGetter(BasicAlloyRecipe::getOutputRaw)
                 ).apply(instance, (inputs, output) -> new BasicAlloyRecipe(inputs.get(0), inputs.get(1), output))),
                 StreamCodec.composite(

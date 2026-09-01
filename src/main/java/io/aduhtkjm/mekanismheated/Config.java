@@ -11,6 +11,7 @@ public class Config {
 
     public static class HeatSmelter {
         public static ModConfigSpec.IntValue BASE_SPEED;
+        public static ModConfigSpec.IntValue FLUID_CAPACITY;
         public static ModConfigSpec.DoubleValue FULL_SPEED_TEMPERATURE;
         public static ModConfigSpec.DoubleValue BASE_TEMPERATURE;
         public static ModConfigSpec.DoubleValue HEAT_CAPACITY;
@@ -38,6 +39,9 @@ public class Config {
         HeatSmelter.BASE_SPEED = BUILDER
             .comment("Base number of game ticks the heat smelter takes to complete a recipe when running at full speed.")
             .defineInRange("baseSpeed", 100, 1, Integer.MAX_VALUE);
+        HeatSmelter.FLUID_CAPACITY = BUILDER
+            .comment("The capacity of the output fluid buffer in heat smelter, in buckets.")
+            .defineInRange("fluidCapacity", 36, 1, Integer.MAX_VALUE);
         HeatSmelter.FULL_SPEED_TEMPERATURE = BUILDER
             .comment("Temperature in Kelvin the Heat Smelter must reach to process recipes at 100% base speed.")
             .defineInRange("fullSpeedTemperature", 1_000D, 0D, Double.MAX_VALUE);

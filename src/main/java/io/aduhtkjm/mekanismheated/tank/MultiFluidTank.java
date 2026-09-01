@@ -3,6 +3,8 @@ package io.aduhtkjm.mekanismheated.tank;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import io.aduhtkjm.mekanismheated.Mod;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
@@ -14,6 +16,7 @@ import net.minecraft.nbt.Tag;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.system.NonnullDefault;
 
 /**
  * A fluid tank that can hold multiple different fluids simultaneously, constrained only by a total capacity
@@ -254,6 +257,7 @@ public class MultiFluidTank {
      * Implements {@link IExtendedFluidTank} for integration with Mekanism's fluid handler system.
      * The effective insert capacity is governed by the parent tank's total remaining capacity.
      */
+    @NonnullDefault
     public class Slot implements IExtendedFluidTank {
 
         private FluidStack stored = FluidStack.EMPTY;

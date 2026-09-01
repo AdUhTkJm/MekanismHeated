@@ -13,6 +13,8 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
+
 /**
  * A recipe that melts two fluids together into a single alloy fluid.
  * <br>

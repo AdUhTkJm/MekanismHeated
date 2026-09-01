@@ -1,6 +1,7 @@
 package io.aduhtkjm.mekanismheated.tile;
 
 import io.aduhtkjm.mekanismheated.Config;
+import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.recipe.*;
 import io.aduhtkjm.mekanismheated.recipe.cache.HeatSensitiveOneInputCachedRecipe;
 import io.aduhtkjm.mekanismheated.recipe.lookup.monitor.HeatSmelterRecipeCacheLookupMonitor;
@@ -85,7 +86,7 @@ public class TileEntityHeatSmelter
     );
 
     /** Capacity of the melting fluid output tank, in milli-buckets. */
-    public static final int MAX_FLUID = 10 * FluidType.BUCKET_VOLUME;
+    public static final int MAX_FLUID = Config.HeatSmelter.FLUID_CAPACITY.get() * FluidType.BUCKET_VOLUME;
 
     protected final IInputHandler<@NotNull ItemStack> inputHandler;
     protected final IOutputHandler<@NotNull ItemStack> outputHandler;
@@ -117,10 +118,7 @@ public class TileEntityHeatSmelter
         }
         ConfigInfo fluidConfig = configComponent.getConfig(TransmissionType.FLUID);
         if (fluidConfig != null) {
-            List<IExtendedFluidTank> slotTanks = new ArrayList<>();
-            for (MultiFluidTank.Slot slot : fluidTank.getSlots()) {
-                slotTanks.add(slot);
-            }
+            List<IExtendedFluidTank> slotTanks = new ArrayList<>(fluidTank.getSlots());
             fluidConfig.addSlotInfo(DataType.OUTPUT, TileComponentConfig.createInfo(TransmissionType.FLUID, false, true, slotTanks));
         }
         configComponent.setupInputConfig(TransmissionType.HEAT, heatCapacitor);
@@ -140,12 +138,12 @@ public class TileEntityHeatSmelter
         outputHandler = OutputHelper.getOutputHandler(outputSlot, RecipeError.NOT_ENOUGH_OUTPUT_SPACE);
         fluidOutputHandler = new IOutputHandler<>() {
             @Override
-            public void handleOutput(FluidStack toOutput, int operations) {
+            public void handleOutput(@NotNull FluidStack toOutput, int operations) {
                 fluidTank.insert(toOutput.copyWithAmount(toOutput.getAmount() * operations), Action.EXECUTE, AutomationType.INTERNAL);
             }
 
             @Override
-            public void calculateOperationsCanSupport(OperationTracker tracker, FluidStack toOutput) {
+            public void calculateOperationsCanSupport(@NotNull OperationTracker tracker, @NotNull FluidStack toOutput) {
                 if (!toOutput.isEmpty()) {
                     FluidStack maxOutput = toOutput.copyWithAmount(Integer.MAX_VALUE);
                     FluidStack remainder = fluidTank.insert(maxOutput, Action.SIMULATE, AutomationType.INTERNAL);
@@ -179,7 +177,10 @@ public class TileEntityHeatSmelter
         FluidTankHelper builder = FluidTankHelper.forSideWithConfig(this);
         fluidTank = MultiFluidTank.output(MAX_FLUID,
               () -> {
-                  fluidChanged = true;
+                  //State updates happens only on server side.
+                  if (!isRemote()) {
+                      fluidChanged = true;
+                  }
                   listener.onContentsChanged();
                   onContentsChanged();
               });
@@ -460,6 +461,7 @@ public class TileEntityHeatSmelter
     }
 
     //Safe to return null. Never used by outside code, but we must have one.
+    @SuppressWarnings("all")
     @Nullable
     @Override
     public IMekanismRecipeTypeProvider<?, HeatSmelterRecipe, ?> getRecipeType() {
