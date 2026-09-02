@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "MekanismHeated.refmap.json",
   "mixins": [
+    "MixinITileHeatHandler"
   ],
   "client": [
   ],

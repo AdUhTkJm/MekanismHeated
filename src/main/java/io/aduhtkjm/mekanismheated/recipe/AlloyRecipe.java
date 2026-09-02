@@ -7,8 +7,8 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
+import net.neoforged.neoforge.fluids.BaseFlowingFluid.Flowing;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -98,7 +98,7 @@ public abstract class AlloyRecipe extends MekanismRecipe<TwoFluidRecipeInput> {
     public static Fluid outputFluid(FluidStackIngredient output) {
         for (FluidStack representation : output.getRepresentations()) {
             Fluid fluid = representation.getFluid();
-            if (!(fluid instanceof FlowingFluid)) {
+            if (!(fluid instanceof Flowing)) {
                 return fluid;
             }
         }

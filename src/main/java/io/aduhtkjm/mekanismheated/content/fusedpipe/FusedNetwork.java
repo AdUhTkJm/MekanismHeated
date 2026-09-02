@@ -528,9 +528,9 @@ public class FusedNetwork {
         return itemBufferCapacity;
     }
 
-    private void pullItems(int interval) {
+    private void pullItems() {
         for (FusedAcceptorCache.TankSource<IItemHandler> entry : acceptorCache.getItemSources()) {
-            int pullRate = entry.origin().getItemPullAmount() * interval;
+            int pullRate = entry.origin().getItemPullAmount() * FusedNetwork.ITEM_INTERVAL;
             if (pullRate <= 0) {
                 continue;
             }
@@ -792,16 +792,16 @@ public class FusedNetwork {
         //Pulls are rate-limited to their configured interval; the amount pulled is scaled by that
         //interval so the average per-tick rate is unchanged.
         if (tickCounter % ITEM_INTERVAL == 0) {
-            pullItems(ITEM_INTERVAL);
+            pullItems();
         }
         if (tickCounter % FLUID_INTERVAL == 0) {
-            pullFluids(FLUID_INTERVAL);
+            pullFluids();
         }
         if (tickCounter % CHEMICAL_INTERVAL == 0) {
-            pullChemicals(CHEMICAL_INTERVAL);
+            pullChemicals();
         }
         if (tickCounter % ENERGY_INTERVAL == 0) {
-            pullEnergy(ENERGY_INTERVAL);
+            pullEnergy();
         }
         //Pushes always run every tick to keep the delivery to machines smooth.
         emitEnergy();
@@ -831,15 +831,23 @@ public class FusedNetwork {
         double myTemp = heatCapacitor.getTemperature();
         //Scale transfers by the simulation interval to preserve the average per-tick rate.
         double scale = HEAT_INTERVAL;
-        //Phase 1: simulate adjacent transfers
+        //Phase 1: simulate adjacent transfers (calorimetry, one-way: hot -> cold)
         for (FusedAcceptorCache.HeatAcceptor entry : acceptorCache.getHeatAcceptors()) {
             IHeatHandler sink = entry.resolve();
             if (sink == null) {
                 continue;
             }
             double sinkTemp = sink.getTotalTemperature();
+            //No heat flows from cooler to hotter; the sink handles the transfer when it simulates,
+            //which also avoids the transfer happening twice per tick.
+            if (myTemp <= sinkTemp) {
+                continue;
+            }
+            double sinkHeatCapacity = sink.getTotalHeatCapacity();
             double invConduction = sink.getTotalInverseConduction() + heatCapacitor.getInverseConduction();
-            double tempToTransfer = (myTemp - sinkTemp) / invConduction;
+            //Calculate the target temperature using calorimetry
+            double finalTemp = (myTemp * totalCapacity + sinkTemp * sinkHeatCapacity) / (totalCapacity + sinkHeatCapacity);
+            double tempToTransfer = (myTemp - finalTemp) / invConduction;
             double heatToTransfer = tempToTransfer * totalCapacity * scale;
             heatCapacitor.handleHeat(-heatToTransfer);
             sink.handleHeat(heatToTransfer);
@@ -858,9 +866,9 @@ public class FusedNetwork {
 
     //Energy
 
-    private void pullEnergy(int interval) {
+    private void pullEnergy() {
         for (FusedAcceptorCache.EnergySource entry : acceptorCache.getEnergySources()) {
-            long availablePull = Math.min(entry.origin().getEnergyPullRate() * interval, energyContainer.getNeeded());
+            long availablePull = Math.min(entry.origin().getEnergyPullRate() * FusedNetwork.ENERGY_INTERVAL, energyContainer.getNeeded());
             if (availablePull <= 0L) {
                 continue;
             }
@@ -879,9 +887,9 @@ public class FusedNetwork {
         }
     }
 
-    private void pullFluids(int interval) {
+    private void pullFluids() {
         for (FusedAcceptorCache.TankSource<IFluidHandler> entry : acceptorCache.getFluidSources()) {
-            int availablePull = (int) Math.min((long) entry.origin().getFluidPullRate() * interval, fluidTank.getNeeded());
+            int availablePull = (int) Math.min((long) entry.origin().getFluidPullRate() * FusedNetwork.FLUID_INTERVAL, fluidTank.getNeeded());
             if (availablePull <= 0) {
                 continue;
             }
@@ -902,9 +910,9 @@ public class FusedNetwork {
         }
     }
 
-    private void pullChemicals(int interval) {
+    private void pullChemicals() {
         for (FusedAcceptorCache.TankSource<IChemicalHandler> entry : acceptorCache.getChemicalSources()) {
-            long availablePull = Math.min(entry.origin().getChemicalPullRate() * interval, chemicalTank.getNeeded());
+            long availablePull = Math.min(entry.origin().getChemicalPullRate() * FusedNetwork.CHEMICAL_INTERVAL, chemicalTank.getNeeded());
             if (availablePull <= 0L) {
                 continue;
             }
