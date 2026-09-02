@@ -1,6 +1,7 @@
 package io.aduhtkjm.mekanismheated.client;
 
 import io.aduhtkjm.mekanismheated.Mod;
+import io.aduhtkjm.mekanismheated.client.gui.machine.GuiCreativeHeatBlock;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiHeatSmelter;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiShaker;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiThermalFractionationController;
@@ -67,6 +68,7 @@ public class ModClient {
         ClientRegistrationUtil.registerScreen(event, ModContainerTypes.HEAT_SMELTER, GuiHeatSmelter::new);
         ClientRegistrationUtil.registerScreen(event, ModContainerTypes.SHAKER, GuiShaker::new);
         ClientRegistrationUtil.registerScreen(event, ModContainerTypes.THERMAL_FRACTIONATION_CONTROLLER, GuiThermalFractionationController::new);
+        ClientRegistrationUtil.registerScreen(event, ModContainerTypes.CREATIVE_HEAT_BLOCK, GuiCreativeHeatBlock::new);
     }
 
     @SubscribeEvent

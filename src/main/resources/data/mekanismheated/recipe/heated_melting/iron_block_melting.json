@@ -1,0 +1,12 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "input": {
+    "count": 1,
+    "item": "minecraft:iron_block"
+  },
+  "output": {
+    "amount": 810,
+    "id": "mekanismheated:molten_iron"
+  },
+  "temperature": 1808
+}

@@ -20,7 +20,9 @@ public enum ModLang implements ILangEntry {
     HEAT_SMELTER_BUFFER("gui", "heat_smelter.buffer"),
     MIN_TEMPERATURE("gui", "min_temperature"),
     PURE("tooltip", "pure"),
-    IMPURE("tooltip", "impure");
+    IMPURE("tooltip", "impure"),
+    DESCRIPTION_CREATIVE_HEAT_BLOCK("block", "creative_heat_block"),
+    GUI_TARGET_TEMPERATURE("gui", "target_temperature");
 
     private final String key;
 

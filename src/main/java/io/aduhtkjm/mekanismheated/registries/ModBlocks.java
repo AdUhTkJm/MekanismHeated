@@ -4,11 +4,13 @@ import io.aduhtkjm.mekanismheated.Config;
 import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.ModLang;
 import io.aduhtkjm.mekanismheated.block.BlockFusedPipe;
+import io.aduhtkjm.mekanismheated.block.creative.CreativeHeatBlock;
 import io.aduhtkjm.mekanismheated.block.fractionation.DistillationTrayBlock;
 import io.aduhtkjm.mekanismheated.block.heatsmelter.HeatSmelterBlock;
 import io.aduhtkjm.mekanismheated.block.shaker.ShakerBlock;
 import io.aduhtkjm.mekanismheated.item.ItemBlockFusedPipe;
 import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedPipeConfig;
+import io.aduhtkjm.mekanismheated.tile.TileEntityCreativeHeatBlock;
 import io.aduhtkjm.mekanismheated.tile.TileEntityShaker;
 import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityFractionationBlock;
@@ -16,6 +18,7 @@ import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionation
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationValve;
 import mekanism.common.block.attribute.AttributeSideConfig;
 import mekanism.common.block.attribute.AttributeStateFacing;
+import mekanism.common.block.attribute.AttributeUpgradeSupport;
 import mekanism.common.block.attribute.Attributes;
 import mekanism.common.block.attribute.Attributes.AttributeCustomResistance;
 import mekanism.common.block.prefab.BlockBasicMultiblock;
@@ -105,4 +108,13 @@ public class ModBlocks {
                 () -> new BlockFusedPipe(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_CYAN).strength(1.0F, 6.0F).noOcclusion().forceSolidOn()),
                 (block, properties) -> new ItemBlockFusedPipe(block,
                       properties.component(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(FusedPipeConfig.createDefaultBlockEntityData()))));
+
+    public static final Machine<TileEntityCreativeHeatBlock> CREATIVE_HEAT_BLOCK_TYPE = MachineBuilder
+          .createMachine(() -> ModTileEntityTypes.CREATIVE_HEAT_BLOCK, ModLang.DESCRIPTION_CREATIVE_HEAT_BLOCK)
+          .withGui(() -> ModContainerTypes.CREATIVE_HEAT_BLOCK)
+          .without(AttributeUpgradeSupport.class)
+          .build();
+
+    public static final BlockRegistryObject<CreativeHeatBlock, BlockItem> CREATIVE_HEAT_BLOCK =
+          BLOCKS.register("creative_heat_block", () -> new CreativeHeatBlock(CREATIVE_HEAT_BLOCK_TYPE, BlockBehaviour.Properties.of().mapColor(MapColor.METAL)));
 }

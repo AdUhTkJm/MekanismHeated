@@ -11,8 +11,10 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import org.lwjgl.system.NonnullDefault;
 
 /** Heated melting recipes for the Heat Smelter: item to fluid above the melting threshold. */
+@NonnullDefault
 public class HeatedMeltingRecipeCategory extends AbstractHeatSmelterRecipeCategory<HeatedItemStackToFluidRecipe> {
 
     private final GuiGauge<?> outputTank;

@@ -10,8 +10,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.BaseFlowingFluid.Flowing;
 import net.neoforged.neoforge.fluids.FluidStack;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
+import org.lwjgl.system.NonnullDefault;
 
 import javax.annotation.Nullable;
 
@@ -26,6 +25,7 @@ import javax.annotation.Nullable;
  * <br>
  * No temperature threshold applies; the heat smelter is assumed to always be hot enough to melt.
  */
+@NonnullDefault
 public abstract class AlloyRecipe extends MekanismRecipe<TwoFluidRecipeInput> {
 
     /**
@@ -109,7 +109,6 @@ public abstract class AlloyRecipe extends MekanismRecipe<TwoFluidRecipeInput> {
      * Resolves the output to a single display item: the bucket of {@link #getOutputFluid()}, or the heat smelter block's
      * item if no fluid can be resolved.
      */
-    @Contract("_ -> new")
     public ItemStack getOutputItem() {
         Fluid fluid = getOutputFluid();
         if (fluid != null) {
@@ -119,7 +118,7 @@ public abstract class AlloyRecipe extends MekanismRecipe<TwoFluidRecipeInput> {
     }
 
     @Override
-    public ItemStack getResultItem(@NotNull HolderLookup.Provider provider) {
+    public ItemStack getResultItem(HolderLookup.Provider provider) {
         return getOutputItem();
     }
 

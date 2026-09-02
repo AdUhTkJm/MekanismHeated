@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "mekanismheated:block/creative_heat_block"
+    }
+  }
+}
