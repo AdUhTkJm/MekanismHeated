@@ -18,7 +18,6 @@ public class MekanismHeatedJadePlugin implements IWailaPlugin {
     @Override
     public void register(IWailaCommonRegistration registration) {
         registration.registerBlockDataProvider(FusedPipeMekDataProvider.INSTANCE, TileEntityFusedPipe.class);
-        registration.registerItemStorage(FusedPipeItemProvider.INSTANCE, TileEntityFusedPipe.class);
         registration.registerBlockDataProvider(HeatSmelterMekDataProvider.INSTANCE, TileEntityHeatSmelter.class);
     }
 

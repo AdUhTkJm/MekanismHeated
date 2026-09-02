@@ -9,7 +9,7 @@ import java.util.UUID;
 import java.util.function.IntSupplier;
 import java.util.function.LongSupplier;
 
-import io.aduhtkjm.mekanismheated.Mod;
+import io.aduhtkjm.mekanismheated.Config;
 import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
@@ -80,6 +80,11 @@ public class FusedNetwork {
     private final List<IChemicalTank> chemicalTanksView;
     private final VariableHeatCapacitor heatCapacitor;
     private final List<IHeatCapacitor> heatCapacitorsView;
+    //Network-wide heat stats, cached and recomputed only when topology or a node's tier changes.
+    private double cachedTotalHeatCapacity;
+    private double cachedTotalHeatConduction;
+    private double cachedTotalHeatInsulation;
+    private boolean heatStatsDirty = true;
     private final List<ItemStack> itemBuffer = new ArrayList<>();
     private int itemCount;
     private int itemBufferCapacity;
@@ -87,6 +92,7 @@ public class FusedNetwork {
     private final ItemHandler itemHandler = new ItemHandler();
     public final FusedAcceptorCache acceptorCache = new FusedAcceptorCache();
     private long lastSavedTime = -1;
+    private int tickCounter;
 
     public FusedNetwork(UUID uuid) {
         this.uuid = uuid;
@@ -286,35 +292,56 @@ public class FusedNetwork {
     }
 
     public double getTotalHeatCapacity() {
-        double capacity = 0;
-        for (FusedPipeNode node : nodes) {
-            capacity += node.getHeatCapacity();
-        }
-        return capacity;
+        ensureHeatStats();
+        return cachedTotalHeatCapacity;
     }
 
     private double getTotalHeatConduction() {
-        double max = 0;
-        for (FusedPipeNode node : nodes) {
-            max = Math.max(max, node.getHeatConduction());
-        }
-        return max;
+        ensureHeatStats();
+        return cachedTotalHeatConduction;
     }
 
     private double getTotalHeatInsulation() {
-        double max = 0;
-        for (FusedPipeNode node : nodes) {
-            max = Math.max(max, node.getHeatInsulation());
-        }
-        return max;
+        ensureHeatStats();
+        return cachedTotalHeatInsulation;
     }
 
     private void updateHeatCapacity() {
+        //Topology or tier changes make the cached heat stats stale; recompute on the next read.
+        heatStatsDirty = true;
         heatCapacitor.setHeatCapacity(getTotalHeatCapacity(), false);
+    }
+
+    /**
+     * Lazily recomputes the network-wide heat stats in a single pass over the nodes. The values are
+     * cached and only recomputed when the topology or a node's tier changes (see
+     * {@link #updateHeatCapacity()}); between those events every read is {@code O(1)} instead of an
+     * enumeration of all nodes.
+     */
+    private void ensureHeatStats() {
+        if (!heatStatsDirty) {
+            return;
+        }
+        double capacity = 0;
+        double maxConduction = 0;
+        double maxInsulation = 0;
+        for (FusedPipeNode node : nodes) {
+            capacity += node.getHeatCapacity();
+            maxConduction = Math.max(maxConduction, node.getHeatConduction());
+            maxInsulation = Math.max(maxInsulation, node.getHeatInsulation());
+        }
+        cachedTotalHeatCapacity = capacity;
+        cachedTotalHeatConduction = maxConduction;
+        cachedTotalHeatInsulation = maxInsulation;
+        heatStatsDirty = false;
     }
 
     public double getHeat() {
         return heatCapacitor.getHeat();
+    }
+
+    public double getTemperature() {
+        return heatCapacitor.getTemperature();
     }
 
     @NotNull
@@ -358,7 +385,6 @@ public class FusedNetwork {
             }
             tag.put("Items", itemTag);
         }
-        Mod.LOGGER.debug("network saved: {}", tag);
         FusedNetworkSavedData.get(level).putNetwork(uuid, tag);
     }
 
@@ -368,7 +394,6 @@ public class FusedNetwork {
      */
     public void loadFromSavedData(@NotNull ServerLevel level, @NotNull HolderLookup.Provider provider) {
         CompoundTag tag = FusedNetworkSavedData.get(level).consumeNetwork(uuid);
-        Mod.LOGGER.debug("network loaded: {}", tag);
         if (tag == null) {
             return;
         }
@@ -503,9 +528,9 @@ public class FusedNetwork {
         return itemBufferCapacity;
     }
 
-    private void pullItems() {
+    private void pullItems(int interval) {
         for (FusedAcceptorCache.TankSource<IItemHandler> entry : acceptorCache.getItemSources()) {
-            int pullRate = entry.origin().getItemPullAmount();
+            int pullRate = entry.origin().getItemPullAmount() * interval;
             if (pullRate <= 0) {
                 continue;
             }
@@ -754,17 +779,38 @@ public class FusedNetwork {
 
     //Ticking
 
+    //Extract these constants to do basic LICM optimization.
+    private static final int ITEM_INTERVAL = Config.FusedNetwork.ITEM_PULL_INTERVAL.get();
+    private static final int FLUID_INTERVAL = Config.FusedNetwork.FLUID_PULL_INTERVAL.get();
+    private static final int CHEMICAL_INTERVAL = Config.FusedNetwork.CHEMICAL_PULL_INTERVAL.get();
+    private static final int ENERGY_INTERVAL = Config.FusedNetwork.ENERGY_PULL_INTERVAL.get();
+    private static final int HEAT_INTERVAL = Config.FusedNetwork.HEAT_SIM_INTERVAL.get();
+
     public void serverTick() {
         acceptorCache.rebuildIfNeeded(nodes);
-        pullEnergy();
-        pullFluids();
-        pullChemicals();
-        pullItems();
+        tickCounter++;
+        //Pulls are rate-limited to their configured interval; the amount pulled is scaled by that
+        //interval so the average per-tick rate is unchanged.
+        if (tickCounter % ITEM_INTERVAL == 0) {
+            pullItems(ITEM_INTERVAL);
+        }
+        if (tickCounter % FLUID_INTERVAL == 0) {
+            pullFluids(FLUID_INTERVAL);
+        }
+        if (tickCounter % CHEMICAL_INTERVAL == 0) {
+            pullChemicals(CHEMICAL_INTERVAL);
+        }
+        if (tickCounter % ENERGY_INTERVAL == 0) {
+            pullEnergy(ENERGY_INTERVAL);
+        }
+        //Pushes always run every tick to keep the delivery to machines smooth.
         emitEnergy();
         emitFluids();
         emitChemicals();
         emitItems();
-        simulateHeat();
+        if (tickCounter % HEAT_INTERVAL == 0) {
+            simulateHeat();
+        }
     }
 
     //Heat
@@ -783,7 +829,8 @@ public class FusedNetwork {
             return;
         }
         double myTemp = heatCapacitor.getTemperature();
-
+        //Scale transfers by the simulation interval to preserve the average per-tick rate.
+        double scale = HEAT_INTERVAL;
         //Phase 1: simulate adjacent transfers
         for (FusedAcceptorCache.HeatAcceptor entry : acceptorCache.getHeatAcceptors()) {
             IHeatHandler sink = entry.resolve();
@@ -793,7 +840,7 @@ public class FusedNetwork {
             double sinkTemp = sink.getTotalTemperature();
             double invConduction = sink.getTotalInverseConduction() + heatCapacitor.getInverseConduction();
             double tempToTransfer = (myTemp - sinkTemp) / invConduction;
-            double heatToTransfer = tempToTransfer * totalCapacity;
+            double heatToTransfer = tempToTransfer * totalCapacity * scale;
             heatCapacitor.handleHeat(-heatToTransfer);
             sink.handleHeat(heatToTransfer);
         }
@@ -802,7 +849,7 @@ public class FusedNetwork {
         double ambientTemp = HeatAPI.AMBIENT_TEMP;
         double invConductionEnv = HeatAPI.AIR_INVERSE_COEFFICIENT + heatCapacitor.getInverseInsulation() + heatCapacitor.getInverseConduction();
         double tempToTransferEnv = (myTemp - ambientTemp) / invConductionEnv;
-        double heatToTransferEnv = tempToTransferEnv * totalCapacity;
+        double heatToTransferEnv = tempToTransferEnv * totalCapacity * scale;
         heatCapacitor.handleHeat(-heatToTransferEnv * 6);
 
         //Phase 2: commit
@@ -811,9 +858,9 @@ public class FusedNetwork {
 
     //Energy
 
-    private void pullEnergy() {
+    private void pullEnergy(int interval) {
         for (FusedAcceptorCache.EnergySource entry : acceptorCache.getEnergySources()) {
-            long availablePull = Math.min(entry.origin().getEnergyPullRate(), energyContainer.getNeeded());
+            long availablePull = Math.min(entry.origin().getEnergyPullRate() * interval, energyContainer.getNeeded());
             if (availablePull <= 0L) {
                 continue;
             }
@@ -832,9 +879,9 @@ public class FusedNetwork {
         }
     }
 
-    private void pullFluids() {
+    private void pullFluids(int interval) {
         for (FusedAcceptorCache.TankSource<IFluidHandler> entry : acceptorCache.getFluidSources()) {
-            int availablePull = Math.min(entry.origin().getFluidPullRate(), fluidTank.getNeeded());
+            int availablePull = (int) Math.min((long) entry.origin().getFluidPullRate() * interval, fluidTank.getNeeded());
             if (availablePull <= 0) {
                 continue;
             }
@@ -855,9 +902,9 @@ public class FusedNetwork {
         }
     }
 
-    private void pullChemicals() {
+    private void pullChemicals(int interval) {
         for (FusedAcceptorCache.TankSource<IChemicalHandler> entry : acceptorCache.getChemicalSources()) {
-            long availablePull = Math.min(entry.origin().getChemicalPullRate(), chemicalTank.getNeeded());
+            long availablePull = Math.min(entry.origin().getChemicalPullRate() * interval, chemicalTank.getNeeded());
             if (availablePull <= 0L) {
                 continue;
             }

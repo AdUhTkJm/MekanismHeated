@@ -33,6 +33,14 @@ public class Config {
         public static ModConfigSpec.DoubleValue HEAT_DISSIPATION;
     }
 
+    public static class FusedNetwork {
+        public static ModConfigSpec.IntValue ITEM_PULL_INTERVAL;
+        public static ModConfigSpec.IntValue CHEMICAL_PULL_INTERVAL;
+        public static ModConfigSpec.IntValue FLUID_PULL_INTERVAL;
+        public static ModConfigSpec.IntValue ENERGY_PULL_INTERVAL;
+        public static ModConfigSpec.IntValue HEAT_SIM_INTERVAL;
+    }
+
     public static ModConfigSpec SPEC;
     static {
         BUILDER.push("heatSmelter");
@@ -87,6 +95,24 @@ public class Config {
         Fractionation.HEAT_DISSIPATION = BUILDER
             .comment("Coefficient controlling how quickly the tower loses heat to the environment (larger means faster loss). Must be positive.")
             .defineInRange("heatDissipation", 1.0E-6D, 0D, Double.MAX_VALUE);
+        BUILDER.pop();
+
+        BUILDER.push("fusedNetwork");
+        FusedNetwork.ITEM_PULL_INTERVAL = BUILDER
+            .comment("How often (in ticks) the fused network pulls items from pull sides. The pulled amount is scaled by this interval to keep the average rate constant. Pushing always happens every tick.")
+            .defineInRange("itemPullInterval", 10, 1, Integer.MAX_VALUE);
+        FusedNetwork.CHEMICAL_PULL_INTERVAL = BUILDER
+            .comment("How often (in ticks) the fused network pulls chemicals from pull sides. The pulled amount is scaled by this interval to keep the average rate constant. Pushing always happens every tick.")
+            .defineInRange("chemicalPullInterval", 2, 1, Integer.MAX_VALUE);
+        FusedNetwork.FLUID_PULL_INTERVAL = BUILDER
+            .comment("How often (in ticks) the fused network pulls fluids from pull sides. The pulled amount is scaled by this interval to keep the average rate constant. Pushing always happens every tick.")
+            .defineInRange("fluidPullInterval", 2, 1, Integer.MAX_VALUE);
+        FusedNetwork.ENERGY_PULL_INTERVAL = BUILDER
+            .comment("How often (in ticks) the fused network pulls energy from pull sides. The pulled amount is scaled by this interval to keep the average rate constant. Pushing always happens every tick.")
+            .defineInRange("energyPullInterval", 2, 1, Integer.MAX_VALUE);
+        FusedNetwork.HEAT_SIM_INTERVAL = BUILDER
+            .comment("How often (in ticks) the fused network runs its heat simulation. Heat transfers are scaled by this interval to keep the average rate constant.")
+            .defineInRange("heatSimInterval", 1, 1, Integer.MAX_VALUE);
         BUILDER.pop();
         SPEC = BUILDER.build();
     }

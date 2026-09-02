@@ -23,9 +23,10 @@ public enum FusedPipeBuiltinRemover implements IComponentProvider<BlockAccessor>
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
         if (accessor.getTarget() instanceof TileEntityFusedPipe) {
-            // Remove Jade universal storage widgets (energy, fluid)
+            // Remove Jade universal storage widgets (energy, fluid, items)
             tooltip.remove(JadeIds.UNIVERSAL_ENERGY_STORAGE);
             tooltip.remove(JadeIds.UNIVERSAL_FLUID_STORAGE);
+            tooltip.remove(JadeIds.UNIVERSAL_ITEM_STORAGE);
             // Remove Mekanism mek_data elements (rendered by JadeTooltipRenderer as MekElement)
             // These are tagged with element IDs, not the renderer UID
             tooltip.remove(LookingAtUtils.ENERGY);
