@@ -62,6 +62,7 @@ public class ModClient {
     @SubscribeEvent
     public static void registerClientExtensions(RegisterClientExtensionsEvent event) {
         ClientRegistrationUtil.registerFluidExtensions(event, ModFluids.FLUIDS);
+        event.registerBlock(new FusedPipeBlockExtensions(), ModBlocks.FUSED_PIPE.get());
     }
 
     @SubscribeEvent
