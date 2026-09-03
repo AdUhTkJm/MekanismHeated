@@ -1,0 +1,38 @@
+{
+  "parent": "mekanismheated:root",
+  "criteria": {
+    "heat_smelter": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "mekanismheated:heat_smelter"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.mekanismheated.heat_smelter.description"
+    },
+    "frame": "task",
+    "icon": {
+      "count": 1,
+      "id": "mekanismheated:heat_smelter"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.mekanismheated.heat_smelter.title"
+    }
+  },
+  "requirements": [
+    [
+      "heat_smelter"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

@@ -1,0 +1,29 @@
+{
+  "criteria": {
+    "automatic": {
+      "trigger": "minecraft:tick"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "background": "mekanismheated:textures/block/heat_smelter/front.png",
+    "description": {
+      "translate": "advancements.mekanismheated.root.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "count": 1,
+      "id": "mekanismheated:heat_smelter"
+    },
+    "show_toast": false,
+    "title": {
+      "translate": "advancements.mekanismheated.root.title"
+    }
+  },
+  "requirements": [
+    [
+      "automatic"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

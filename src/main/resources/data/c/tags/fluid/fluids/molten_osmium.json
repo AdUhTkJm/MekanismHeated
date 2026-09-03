@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "mekanismheated:molten_osmium",
+    "mekanismheated:flowing_molten_osmium"
+  ]
+}

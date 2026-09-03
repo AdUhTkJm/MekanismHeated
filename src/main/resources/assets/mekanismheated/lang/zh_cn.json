@@ -1,4 +1,8 @@
 {
+  "advancements.mekanismheated.root.title": "通用机械：热力学",
+  "advancements.mekanismheated.root.description": "把温度调高。",
+  "advancements.mekanismheated.heat_smelter.title": "热射病",
+  "advancements.mekanismheated.heat_smelter.description": "制作你的第一台热力熔炼炉。",
   "block.mekanismheated.acetic_acid": "乙酸",
   "block.mekanismheated.asphalt": "沥青",
   "block.mekanismheated.distillation_tray": "蒸馏托盘",

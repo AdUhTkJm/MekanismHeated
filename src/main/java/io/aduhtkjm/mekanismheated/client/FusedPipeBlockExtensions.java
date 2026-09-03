@@ -16,8 +16,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.RenderShape;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -62,14 +62,16 @@ public class FusedPipeBlockExtensions implements IClientBlockExtensions {
                         double fx = ((double) l + 0.5) / i;
                         double fy = ((double) i1 + 0.5) / j;
                         double fz = ((double) j1 + 0.5) / k;
-                        manager.add(new TerrainParticle(
-                                clientLevel,
-                                pos.getX() + fx * sx + x1,
-                                pos.getY() + fy * sy + y1,
-                                pos.getZ() + fz * sz + z1,
-                                fx - 0.5, fy - 0.5, fz - 0.5,
-                                state, pos
-                        ).setSpriteFromAge(sprite));
+                        var particle = new TerrainParticle(
+                            clientLevel,
+                            pos.getX() + fx * sx + x1,
+                            pos.getY() + fy * sy + y1,
+                            pos.getZ() + fz * sz + z1,
+                            fx - 0.5, fy - 0.5, fz - 0.5,
+                            state, pos
+                        );
+                        particle.setSpriteFromAge(sprite);
+                        manager.add(particle);
                     }
                 }
             }
@@ -110,9 +112,11 @@ public class FusedPipeBlockExtensions implements IClientBlockExtensions {
         if (side == Direction.EAST) {
             x = pos.getX() + bounds.maxX + 0.1F;
         }
-        manager.add(new TerrainParticle(
-                clientLevel, x, y, z, 0.0D, 0.0D, 0.0D, state, pos
-        ).setSpriteFromAge(tierSpriteSet(state)).setPower(0.2F).scale(0.6F));
+        var particle = new TerrainParticle(
+            clientLevel, x, y, z, 0.0D, 0.0D, 0.0D, state, pos
+        );
+        particle.setSpriteFromAge(tierSpriteSet(state));
+        manager.add(particle.setPower(0.2F).scale(0.6F));
         return true;
     }
 

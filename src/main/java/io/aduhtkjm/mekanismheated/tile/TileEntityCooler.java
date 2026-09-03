@@ -63,7 +63,7 @@ public class TileEntityCooler extends TileEntityMekanism {
         double inverseInsulation = Config.Cooler.INVERSE_INSULATION_COEFFICIENT.get();
         builder.addCapacitor(hotCapacitor = BasicHeatCapacitor.create(heatCapacity, inverseConduction, inverseInsulation, ambientTemperature, listener), RelativeSide.FRONT);
         builder.addCapacitor(coldCapacitor = BasicHeatCapacitor.create(heatCapacity, inverseConduction, inverseInsulation, ambientTemperature, listener),
-              RelativeSide.BACK, RelativeSide.LEFT, RelativeSide.RIGHT, RelativeSide.UP, RelativeSide.DOWN);
+              RelativeSide.BACK, RelativeSide.LEFT, RelativeSide.RIGHT, RelativeSide.TOP, RelativeSide.BOTTOM);
         return builder.build();
     }
 

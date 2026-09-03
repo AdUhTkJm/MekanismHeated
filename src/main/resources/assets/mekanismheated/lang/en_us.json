@@ -1,4 +1,8 @@
 {
+  "advancements.mekanismheated.root.title": "Mekanism Heated",
+  "advancements.mekanismheated.root.description": "Turn up the heat.",
+  "advancements.mekanismheated.heat_smelter.title": "Heat Stroke",
+  "advancements.mekanismheated.heat_smelter.description": "Craft your first Heat Smelter.",
   "block.mekanismheated.acetic_acid": "Acetic Acid",
   "block.mekanismheated.asphalt": "Asphalt",
   "block.mekanismheated.distillation_tray": "Distillation Tray",

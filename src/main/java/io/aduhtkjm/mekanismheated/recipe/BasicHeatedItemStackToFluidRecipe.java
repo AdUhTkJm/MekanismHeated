@@ -54,7 +54,7 @@ public class BasicHeatedItemStackToFluidRecipe extends HeatedItemStackToFluidRec
             }
         }
         List<FluidStack> reps = output.getRepresentations();
-        return reps.isEmpty() ? new FluidStack(Fluid.EMPTY, 0) : reps.get(0).copy();
+        return reps.isEmpty() ? FluidStack.EMPTY : reps.getFirst().copy();
     }
 
     @Override
