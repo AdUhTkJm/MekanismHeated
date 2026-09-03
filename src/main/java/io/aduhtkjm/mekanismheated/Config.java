@@ -41,6 +41,13 @@ public class Config {
         public static ModConfigSpec.IntValue HEAT_SIM_INTERVAL;
     }
 
+    public static class Cooler {
+        public static ModConfigSpec.DoubleValue EFFICIENCY;
+        public static ModConfigSpec.DoubleValue HEAT_CAPACITY;
+        public static ModConfigSpec.DoubleValue INVERSE_CONDUCTION_COEFFICIENT;
+        public static ModConfigSpec.DoubleValue INVERSE_INSULATION_COEFFICIENT;
+    }
+
     public static ModConfigSpec SPEC;
     static {
         BUILDER.push("heatSmelter");
@@ -113,6 +120,21 @@ public class Config {
         FusedNetwork.HEAT_SIM_INTERVAL = BUILDER
             .comment("How often (in ticks) the fused network runs its heat simulation. Heat transfers are scaled by this interval to keep the average rate constant.")
             .defineInRange("heatSimInterval", 1, 1, Integer.MAX_VALUE);
+        BUILDER.pop();
+
+        BUILDER.push("cooler");
+        Cooler.EFFICIENCY = BUILDER
+            .comment("Heat pump coefficient of performance (COP). Heat moved per joule of energy consumed.")
+            .defineInRange("efficiency", 2.0D, 0.1D, Double.MAX_VALUE);
+        Cooler.HEAT_CAPACITY = BUILDER
+            .comment("Heat capacity of the Cooler in J/K, controlling how quickly its temperature changes. Must be at least one.")
+            .defineInRange("heatCapacity", 100D, 1D, Double.MAX_VALUE);
+        Cooler.INVERSE_CONDUCTION_COEFFICIENT = BUILDER
+            .comment("Inverse conduction coefficient of the Cooler, controlling how readily it exchanges heat with adjacent blocks (smaller means faster). Must be at least one.")
+            .defineInRange("inverseConductionCoefficient", 5D, 1D, Double.MAX_VALUE);
+        Cooler.INVERSE_INSULATION_COEFFICIENT = BUILDER
+            .comment("Inverse insulation coefficient of the Cooler, controlling how readily it loses heat to the environment (smaller means slower). Must be at least one.")
+            .defineInRange("inverseInsulationCoefficient", 10D, 1D, Double.MAX_VALUE);
         BUILDER.pop();
         SPEC = BUILDER.build();
     }

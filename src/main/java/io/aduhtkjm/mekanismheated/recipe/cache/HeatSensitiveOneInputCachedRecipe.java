@@ -1,6 +1,6 @@
 package io.aduhtkjm.mekanismheated.recipe.cache;
 
-import io.aduhtkjm.mekanismheated.recipe.HeatedItemStackToFluidRecipe;
+import io.aduhtkjm.mekanismheated.recipe.HeatSmelterRecipe;
 import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
@@ -9,7 +9,6 @@ import java.util.function.Supplier;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.functions.ConstantPredicates;
 import mekanism.api.recipes.ItemStackToItemStackRecipe;
-import mekanism.api.recipes.MekanismRecipe;
 import mekanism.api.recipes.cache.CachedRecipe;
 import mekanism.api.recipes.cache.OneInputCachedRecipe;
 import mekanism.api.recipes.ingredients.InputIngredient;
@@ -44,11 +43,10 @@ import org.jetbrains.annotations.NotNull;
  * handled here; it is enforced by the caller through {@link CachedRecipe#setBaselineMaxOperations}.
  *
  * @param <OUTPUT> Type of the recipe's output (an {@link ItemStack} or a {@link FluidStack}).
- * @param <RECIPE> Type of the recipe being processed, which must take a single {@link ItemStack} as input.
  */
 @NothingNullByDefault
-public class HeatSensitiveOneInputCachedRecipe<OUTPUT, RECIPE extends MekanismRecipe<?> & Predicate<@NotNull ItemStack>>
-      extends OneInputCachedRecipe<@NotNull ItemStack, @NotNull OUTPUT, RECIPE> {
+public class HeatSensitiveOneInputCachedRecipe<OUTPUT>
+      extends OneInputCachedRecipe<@NotNull ItemStack, @NotNull OUTPUT, HeatSmelterRecipe> {
 
     private final TileEntityHeatSmelter smelter;
     /**
@@ -77,7 +75,7 @@ public class HeatSensitiveOneInputCachedRecipe<OUTPUT, RECIPE extends MekanismRe
      * @param outputEmptyCheck Checks if the output is empty (indicating something went horribly wrong).
      * @param smelter          The heat smelter this recipe is processing for, used to look up the current speed factor and required ticks.
      */
-    public HeatSensitiveOneInputCachedRecipe(RECIPE recipe, BooleanSupplier recheckAllErrors,
+    public HeatSensitiveOneInputCachedRecipe(HeatSmelterRecipe recipe, BooleanSupplier recheckAllErrors,
           IInputHandler<@NotNull ItemStack> inputHandler, IOutputHandler<@NotNull OUTPUT> outputHandler,
           Supplier<? extends InputIngredient<@NotNull ItemStack>> inputSupplier, Function<@NotNull ItemStack, OUTPUT> outputGetter,
           Predicate<@NotNull OUTPUT> outputEmptyCheck, TileEntityHeatSmelter smelter) {
@@ -86,6 +84,15 @@ public class HeatSensitiveOneInputCachedRecipe<OUTPUT, RECIPE extends MekanismRe
         //The base implementation counts raw ticks via operatingTicks++ with no way to change the increment, so instead we
         // offset the required ticks by the raw tick count, turning the base's completion check into "progress >= required ticks"
         setRequiredTicks(() -> getOperatingTicks() + (int) Math.ceil(smelter.getTicksRequired() - progress));
+    }
+
+    @Override
+    public boolean isInputValid() {
+        //Matching the input is not enough to keep this cache: the smelter switches between plain smelting and
+        // temperature-gated heated recipes as its temperature crosses a recipe's threshold. If the recipe the smelter would
+        // select at its current temperature is no longer the one we are caching, report the cache as invalid so the lookup
+        // monitor re-selects the correct recipe.
+        return super.isInputValid() && smelter.isRecipeStillEffective(recipe);
     }
 
     @Override

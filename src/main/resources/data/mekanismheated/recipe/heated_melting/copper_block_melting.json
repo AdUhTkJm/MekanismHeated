@@ -2,11 +2,11 @@
   "type": "mekanismheated:heated_melting",
   "input": {
     "count": 1,
-    "tag": "c:storage_blocks/iron"
+    "tag": "c:storage_blocks/copper"
   },
   "output": {
     "amount": 810,
-    "id": "mekanismheated:molten_iron"
+    "id": "mekanismheated:molten_copper"
   },
-  "temperature": 1808
+  "temperature": 1357
 }

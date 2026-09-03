@@ -2,7 +2,7 @@
   "type": "mekanismheated:heated_melting",
   "input": {
     "count": 1,
-    "item": "minecraft:iron_ingot"
+    "tag": "c:ingots/iron"
   },
   "output": {
     "amount": 90,

@@ -3,6 +3,7 @@ package io.aduhtkjm.mekanismheated;
 import com.mojang.logging.LogUtils;
 import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedPipeRegistry;
 import io.aduhtkjm.mekanismheated.content.moltenfluid.MoltenFluidHandler;
+import io.aduhtkjm.mekanismheated.network.PacketCoolerSetEnergy;
 import io.aduhtkjm.mekanismheated.network.PacketSetHeatTarget;
 import io.aduhtkjm.mekanismheated.recipe.ModRecipeSerializers;
 import io.aduhtkjm.mekanismheated.recipe.ModRecipeTypes;
@@ -91,7 +92,8 @@ public class Mod {
 
     private void registerPayloadHandlers(final RegisterPayloadHandlersEvent event) {
         event.registrar(MODID)
-              .playToServer(PacketSetHeatTarget.TYPE, PacketSetHeatTarget.STREAM_CODEC, PacketSetHeatTarget::handle);
+              .playToServer(PacketSetHeatTarget.TYPE, PacketSetHeatTarget.STREAM_CODEC, PacketSetHeatTarget::handle)
+              .playToServer(PacketCoolerSetEnergy.TYPE, PacketCoolerSetEnergy.STREAM_CODEC, PacketCoolerSetEnergy::handle);
     }
 
     @SubscribeEvent

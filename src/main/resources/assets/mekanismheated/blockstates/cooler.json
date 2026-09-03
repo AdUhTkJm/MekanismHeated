@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,active=false": {
+      "model": "mekanismheated:block/cooler"
+    },
+    "facing=south,active=false": {
+      "model": "mekanismheated:block/cooler",
+      "y": 180
+    },
+    "facing=east,active=false": {
+      "model": "mekanismheated:block/cooler",
+      "y": 90
+    },
+    "facing=west,active=false": {
+      "model": "mekanismheated:block/cooler",
+      "y": -90
+    },
+    "facing=north,active=true": {
+      "model": "mekanismheated:block/cooler_active"
+    },
+    "facing=south,active=true": {
+      "model": "mekanismheated:block/cooler_active",
+      "y": 180
+    },
+    "facing=east,active=true": {
+      "model": "mekanismheated:block/cooler_active",
+      "y": 90
+    },
+    "facing=west,active=true": {
+      "model": "mekanismheated:block/cooler_active",
+      "y": -90
+    }
+  }
+}

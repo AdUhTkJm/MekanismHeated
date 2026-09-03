@@ -33,4 +33,16 @@ public class HeatSmelterRecipeCacheLookupMonitor
         }
         return cachedRecipe;
     }
+
+    @Override
+    public boolean hasNoRecipe(int cacheIndex) {
+        if (!super.hasNoRecipe(cacheIndex)) {
+            return false;
+        }
+        //We previously found no recipe, but recipe selection depends on the smelter's temperature: a heated recipe that
+        // was too cold to run (and had no smelt fallback) has no cached recipe yet. While the smelter is warm, keep
+        // re-checking so such a recipe is picked up as the temperature rises; once it is too cold for any heated recipe
+        // to run, a confirmed "no recipe" can safely stand.
+        return heatSmelter.getSpeedFactor() <= 0;
+    }
 }

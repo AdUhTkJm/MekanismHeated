@@ -4,12 +4,15 @@ import io.aduhtkjm.mekanismheated.Config;
 import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.ModLang;
 import io.aduhtkjm.mekanismheated.block.BlockFusedPipe;
+import io.aduhtkjm.mekanismheated.block.cooler.CoolerBlock;
 import io.aduhtkjm.mekanismheated.block.creative.CreativeHeatBlock;
 import io.aduhtkjm.mekanismheated.block.fractionation.DistillationTrayBlock;
 import io.aduhtkjm.mekanismheated.block.heatsmelter.HeatSmelterBlock;
 import io.aduhtkjm.mekanismheated.block.shaker.ShakerBlock;
+import io.aduhtkjm.mekanismheated.item.ItemBlockCooler;
 import io.aduhtkjm.mekanismheated.item.ItemBlockFusedPipe;
 import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedPipeConfig;
+import io.aduhtkjm.mekanismheated.tile.TileEntityCooler;
 import io.aduhtkjm.mekanismheated.tile.TileEntityCreativeHeatBlock;
 import io.aduhtkjm.mekanismheated.tile.TileEntityShaker;
 import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
@@ -117,4 +120,14 @@ public class ModBlocks {
 
     public static final BlockRegistryObject<CreativeHeatBlock, BlockItem> CREATIVE_HEAT_BLOCK =
           BLOCKS.register("creative_heat_block", () -> new CreativeHeatBlock(CREATIVE_HEAT_BLOCK_TYPE, BlockBehaviour.Properties.of().mapColor(MapColor.METAL)));
+
+    public static final Machine<TileEntityCooler> COOLER_TYPE = MachineBuilder
+          .createMachine(() -> ModTileEntityTypes.COOLER, ModLang.DESCRIPTION_COOLER)
+          .withGui(() -> ModContainerTypes.COOLER)
+          .withEnergyConfig(() -> TileEntityCooler.BASE_USAGE, null)
+          .build();
+
+    public static final BlockRegistryObject<CoolerBlock, ItemBlockCooler> COOLER =
+          BLOCKS.register("cooler", () -> new CoolerBlock(COOLER_TYPE, BlockBehaviour.Properties.of().mapColor(MapColor.METAL)),
+                (block, properties) -> new ItemBlockCooler(block, properties));
 }

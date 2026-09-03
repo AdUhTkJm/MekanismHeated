@@ -223,7 +223,7 @@ public class TileEntityHeatSmelter
         recipeCacheLookupMonitor.updateAndProcess();
         //Keep the synced progress in step with the temperature-scaled fractional progress: the base implementation counts
         // raw ticks, which would overflow the progress bar whenever the smelter runs slower than full speed
-        if (recipeCacheLookupMonitor.getCachedRecipe(0) instanceof HeatSensitiveOneInputCachedRecipe<?, ?> cachedRecipe) {
+        if (recipeCacheLookupMonitor.getCachedRecipe(0) instanceof HeatSensitiveOneInputCachedRecipe<?> cachedRecipe) {
             setOperatingTicks(cachedRecipe.getProgressTicks());
         }
         //Passively alloy the molten output in place; temperature-independent and energy-free since the metals are already molten
@@ -295,6 +295,33 @@ public class TileEntityHeatSmelter
             return HeatSmelterRecipe.smelt(smelt);
 
         return null;
+    }
+
+    /**
+     * Checks whether the given recipe is still the one the smelter would select for its current input at its current
+     * temperature. Recipe selection switches between plain smelting and temperature-gated heated recipes as the smelter's
+     * temperature crosses a recipe's threshold, so this lets the cached recipe detect when it has become stale and needs to
+     * be re-selected.
+     */
+    public boolean isRecipeStillEffective(HeatSmelterRecipe recipe) {
+        return isSameRecipe(findRecipe(inputHandler.getInput(), true), recipe);
+    }
+
+    /**
+     * Checks whether two {@link HeatSmelterRecipe}s wrap the same underlying recipe, comparing the active branch and the
+     * recipe it holds. The wrapped recipes are stable references from the recipe manager, so reference equality suffices.
+     */
+    private static boolean isSameRecipe(@Nullable HeatSmelterRecipe a, HeatSmelterRecipe b) {
+        if (a == null) {
+            return false;
+        }
+        if (a.isOversmelt()) {
+            return b.isOversmelt() && a.getOversmelt() == b.getOversmelt();
+        }
+        if (a.isMelt()) {
+            return b.isMelt() && a.getMelt() == b.getMelt();
+        }
+        return a.isSmelt() && b.isSmelt() && a.getSmelt() == b.getSmelt();
     }
 
     /**
@@ -428,14 +455,14 @@ public class TileEntityHeatSmelter
     /**
      * Helper functions to create a cached recipe.
      */
-    private static HeatSensitiveOneInputCachedRecipe<ItemStack, HeatSmelterRecipe> itemToItem(HeatSmelterRecipe recipe,
+    private static HeatSensitiveOneInputCachedRecipe<ItemStack> itemToItem(HeatSmelterRecipe recipe,
             BooleanSupplier recheckAllErrors, IInputHandler<ItemStack> inputHandler, IOutputHandler<ItemStack> outputHandler,
             TileEntityHeatSmelter smelter) {
         return new HeatSensitiveOneInputCachedRecipe<>(recipe, recheckAllErrors, inputHandler, outputHandler, recipe::getInput, recipe::getItemOutput,
             ConstantPredicates.ITEM_EMPTY, smelter);
     }
 
-    private static HeatSensitiveOneInputCachedRecipe<FluidStack, HeatSmelterRecipe> itemToFluid(HeatSmelterRecipe recipe,
+    private static HeatSensitiveOneInputCachedRecipe<FluidStack> itemToFluid(HeatSmelterRecipe recipe,
             BooleanSupplier recheckAllErrors, IInputHandler<ItemStack> inputHandler, IOutputHandler<FluidStack> outputHandler,
             TileEntityHeatSmelter smelter) {
         return new HeatSensitiveOneInputCachedRecipe<>(recipe, recheckAllErrors, inputHandler, outputHandler, recipe::getInput, recipe::getFluidOutput,
@@ -445,7 +472,7 @@ public class TileEntityHeatSmelter
     @NotNull
     @Override
     public CachedRecipe<HeatSmelterRecipe> createNewCachedRecipe(HeatSmelterRecipe recipe, int cacheIndex) {
-        HeatSensitiveOneInputCachedRecipe<?, HeatSmelterRecipe> cached;
+        HeatSensitiveOneInputCachedRecipe<?> cached;
 
         if (recipe.isItemOutput()) {
             cached = itemToItem(recipe, recheckAllRecipeErrors, inputHandler, outputHandler, this);

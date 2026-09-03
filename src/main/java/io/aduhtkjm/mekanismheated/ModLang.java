@@ -22,7 +22,11 @@ public enum ModLang implements ILangEntry {
     PURE("tooltip", "pure"),
     IMPURE("tooltip", "impure"),
     DESCRIPTION_CREATIVE_HEAT_BLOCK("block", "creative_heat_block"),
-    GUI_TARGET_TEMPERATURE("gui", "target_temperature");
+    GUI_TARGET_TEMPERATURE("gui", "target_temperature"),
+    DESCRIPTION_COOLER("block", "cooler"),
+    COOLER_HOT_TEMPERATURE("gui", "cooler.hot_temperature"),
+    COOLER_COLD_TEMPERATURE("gui", "cooler.cold_temperature"),
+    COOLER_USAGE("gui", "cooler.usage");
 
     private final String key;
 
