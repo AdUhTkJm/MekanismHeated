@@ -1,0 +1,12 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "input": {
+    "count": 1,
+    "tag": "c:storage_blocks/osmium"
+  },
+  "output": {
+    "amount": 810,
+    "tag": "c:fluids/molten_osmium"
+  },
+  "temperature": 3318
+}

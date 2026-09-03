@@ -1,0 +1,12 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "input": {
+    "count": 1,
+    "tag": "c:ingots/zinc"
+  },
+  "output": {
+    "amount": 90,
+    "tag": "c:fluids/molten_zinc"
+  },
+  "temperature": 692
+}

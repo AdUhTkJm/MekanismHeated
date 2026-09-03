@@ -1,0 +1,12 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "input": {
+    "count": 1,
+    "tag": "c:storage_blocks/tin"
+  },
+  "output": {
+    "amount": 810,
+    "id": "mekanismheated:molten_tin"
+  },
+  "temperature": 778
+}

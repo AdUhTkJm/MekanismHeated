@@ -51,6 +51,7 @@ public class ModItems {
         output.accept(ModFluids.MOLTEN_COPPER.getBucket());
         output.accept(ModFluids.MOLTEN_TIN.getBucket());
         output.accept(ModFluids.MOLTEN_BRONZE.getBucket());
+        output.accept(ModFluids.MOLTEN_OSMIUM.getBucket());
         output.accept(ModFluids.MOLTEN_THERMOENERGETIC_ALLOY.getBucket());
     }
 }

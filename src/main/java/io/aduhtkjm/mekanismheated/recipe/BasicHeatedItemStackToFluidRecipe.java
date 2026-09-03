@@ -1,12 +1,14 @@
 package io.aduhtkjm.mekanismheated.recipe;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.recipes.ingredients.FluidStackIngredient;
 import mekanism.api.recipes.ingredients.ItemStackIngredient;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.level.material.Fluid;
+import net.neoforged.neoforge.fluids.BaseFlowingFluid.Flowing;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.Contract;
 
@@ -14,7 +16,7 @@ import org.jetbrains.annotations.Contract;
 public class BasicHeatedItemStackToFluidRecipe extends HeatedItemStackToFluidRecipe {
 
     protected final ItemStackIngredient input;
-    protected final FluidStack output;
+    protected final FluidStackIngredient output;
 
     /**
      * @param input               Input.
@@ -22,14 +24,10 @@ public class BasicHeatedItemStackToFluidRecipe extends HeatedItemStackToFluidRec
      * @param temperatureThreshold Minimum temperature, in Kelvin, the processing machine must have to process this recipe.
      *                             Must be greater than zero.
      */
-    public BasicHeatedItemStackToFluidRecipe(ItemStackIngredient input, FluidStack output, double temperatureThreshold) {
+    public BasicHeatedItemStackToFluidRecipe(ItemStackIngredient input, FluidStackIngredient output, double temperatureThreshold) {
         super(temperatureThreshold);
         this.input = Objects.requireNonNull(input, "Input cannot be null.");
-        Objects.requireNonNull(output, "Output cannot be null.");
-        if (output.isEmpty()) {
-            throw new IllegalArgumentException("Output cannot be empty.");
-        }
-        this.output = output.copy();
+        this.output = Objects.requireNonNull(output, "Output cannot be null.");
     }
 
     @Override
@@ -43,22 +41,31 @@ public class BasicHeatedItemStackToFluidRecipe extends HeatedItemStackToFluidRec
     }
 
     @Override
+    public FluidStackIngredient getOutputIngredient() {
+        return output;
+    }
+
+    @Override
     @Contract(value = "_ -> new", pure = true)
     public FluidStack getOutput(ItemStack input) {
-        return output.copy();
+        for (FluidStack representation : output.getRepresentations()) {
+            if (!(representation.getFluid() instanceof Flowing)) {
+                return representation.copy();
+            }
+        }
+        List<FluidStack> reps = output.getRepresentations();
+        return reps.isEmpty() ? new FluidStack(Fluid.EMPTY, 0) : reps.get(0).copy();
     }
 
     @Override
     public List<FluidStack> getOutputDefinition() {
-        return Collections.singletonList(output);
+        return output.getRepresentations();
     }
 
     /**
      * For Serializer use. DO NOT MODIFY RETURN VALUE.
-     *
-     * @return the uncopied basic output
      */
-    public FluidStack getOutputRaw() {
+    public FluidStackIngredient getOutputRaw() {
         return output;
     }
 
@@ -75,14 +82,13 @@ public class BasicHeatedItemStackToFluidRecipe extends HeatedItemStackToFluidRec
             return false;
         }
         BasicHeatedItemStackToFluidRecipe other = (BasicHeatedItemStackToFluidRecipe) o;
-        return Double.compare(temperatureThreshold, other.temperatureThreshold) == 0 && input.equals(other.input) && FluidStack.matches(output, other.output);
+        return Double.compare(temperatureThreshold, other.temperatureThreshold) == 0 && input.equals(other.input) && output.equals(other.output);
     }
 
     @Override
     public int hashCode() {
         int result = input.hashCode();
-        result = 31 * result + FluidStack.hashFluidAndComponents(output);
-        result = 31 * result + output.getAmount();
+        result = 31 * result + output.hashCode();
         result = 31 * result + Double.hashCode(temperatureThreshold);
         return result;
     }

@@ -125,7 +125,7 @@ public class Config {
         BUILDER.push("cooler");
         Cooler.EFFICIENCY = BUILDER
             .comment("Heat pump coefficient of performance (COP). Heat moved per joule of energy consumed.")
-            .defineInRange("efficiency", 2.0D, 0.1D, Double.MAX_VALUE);
+            .defineInRange("efficiency", 2.0D, 0, Double.MAX_VALUE);
         Cooler.HEAT_CAPACITY = BUILDER
             .comment("Heat capacity of the Cooler in J/K, controlling how quickly its temperature changes. Must be at least one.")
             .defineInRange("heatCapacity", 100D, 1D, Double.MAX_VALUE);

@@ -4,6 +4,7 @@ import io.aduhtkjm.mekanismheated.Mod;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.heat.ISidedHeatHandler;
 import mekanism.api.recipes.ItemStackToFluidRecipe;
+import mekanism.api.recipes.ingredients.FluidStackIngredient;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -58,6 +59,26 @@ public abstract class HeatedItemStackToFluidRecipe extends ItemStackToFluidRecip
      */
     public boolean canProcess(ISidedHeatHandler machine) {
         return machine.getTotalTemperature() >= temperatureThreshold;
+    }
+
+    /**
+     * Gets the output fluid ingredient.
+     */
+    public abstract FluidStackIngredient getOutputIngredient();
+
+    @Override
+    public boolean isIncomplete() {
+        return getInput().hasNoMatchingInstances() || getOutputIngredient().hasNoMatchingInstances();
+    }
+
+    @Override
+    public void logMissingTags() {
+        if (getInput().hasNoMatchingInstances()) {
+            getInput().logMissingTags();
+        }
+        if (getOutputIngredient().hasNoMatchingInstances()) {
+            getOutputIngredient().logMissingTags();
+        }
     }
 
     @Override

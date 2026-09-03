@@ -1,0 +1,12 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "input": {
+    "count": 1,
+    "tag": "c:raw_materials/copper"
+  },
+  "output": {
+    "amount": 180,
+    "id": "mekanismheated:molten_copper"
+  },
+  "temperature": 1357
+}

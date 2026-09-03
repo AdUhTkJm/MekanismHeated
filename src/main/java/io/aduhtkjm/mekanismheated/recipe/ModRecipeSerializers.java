@@ -14,7 +14,6 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -78,12 +77,12 @@ public class ModRecipeSerializers {
           RECIPE_SERIALIZERS.register("heated_melting", () -> new MekanismRecipeSerializer<>(
                 RecordCodecBuilder.mapCodec(instance -> instance.group(
                       ItemStackIngredient.CODEC.fieldOf(SerializationConstants.INPUT).forGetter(BasicHeatedItemStackToFluidRecipe::getInput),
-                      FluidStack.CODEC.fieldOf(SerializationConstants.OUTPUT).forGetter(BasicHeatedItemStackToFluidRecipe::getOutputRaw),
+                      FluidStackIngredient.CODEC.fieldOf(SerializationConstants.OUTPUT).forGetter(BasicHeatedItemStackToFluidRecipe::getOutputRaw),
                       TEMPERATURE_THRESHOLD_CODEC.fieldOf("temperature").forGetter(HeatedItemStackToFluidRecipe::getTemperatureThreshold)
                 ).apply(instance, BasicHeatedItemStackToFluidRecipe::new)),
                 StreamCodec.composite(
                       ItemStackIngredient.STREAM_CODEC, BasicHeatedItemStackToFluidRecipe::getInput,
-                      FluidStack.STREAM_CODEC, BasicHeatedItemStackToFluidRecipe::getOutputRaw,
+                      FluidStackIngredient.STREAM_CODEC, BasicHeatedItemStackToFluidRecipe::getOutputRaw,
                       ByteBufCodecs.DOUBLE, HeatedItemStackToFluidRecipe::getTemperatureThreshold,
                       BasicHeatedItemStackToFluidRecipe::new
                 )));

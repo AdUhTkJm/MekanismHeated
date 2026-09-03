@@ -42,6 +42,9 @@ public class ModFluids {
     public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ChemicalFormulaBucketItem> MOLTEN_BRONZE =
         FLUIDS.register("molten_bronze", (fluid, properties) -> new ChemicalFormulaBucketItem(fluid, properties, "Cu-Sn"),
             UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFFEBAD41));
+    public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ChemicalFormulaBucketItem> MOLTEN_OSMIUM =
+        FLUIDS.register("molten_osmium", (fluid, properties) -> new ChemicalFormulaBucketItem(fluid, properties, "Os"),
+            UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFFC8CCF3));
     public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ChemicalFormulaBucketItem> MOLTEN_THERMOENERGETIC_ALLOY =
         FLUIDS.register("molten_thermoenergetic_alloy", (fluid, properties) -> new ChemicalFormulaBucketItem(fluid, properties, "Fe-Cu"),
             UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFFFC7E11));
