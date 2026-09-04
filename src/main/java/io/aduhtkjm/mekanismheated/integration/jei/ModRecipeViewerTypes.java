@@ -1,6 +1,7 @@
 package io.aduhtkjm.mekanismheated.integration.jei;
 
 import io.aduhtkjm.mekanismheated.Mod;
+import io.aduhtkjm.mekanismheated.recipe.CondenserRecipe;
 import io.aduhtkjm.mekanismheated.recipe.HeatedItemStackToFluidRecipe;
 import io.aduhtkjm.mekanismheated.recipe.HeatedItemStackToItemStackRecipe;
 import io.aduhtkjm.mekanismheated.recipe.ShakerRecipe;
@@ -18,4 +19,6 @@ public final class ModRecipeViewerTypes {
           new ModRecipeViewerType<>(Mod.rl("heated_melting"), ModBlocks.HEAT_SMELTER, -28, -16, 144, 54);
     public static final ModRecipeViewerType<ShakerRecipe> SHAKING =
           new ModRecipeViewerType<>(Mod.rl("shaking"), ModBlocks.SHAKER, -6, -10, 164, 62);
+    public static final ModRecipeViewerType<CondenserRecipe> CONDENSING =
+          new ModRecipeViewerType<>(Mod.rl("condensing"), ModBlocks.CONDENSER, -6, -10, 164, 62);
 }

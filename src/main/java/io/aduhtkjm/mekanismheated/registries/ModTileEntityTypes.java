@@ -1,6 +1,7 @@
 package io.aduhtkjm.mekanismheated.registries;
 
 import io.aduhtkjm.mekanismheated.Mod;
+import io.aduhtkjm.mekanismheated.tile.TileEntityCondenser;
 import io.aduhtkjm.mekanismheated.tile.TileEntityCooler;
 import io.aduhtkjm.mekanismheated.tile.TileEntityCreativeHeatBlock;
 import io.aduhtkjm.mekanismheated.tile.TileEntityShaker;
@@ -72,6 +73,12 @@ public class ModTileEntityTypes {
           .build();
 
     public static final TileEntityTypeRegistryObject<TileEntityCooler> COOLER = TILE_ENTITY_TYPES.mekBuilder(ModBlocks.COOLER, TileEntityCooler::new)
+          .clientTicker(TileEntityMekanism::tickClient)
+          .serverTicker(TileEntityMekanism::tickServer)
+          .withSimple(Capabilities.CONFIG_CARD)
+          .build();
+
+    public static final TileEntityTypeRegistryObject<TileEntityCondenser> CONDENSER = TILE_ENTITY_TYPES.mekBuilder(ModBlocks.CONDENSER, TileEntityCondenser::new)
           .clientTicker(TileEntityMekanism::tickClient)
           .serverTicker(TileEntityMekanism::tickServer)
           .withSimple(Capabilities.CONFIG_CARD)

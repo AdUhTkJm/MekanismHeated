@@ -45,6 +45,7 @@ public final class MoltenFluidHandler {
         add(set, ModFluids.MOLTEN_COPPER);
         add(set, ModFluids.MOLTEN_TIN);
         add(set, ModFluids.MOLTEN_BRONZE);
+        add(set, ModFluids.MOLTEN_OSMIUM);
         add(set, ModFluids.MOLTEN_THERMOENERGETIC_ALLOY);
         moltenFluids = Set.copyOf(set);
     }

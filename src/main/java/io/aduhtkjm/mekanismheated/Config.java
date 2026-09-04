@@ -26,6 +26,16 @@ public class Config {
         public static ModConfigSpec.LongValue MAX_ENERGY;
     }
 
+    public static class Condenser {
+        public static ModConfigSpec.IntValue BASE_SPEED;
+        public static ModConfigSpec.IntValue FLUID_CAPACITY;
+        public static ModConfigSpec.DoubleValue MAX_TEMPERATURE;
+        public static ModConfigSpec.DoubleValue FULL_SPEED_TEMPERATURE;
+        public static ModConfigSpec.DoubleValue HEAT_CAPACITY;
+        public static ModConfigSpec.DoubleValue INVERSE_CONDUCTION_COEFFICIENT;
+        public static ModConfigSpec.DoubleValue INVERSE_INSULATION_COEFFICIENT;
+    }
+
     public static class Fractionation {
         public static ModConfigSpec.IntValue TOWER_MAX_HEIGHT;
         public static ModConfigSpec.IntValue FLUID_PER_LAYER;
@@ -87,6 +97,30 @@ public class Config {
         Shaker.MAX_ENERGY = BUILDER
             .comment("Maximum amount of energy the shaker can hold.")
             .defineInRange("maxEnergy", 80000, 0, Long.MAX_VALUE);
+        BUILDER.pop();
+
+        BUILDER.push("condenser");
+        Condenser.BASE_SPEED = BUILDER
+            .comment("Base number of game ticks the condenser takes to complete a recipe when running at full speed (coldest).")
+            .defineInRange("baseSpeed", 200, 1, Integer.MAX_VALUE);
+        Condenser.FLUID_CAPACITY = BUILDER
+            .comment("The capacity of the input fluid buffer in the condenser, in buckets.")
+            .defineInRange("fluidCapacity", 10, 1, Integer.MAX_VALUE);
+        Condenser.MAX_TEMPERATURE = BUILDER
+            .comment("Temperature in Kelvin at which the Condenser cannot process recipes (0% speed).")
+            .defineInRange("maxTemperature", 500D, 0D, Double.MAX_VALUE);
+        Condenser.FULL_SPEED_TEMPERATURE = BUILDER
+            .comment("Temperature in Kelvin at which the Condenser processes recipes at 100% base speed.")
+            .defineInRange("fullSpeedTemperature", 100D, 0D, Double.MAX_VALUE);
+        Condenser.HEAT_CAPACITY = BUILDER
+            .comment("Heat capacity of the Condenser in J/K, controlling how quickly its temperature changes. Must be at least one.")
+            .defineInRange("heatCapacity", 50D, 1D, Double.MAX_VALUE);
+        Condenser.INVERSE_CONDUCTION_COEFFICIENT = BUILDER
+            .comment("Inverse conduction coefficient of the Condenser, controlling how readily it exchanges heat with adjacent blocks (smaller means faster). Must be at least one.")
+            .defineInRange("inverseConductionCoefficient", 5D, 1D, Double.MAX_VALUE);
+        Condenser.INVERSE_INSULATION_COEFFICIENT = BUILDER
+            .comment("Inverse insulation coefficient of the Condenser, controlling how readily it exchanges heat with the environment (smaller means faster). Must be at least one.")
+            .defineInRange("inverseInsulationCoefficient", 5D, 1D, Double.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.push("fractionation");

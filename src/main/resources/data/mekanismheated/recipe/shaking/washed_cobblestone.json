@@ -1,8 +1,8 @@
 {
   "type": "mekanismheated:shaking",
   "input": {
-    "count": 1,
-    "item": "minecraft:sand"
+    "count": 4,
+    "item": "minecraft:cobblestone"
   },
   "fluid_input": {
     "fluid": "minecraft:water",
@@ -10,11 +10,7 @@
   },
   "output": [
     {
-      "id": "minecraft:clay_ball",
-      "count": 3
-    },
-    {
-      "id": "mekanismheated:caco3_dust",
+      "id": "mekanismheated:fe2o3_dust",
       "count": 1
     }
   ]

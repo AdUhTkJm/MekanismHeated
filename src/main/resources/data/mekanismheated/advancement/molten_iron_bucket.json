@@ -1,0 +1,38 @@
+{
+  "parent": "mekanismheated:heat_smelter",
+  "criteria": {
+    "molten_iron_bucket": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "mekanismheated:molten_iron_bucket"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.mekanismheated.molten_iron_bucket.description"
+    },
+    "frame": "task",
+    "icon": {
+      "count": 1,
+      "id": "mekanismheated:molten_iron_bucket"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.mekanismheated.molten_iron_bucket.title"
+    }
+  },
+  "requirements": [
+    [
+      "molten_iron_bucket"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

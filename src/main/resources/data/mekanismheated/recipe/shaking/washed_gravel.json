@@ -1,7 +1,7 @@
 {
   "type": "mekanismheated:shaking",
   "input": {
-    "count": 1,
+    "count": 4,
     "item": "minecraft:gravel"
   },
   "fluid_input": {
@@ -11,10 +11,14 @@
   "output": [
     {
       "id": "minecraft:flint",
+      "count": 3
+    },
+    {
+      "id": "minecraft:gravel",
       "count": 1
     },
     {
-      "id": "mekanismheated:fe2o3_dust",
+      "id": "mekanismheated:cuo_dust",
       "count": 1
     }
   ]

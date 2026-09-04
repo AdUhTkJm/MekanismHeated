@@ -1,0 +1,6 @@
+{
+  "parent": "mekanismheated:block/condenser",
+  "textures": {
+    "front": "mekanism:block/enrichment_chamber/front_active"
+  }
+}

@@ -2,11 +2,11 @@
   "type": "mekanismheated:heated_melting",
   "input": {
     "count": 1,
-    "tag": "c:raw_materials/iron"
+    "tag": "c:raw_materials/tin"
   },
   "output": {
     "amount": 180,
-    "id": "mekanismheated:molten_iron"
+    "id": "mekanismheated:molten_tin"
   },
   "temperature": 778
 }

@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SRS",
+    "RWR",
+    "SRS"
+  ],
+  "key": {
+    "S": {
+      "item": "mekanism:steel_casing"
+    },
+    "R": {
+      "tag": "c:dusts/redstone"
+    },
+    "W": {
+      "item": "minecraft:water_bucket"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "mekanismheated:condenser"
+  }
+}

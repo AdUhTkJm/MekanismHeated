@@ -14,8 +14,11 @@ def convert_white_to_transparent(image_path, output_path, threshold=240):
     img.putdata(new_data)
     img.save(output_path, "PNG")
 
-prefix = "src/main/resources/assets/mekanismheated/textures/item/"
+prefix = "src/main/resources/assets/mekanismheated/textures"
 tiers = ["advanced", "basic", "elite", "ultimate"]
 for t in tiers:
-    path = f"{prefix}fused_pipe_{t}.png"
+    path = f"{prefix}/item/fused_pipe_{t}.png"
     convert_white_to_transparent(path, path)
+
+path = f"{prefix}/block/models/cooler_led.png"
+convert_white_to_transparent(path, path)

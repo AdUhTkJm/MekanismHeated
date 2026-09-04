@@ -33,6 +33,7 @@ public class ModItems {
         output.accept(ModBlocks.DISTILLATION_TRAY);
         output.accept(ModBlocks.CREATIVE_HEAT_BLOCK);
         output.accept(ModBlocks.COOLER);
+        output.accept(ModBlocks.CONDENSER);
 
         output.accept(ModItems.SPONGE_IRON_INGOT.get());
         output.accept(ModItems.IMPURE_SN_INGOT.get());

@@ -1,11 +1,14 @@
 {
   "type": "mekanismheated:shaking",
   "input": {
-    "count": 1,
+    "count": 4,
     "item": "minecraft:gravel"
   },
-  "output": {
+  "output": [{
     "id": "minecraft:flint",
     "count": 1
-  }
+  }, {
+    "id": "minecraft:gravel",
+    "count": 3
+  }]
 }

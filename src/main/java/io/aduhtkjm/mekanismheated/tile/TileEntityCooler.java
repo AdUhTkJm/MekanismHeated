@@ -83,7 +83,7 @@ public class TileEntityCooler extends TileEntityMekanism {
         if (canFunction()) {
             toUse = energyContainer.extract(energyContainer.getEnergyPerTick(), Action.SIMULATE, AutomationType.INTERNAL);
             if (toUse > 0L) {
-                double heat = toUse * Config.Cooler.EFFICIENCY.get();
+                double heat = toUse * getCop();
                 coldCapacitor.handleHeat(-heat);
                 hotCapacitor.handleHeat(heat);
                 energyContainer.extract(toUse, Action.EXECUTE, AutomationType.INTERNAL);
@@ -93,6 +93,25 @@ public class TileEntityCooler extends TileEntityMekanism {
         clientEnergyUsed = toUse;
         simulate();
         return sendUpdatePacket;
+    }
+
+    /**
+     * Effective heat pump coefficient of performance (COP), i.e. heat moved per joule of energy
+     * consumed, at the current cold-side temperature.
+     *
+     * <p>The COP scales linearly with the cold side's absolute temperature, equal to the configured
+     * {@link Config.Cooler#EFFICIENCY} at the ambient temperature the cold side starts at. A
+     * refrigerator's ideal (Carnot) COP is proportional to the cold reservoir's absolute
+     * temperature, so this makes cooling progressively harder as the cold side gets colder: the
+     * cooling rate tends to zero as the cold side approaches 0K, which acts as an asymptote the
+     * cold side can get arbitrarily close to but never below.
+     */
+    public double getCop() {
+        double coldTemperature = coldCapacitor.getTemperature();
+        if (coldTemperature <= 0) {
+            return 0;
+        }
+        return Config.Cooler.EFFICIENCY.get() * coldTemperature / ambientTemperature.getAsDouble();
     }
 
     public long getEnergyUsed() {

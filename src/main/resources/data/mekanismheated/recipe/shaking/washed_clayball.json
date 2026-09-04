@@ -1,8 +1,12 @@
 {
   "type": "mekanismheated:shaking",
   "input": {
-    "count": 1,
+    "count": 3,
     "item": "minecraft:clay_ball"
+  },
+  "fluid_input": {
+    "fluid": "minecraft:water",
+    "amount": 1000
   },
   "output": [
     {

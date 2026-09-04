@@ -1,7 +1,7 @@
 {
   "type": "mekanismheated:shaking",
   "input": {
-    "count": 2,
+    "count": 5,
     "item": "minecraft:clay_ball"
   },
   "output": {

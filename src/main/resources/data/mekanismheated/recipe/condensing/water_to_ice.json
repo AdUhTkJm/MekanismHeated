@@ -1,0 +1,11 @@
+{
+  "type": "mekanismheated:condensing",
+  "input": {
+    "fluid": "minecraft:water",
+    "amount": 1000
+  },
+  "output": {
+    "id": "minecraft:ice",
+    "count": 2
+  }
+}

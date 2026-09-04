@@ -18,6 +18,7 @@ public class ModRecipeTypes {
     public static final ResourceLocation NAME_SHAKING = Mod.rl("shaking");
     public static final ResourceLocation NAME_FRACTIONATING = Mod.rl("fractionating");
     public static final ResourceLocation NAME_ALLOYING = Mod.rl("alloying");
+    public static final ResourceLocation NAME_CONDENSING = Mod.rl("condensing");
 
     public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, Mod.MODID);
 
@@ -33,4 +34,6 @@ public class ModRecipeTypes {
         RECIPE_TYPES.register(NAME_FRACTIONATING.getPath(), () -> new RecipeType<>() {});
     public static final DeferredHolder<RecipeType<?>, RecipeType<AlloyRecipe>> TYPE_ALLOYING =
         RECIPE_TYPES.register(NAME_ALLOYING.getPath(), () -> new RecipeType<>() {});
+    public static final DeferredHolder<RecipeType<?>, RecipeType<CondenserRecipe>> TYPE_CONDENSING =
+        RECIPE_TYPES.register(NAME_CONDENSING.getPath(), () -> new RecipeType<>() {});
 }

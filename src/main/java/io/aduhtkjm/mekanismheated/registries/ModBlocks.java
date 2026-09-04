@@ -4,6 +4,7 @@ import io.aduhtkjm.mekanismheated.Config;
 import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.ModLang;
 import io.aduhtkjm.mekanismheated.block.BlockFusedPipe;
+import io.aduhtkjm.mekanismheated.block.condenser.CondenserBlock;
 import io.aduhtkjm.mekanismheated.block.cooler.CoolerBlock;
 import io.aduhtkjm.mekanismheated.block.creative.CreativeHeatBlock;
 import io.aduhtkjm.mekanismheated.block.fractionation.DistillationTrayBlock;
@@ -12,6 +13,7 @@ import io.aduhtkjm.mekanismheated.block.shaker.ShakerBlock;
 import io.aduhtkjm.mekanismheated.item.ItemBlockCooler;
 import io.aduhtkjm.mekanismheated.item.ItemBlockFusedPipe;
 import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedPipeConfig;
+import io.aduhtkjm.mekanismheated.tile.TileEntityCondenser;
 import io.aduhtkjm.mekanismheated.tile.TileEntityCooler;
 import io.aduhtkjm.mekanismheated.tile.TileEntityCreativeHeatBlock;
 import io.aduhtkjm.mekanismheated.tile.TileEntityShaker;
@@ -130,4 +132,14 @@ public class ModBlocks {
     public static final BlockRegistryObject<CoolerBlock, ItemBlockCooler> COOLER =
           BLOCKS.register("cooler", () -> new CoolerBlock(COOLER_TYPE, BlockBehaviour.Properties.of().mapColor(MapColor.METAL)),
                 (block, properties) -> new ItemBlockCooler(block, properties));
+
+    public static final Machine<TileEntityCondenser> CONDENSER_TYPE = MachineBuilder
+          .createMachine(() -> ModTileEntityTypes.CONDENSER, ModLang.DESCRIPTION_CONDENSER)
+          .withGui(() -> ModContainerTypes.CONDENSER)
+          .with(AttributeSideConfig.create(TransmissionType.ITEM, TransmissionType.FLUID, TransmissionType.HEAT))
+          .build();
+
+    public static final BlockRegistryObject<CondenserBlock, ItemBlockTooltip<CondenserBlock>> CONDENSER =
+          BLOCKS.register("condenser", () -> new CondenserBlock(CONDENSER_TYPE, BlockBehaviour.Properties.of().mapColor(MapColor.METAL)),
+                (block, properties) -> new ItemBlockTooltip<>(block, true, properties));
 }

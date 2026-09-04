@@ -61,7 +61,7 @@ public class GuiCooler extends GuiMekanismTile<TileEntityCooler, MekanismTileCon
             );
         }));
 
-        energyUsageField = addRenderableWidget(new GuiTextField(this, 50, 51, 76, 12));
+        energyUsageField = addRenderableWidget(new GuiTextField(this, 50, 63, 76, 12));
         energyUsageField.setMaxLength(7);
         energyUsageField.setInputValidator(InputValidator.DIGIT)
               .configureDigitalInput(this::setEnergyUsage);

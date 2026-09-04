@@ -26,7 +26,8 @@ public enum ModLang implements ILangEntry {
     DESCRIPTION_COOLER("block", "cooler"),
     COOLER_HOT_TEMPERATURE("gui", "cooler.hot_temperature"),
     COOLER_COLD_TEMPERATURE("gui", "cooler.cold_temperature"),
-    COOLER_USAGE("gui", "cooler.usage");
+    COOLER_USAGE("gui", "cooler.usage"),
+    DESCRIPTION_CONDENSER("block", "condenser");
 
     private final String key;
 
