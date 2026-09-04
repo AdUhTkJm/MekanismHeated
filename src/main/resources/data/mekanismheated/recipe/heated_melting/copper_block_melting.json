@@ -6,7 +6,7 @@
   },
   "output": {
     "amount": 810,
-    "id": "mekanismheated:molten_copper"
+    "tag": "c:fluids/molten_copper"
   },
   "temperature": 1357
 }

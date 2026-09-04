@@ -38,7 +38,7 @@ public class GuiCooler extends GuiMekanismTile<TileEntityCooler, MekanismTileCon
     @Override
     protected void addGuiElements() {
         super.addGuiElements();
-        addRenderableWidget(new GuiInnerScreen(this, 48, 23, 80, 42, () -> List.of(
+        addRenderableWidget(new GuiInnerScreen(this, 48, 23, 80, 52, () -> List.of(
               ModLang.COOLER_HOT_TEMPERATURE.translate(MekanismUtils.getTemperatureDisplay(tile.getHotTemperature(), TemperatureUnit.KELVIN, true)),
               ModLang.COOLER_COLD_TEMPERATURE.translate(MekanismUtils.getTemperatureDisplay(tile.getColdTemperature(), TemperatureUnit.KELVIN, true)),
               ModLang.COOLER_USAGE.translate(EnergyDisplay.of(tile.getEnergyContainer().getEnergyPerTick()))
@@ -61,7 +61,7 @@ public class GuiCooler extends GuiMekanismTile<TileEntityCooler, MekanismTileCon
             );
         }));
 
-        energyUsageField = addRenderableWidget(new GuiTextField(this, 50, 63, 76, 12));
+        energyUsageField = addRenderableWidget(new GuiTextField(this, 50, 61, 76, 12));
         energyUsageField.setMaxLength(7);
         energyUsageField.setInputValidator(InputValidator.DIGIT)
               .configureDigitalInput(this::setEnergyUsage);

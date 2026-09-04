@@ -6,7 +6,7 @@
   },
   "output": {
     "amount": 180,
-    "id": "mekanismheated:molten_tin"
+    "tag": "c:fluids/molten_tin"
   },
   "temperature": 778
 }

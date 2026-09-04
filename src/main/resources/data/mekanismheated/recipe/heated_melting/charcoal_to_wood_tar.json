@@ -6,7 +6,7 @@
   },
   "output": {
     "amount": 100,
-    "id": "mekanismheated:wood_tar"
+    "fluid": "mekanismheated:wood_tar"
   },
   "temperature": 800
 }

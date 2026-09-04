@@ -6,7 +6,7 @@
   },
   "output": {
     "amount": 250,
-    "id": "minecraft:lava"
+    "fluid": "minecraft:lava"
   },
   "temperature": 1500
 }

@@ -6,7 +6,7 @@
   },
   "output": {
     "amount": 180,
-    "id": "mekanismheated:molten_iron"
+    "tag": "c:fluids/molten_iron"
   },
   "temperature": 1808
 }

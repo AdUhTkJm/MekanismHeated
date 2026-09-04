@@ -74,11 +74,11 @@ public class TileEntityCondenser extends TileEntityProgressMachine<CondenserReci
     private BasicHeatCapacitor heatCapacitor;
     public BasicFluidTank inputFluidTank;
 
+    public InputInventorySlot inputSlot;
+    public OutputInventorySlot outputSlot;
+
     private double lastEnvironmentLoss;
     private double lastTransferLoss;
-
-    InputInventorySlot inputSlot;
-    OutputInventorySlot outputSlot;
 
     public TileEntityCondenser(BlockPos pos, BlockState state) {
         super(ModBlocks.CONDENSER, pos, state, TRACKED_ERROR_TYPES, Config.Condenser.BASE_SPEED.get());
@@ -164,7 +164,7 @@ public class TileEntityCondenser extends TileEntityProgressMachine<CondenserReci
     @Override
     protected IInventorySlotHolder getInitialInventory(IContentsListener listener, IContentsListener recipeCacheListener, IContentsListener recipeCacheUnpauseListener) {
         InventorySlotHelper builder = InventorySlotHelper.forSideWithConfig(this);
-        builder.addSlot(inputSlot = InputInventorySlot.at(this::containsRecipeItem, recipeCacheListener, 17, 17))
+        builder.addSlot(inputSlot = InputInventorySlot.at(this::containsRecipeItem, recipeCacheListener, 75, 35))
               .tracksWarnings(slot -> slot.warning(WarningType.NO_MATCHING_RECIPE, getWarningCheck(RecipeError.NOT_ENOUGH_INPUT)));
         builder.addSlot(outputSlot = OutputInventorySlot.at(recipeCacheUnpauseListener, 116, 35))
               .tracksWarnings(slot -> slot.warning(WarningType.NO_SPACE_IN_OUTPUT, getWarningCheck(RecipeError.NOT_ENOUGH_OUTPUT_SPACE)));
