@@ -54,5 +54,7 @@ public class ModItems {
         output.accept(ModFluids.MOLTEN_BRONZE.getBucket());
         output.accept(ModFluids.MOLTEN_OSMIUM.getBucket());
         output.accept(ModFluids.MOLTEN_THERMOENERGETIC_ALLOY.getBucket());
+        output.accept(ModFluids.MOLTEN_INFUSED_ALLOY.getBucket());
+        output.accept(ModFluids.MOLTEN_REINFORCED_ALLOY.getBucket());
     }
 }

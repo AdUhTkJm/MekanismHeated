@@ -61,7 +61,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.ICapabilityProvider;
 import net.neoforged.neoforge.items.IItemHandler;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.system.NonnullDefault;
 
@@ -534,6 +533,7 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
         //A single fused pipe provides several functions, so an alloy converts fewer consecutive
         //pipes than a vanilla single-function transmitter would (ceiling of 8 / enabled functions).
         int limit = (int) Math.ceil(8.0 / enabled);
+        double previousHeatCapacity = network.getTotalHeatCapacity();
         List<FusedPipeNode> candidates = new ArrayList<>(network.getNodes());
         candidates.sort(Comparator.comparingDouble(node -> node.getBlockPos().distSqr(getBlockPos())));
         int upgraded = 0;
@@ -548,7 +548,7 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
         }
         if (upgraded > 0) {
             //Network-wide cached values (heat capacity, item buffer) depend on per-pipe tiers
-            network.onPipeUpgraded();
+            network.onPipeUpgraded(previousHeatCapacity);
             if (!player.isCreative()) {
                 stack.shrink(1);
             }

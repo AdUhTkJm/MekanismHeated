@@ -1,11 +1,11 @@
 {
   "type": "mekanismheated:condensing",
   "input": {
-    "fluid": "minecraft:water",
-    "amount": 1000
+    "tag": "c:fluids/molten_copper",
+    "amount": 90
   },
   "output": {
-    "item": "minecraft:ice",
+    "tag": "c:ingots/copper",
     "count": 1
   }
 }

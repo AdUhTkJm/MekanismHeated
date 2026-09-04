@@ -1,0 +1,15 @@
+{
+  "type": "mekanismheated:condensing",
+  "input": {
+    "tag": "c:fluids/molten_infused_alloy",
+    "amount": 90
+  },
+  "item_input": {
+    "tag": "c:gems/diamond",
+    "amount": 1
+  },
+  "output": {
+    "item": "mekanism:alloy_reinforced",
+    "count": 9
+  }
+}

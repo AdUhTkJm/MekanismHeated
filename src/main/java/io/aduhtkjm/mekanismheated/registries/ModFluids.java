@@ -38,14 +38,18 @@ public class ModFluids {
             UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFFEBAD41));
     public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ChemicalFormulaBucketItem> MOLTEN_TIN =
         FLUIDS.register("molten_tin", (fluid, properties) -> new ChemicalFormulaBucketItem(fluid, properties, "Sn"),
-            UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFFEBAD41));
+            UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFFC9CBDC));
     public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ChemicalFormulaBucketItem> MOLTEN_BRONZE =
         FLUIDS.register("molten_bronze", (fluid, properties) -> new ChemicalFormulaBucketItem(fluid, properties, "Cu-Sn"),
-            UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFFEBAD41));
+            UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFFF9A648));
     public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ChemicalFormulaBucketItem> MOLTEN_OSMIUM =
         FLUIDS.register("molten_osmium", (fluid, properties) -> new ChemicalFormulaBucketItem(fluid, properties, "Os"),
             UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFFC8CCF3));
     public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ChemicalFormulaBucketItem> MOLTEN_THERMOENERGETIC_ALLOY =
         FLUIDS.register("molten_thermoenergetic_alloy", (fluid, properties) -> new ChemicalFormulaBucketItem(fluid, properties, "Fe-Cu"),
             UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFFFC7E11));
+    public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, BucketItem> MOLTEN_INFUSED_ALLOY =
+        FLUIDS.register("molten_infused_alloy", renderProperties -> renderProperties.tint(0xFFE64141));
+    public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, BucketItem> MOLTEN_REINFORCED_ALLOY =
+        FLUIDS.register("molten_reinforced_alloy", renderProperties -> renderProperties.tint(0xFF58D7F0));
 }

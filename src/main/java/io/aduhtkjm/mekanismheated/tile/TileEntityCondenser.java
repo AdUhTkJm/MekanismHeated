@@ -1,6 +1,7 @@
 package io.aduhtkjm.mekanismheated.tile;
 
 import io.aduhtkjm.mekanismheated.Config;
+import io.aduhtkjm.mekanismheated.integration.jei.ModRecipeViewerTypes;
 import io.aduhtkjm.mekanismheated.recipe.CondenserRecipe;
 import io.aduhtkjm.mekanismheated.recipe.ModRecipeTypes;
 import io.aduhtkjm.mekanismheated.recipe.cache.CondenserCachedRecipe;
@@ -33,6 +34,7 @@ import mekanism.common.inventory.slot.OutputInventorySlot;
 import mekanism.common.inventory.warning.WarningTracker.WarningType;
 import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.recipe.IMekanismRecipeTypeProvider;
+import mekanism.client.recipe_viewer.type.IRecipeViewerRecipeType;
 import mekanism.common.recipe.lookup.IRecipeLookupHandler;
 import mekanism.common.recipe.lookup.monitor.RecipeCacheLookupMonitor;
 import mekanism.common.tile.component.TileComponentEjector;
@@ -164,7 +166,7 @@ public class TileEntityCondenser extends TileEntityProgressMachine<CondenserReci
     @Override
     protected IInventorySlotHolder getInitialInventory(IContentsListener listener, IContentsListener recipeCacheListener, IContentsListener recipeCacheUnpauseListener) {
         InventorySlotHelper builder = InventorySlotHelper.forSideWithConfig(this);
-        builder.addSlot(inputSlot = InputInventorySlot.at(this::containsRecipeItem, recipeCacheListener, 75, 35))
+        builder.addSlot(inputSlot = InputInventorySlot.at(this::containsRecipeItem, recipeCacheListener, 65, 35))
               .tracksWarnings(slot -> slot.warning(WarningType.NO_MATCHING_RECIPE, getWarningCheck(RecipeError.NOT_ENOUGH_INPUT)));
         builder.addSlot(outputSlot = OutputInventorySlot.at(recipeCacheUnpauseListener, 116, 35))
               .tracksWarnings(slot -> slot.warning(WarningType.NO_SPACE_IN_OUTPUT, getWarningCheck(RecipeError.NOT_ENOUGH_OUTPUT_SPACE)));
@@ -259,6 +261,12 @@ public class TileEntityCondenser extends TileEntityProgressMachine<CondenserReci
     @Override
     public IMekanismRecipeTypeProvider<?, CondenserRecipe, ?> getRecipeType() {
         return null;
+    }
+
+    @NotNull
+    @Override
+    public IRecipeViewerRecipeType<CondenserRecipe> recipeViewerType() {
+        return ModRecipeViewerTypes.CONDENSING;
     }
 
     @Override

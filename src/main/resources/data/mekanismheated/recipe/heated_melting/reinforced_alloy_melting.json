@@ -1,0 +1,12 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "input": {
+    "count": 1,
+    "item": "mekanism:alloy_reinforced"
+  },
+  "output": {
+    "amount": 90,
+    "tag": "c:fluids/molten_reinforced_alloy"
+  },
+  "temperature": 1672
+}

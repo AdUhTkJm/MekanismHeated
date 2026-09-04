@@ -1,0 +1,15 @@
+{
+  "type": "mekanismheated:condensing",
+  "input": {
+    "tag": "c:fluids/molten_osmium",
+    "amount": 90
+  },
+  "item_input": {
+    "tag": "c:dusts/redstone",
+    "amount": 1
+  },
+  "output": {
+    "item": "mekanism:basic_control_circuit",
+    "count": 9
+  }
+}

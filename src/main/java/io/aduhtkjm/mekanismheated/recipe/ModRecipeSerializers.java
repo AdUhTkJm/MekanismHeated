@@ -137,12 +137,12 @@ public class ModRecipeSerializers {
                 RecordCodecBuilder.mapCodec(instance -> instance.group(
                       FluidStackIngredient.CODEC.fieldOf(SerializationConstants.INPUT).forGetter(BasicCondenserRecipe::getFluidInput),
                       ItemStackIngredient.CODEC.optionalFieldOf("item_input").forGetter(BasicCondenserRecipe::getItemInput),
-                      ItemStack.CODEC.fieldOf(SerializationConstants.OUTPUT).forGetter(BasicCondenserRecipe::getOutputRaw)
+                      ItemStackIngredient.CODEC.fieldOf(SerializationConstants.OUTPUT).forGetter(BasicCondenserRecipe::getOutputRaw)
                 ).apply(instance, BasicCondenserRecipe::new)),
                 StreamCodec.composite(
                       FluidStackIngredient.STREAM_CODEC, BasicCondenserRecipe::getFluidInput,
                       ByteBufCodecs.optional(ItemStackIngredient.STREAM_CODEC), BasicCondenserRecipe::getItemInput,
-                      ItemStack.STREAM_CODEC, BasicCondenserRecipe::getOutputRaw,
+                      ItemStackIngredient.STREAM_CODEC, BasicCondenserRecipe::getOutputRaw,
                       BasicCondenserRecipe::new
                 )));
 }

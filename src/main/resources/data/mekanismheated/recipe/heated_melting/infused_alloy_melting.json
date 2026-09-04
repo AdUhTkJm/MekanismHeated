@@ -1,0 +1,12 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "input": {
+    "count": 1,
+    "item": "mekanism:alloy_infused"
+  },
+  "output": {
+    "amount": 90,
+    "tag": "c:fluids/molten_infused_alloy"
+  },
+  "temperature": 989
+}

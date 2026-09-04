@@ -1,0 +1,5 @@
+{
+  "parent": "neoforge:item/bucket",
+  "fluid": "mekanismheated:molten_infused_alloy",
+  "loader": "neoforge:fluid_container"
+}

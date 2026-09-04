@@ -1,6 +1,7 @@
 package io.aduhtkjm.mekanismheated.integration.jei;
 
 import io.aduhtkjm.mekanismheated.Mod;
+import io.aduhtkjm.mekanismheated.integration.jei.category.CondenserRecipeCategory;
 import io.aduhtkjm.mekanismheated.integration.jei.category.HeatedMeltingRecipeCategory;
 import io.aduhtkjm.mekanismheated.integration.jei.category.HeatedSmeltingRecipeCategory;
 import io.aduhtkjm.mekanismheated.integration.jei.category.ShakerRecipeCategory;
@@ -45,7 +46,8 @@ public class MekanismHeatedJEI implements IModPlugin {
         registry.addRecipeCategories(
               new HeatedSmeltingRecipeCategory(guiHelper, ModRecipeViewerTypes.HEATED_SMELTING),
               new HeatedMeltingRecipeCategory(guiHelper, ModRecipeViewerTypes.HEATED_MELTING),
-              new ShakerRecipeCategory(guiHelper, ModRecipeViewerTypes.SHAKING));
+              new ShakerRecipeCategory(guiHelper, ModRecipeViewerTypes.SHAKING),
+              new CondenserRecipeCategory(guiHelper, ModRecipeViewerTypes.CONDENSING));
     }
 
     @Override
@@ -53,12 +55,13 @@ public class MekanismHeatedJEI implements IModPlugin {
         registerRecipes(registry, ModRecipeViewerTypes.HEATED_SMELTING, ModRecipeTypes.TYPE_HEATED_SMELTING);
         registerRecipes(registry, ModRecipeViewerTypes.HEATED_MELTING, ModRecipeTypes.TYPE_HEATED_MELTING);
         registerRecipes(registry, ModRecipeViewerTypes.SHAKING, ModRecipeTypes.TYPE_SHAKING);
+        registerRecipes(registry, ModRecipeViewerTypes.CONDENSING, ModRecipeTypes.TYPE_CONDENSING);
     }
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registry) {
         CatalystRegistryHelper.register(registry, ModRecipeViewerTypes.HEATED_SMELTING, ModRecipeViewerTypes.HEATED_MELTING,
-              ModRecipeViewerTypes.SHAKING);
+              ModRecipeViewerTypes.SHAKING, ModRecipeViewerTypes.CONDENSING);
     }
 
     private static <I extends RecipeInput, RECIPE extends Recipe<I>>

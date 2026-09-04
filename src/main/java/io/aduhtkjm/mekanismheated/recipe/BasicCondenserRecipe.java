@@ -2,6 +2,7 @@ package io.aduhtkjm.mekanismheated.recipe;
 
 import com.mojang.serialization.Codec;
 import io.aduhtkjm.mekanismheated.Mod;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import mekanism.api.annotations.NothingNullByDefault;
@@ -26,15 +27,12 @@ public class BasicCondenserRecipe extends CondenserRecipe {
 
     protected final FluidStackIngredient fluidInput;
     protected final Optional<ItemStackIngredient> itemInput;
-    protected final ItemStack output;
+    protected final ItemStackIngredient output;
 
-    public BasicCondenserRecipe(FluidStackIngredient fluidInput, Optional<ItemStackIngredient> itemInput, ItemStack output) {
+    public BasicCondenserRecipe(FluidStackIngredient fluidInput, Optional<ItemStackIngredient> itemInput, ItemStackIngredient output) {
         this.fluidInput = Objects.requireNonNull(fluidInput, "Fluid input cannot be null.");
         this.itemInput = Objects.requireNonNull(itemInput, "Item input cannot be null.");
         Objects.requireNonNull(output, "Output cannot be null.");
-        if (output.isEmpty()) {
-            throw new IllegalArgumentException("Output cannot be empty.");
-        }
         this.output = output;
     }
 
@@ -56,18 +54,24 @@ public class BasicCondenserRecipe extends CondenserRecipe {
     @Override
     @Contract(value = "_, _ -> new", pure = true)
     public ItemStack getOutput(FluidStack fluid, ItemStack item) {
-        return output.copy();
+        List<ItemStack> reps = output.getRepresentations();
+        return reps.isEmpty() ? ItemStack.EMPTY : reps.getFirst().copy();
     }
 
     @Override
-    public ItemStack getOutputDefinition() {
+    public ItemStackIngredient getOutputIngredient() {
         return output;
+    }
+
+    @Override
+    public List<ItemStack> getOutputDefinition() {
+        return output.getRepresentations();
     }
 
     /**
      * For Serializer use. DO NOT MODIFY RETURN VALUE.
      */
-    public ItemStack getOutputRaw() {
+    public ItemStackIngredient getOutputRaw() {
         return output;
     }
 
@@ -99,7 +103,7 @@ public class BasicCondenserRecipe extends CondenserRecipe {
             return false;
         }
         BasicCondenserRecipe other = (BasicCondenserRecipe) o;
-        return fluidInput.equals(other.fluidInput) && itemInput.equals(other.itemInput) && ItemStack.matches(output, other.output);
+        return fluidInput.equals(other.fluidInput) && itemInput.equals(other.itemInput) && output.equals(other.output);
     }
 
     @Override

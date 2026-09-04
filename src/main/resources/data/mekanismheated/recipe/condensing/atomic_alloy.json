@@ -1,0 +1,15 @@
+{
+  "type": "mekanismheated:condensing",
+  "input": {
+    "tag": "c:fluids/molten_reinforced_alloy",
+    "amount": 90
+  },
+  "item_input": {
+    "tag": "c:dusts/refined_obsidian",
+    "amount": 1
+  },
+  "output": {
+    "item": "mekanism:alloy_atomic",
+    "count": 9
+  }
+}

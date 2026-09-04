@@ -171,6 +171,15 @@ public class FusedNetwork {
     }
 
     public void removeNode(FusedPipeNode node) {
+        double totalCapacity = getTotalHeatCapacity();
+        double nodeCapacity = node.isEnabled(FusedFunction.HEAT) ? node.getHeatCapacity() : 0D;
+        if (totalCapacity > 0 && nodeCapacity > 0) {
+            //The departing node leaves with its proportional share of the heat, so the remaining
+            //network keeps the same temperature instead of spiking when its capacity shrinks.
+            double systemHeat = heatCapacitor.getHeat() + node.getSavedHeat();
+            double temperature = systemHeat / totalCapacity;
+            heatCapacitor.setHeat(Math.max(0, systemHeat - nodeCapacity * temperature));
+        }
         nodes.remove(node);
         acceptorCache.invalidate();
         itemCapacityDirty = true;
@@ -181,11 +190,19 @@ public class FusedNetwork {
      * Called after one or more pipes in this network were upgraded in place with an alloy, so
      * network-wide cached values (heat capacity, item buffer capacity) are recomputed from the
      * nodes' new tiers. The energy/fluid/chemical container capacities are lazy and pick the new
-     * tiers up on their own.
+     * tiers up on their own. {@code previousTotalHeatCapacity} is the heat capacity before the
+     * upgrade, used to add back the gained heat so the network's temperature is preserved.
      */
-    public void onPipeUpgraded() {
+    public void onPipeUpgraded(double previousTotalHeatCapacity) {
         itemCapacityDirty = true;
         updateHeatCapacity();
+        double newCapacity = getTotalHeatCapacity();
+        if (previousTotalHeatCapacity > 0 && newCapacity > previousTotalHeatCapacity) {
+            //The upgraded pipes gained heat capacity; add a proportional amount of heat so the
+            //network keeps the same temperature instead of cooling down.
+            double temperature = heatCapacitor.getHeat() / previousTotalHeatCapacity;
+            heatCapacitor.setHeat(heatCapacitor.getHeat() + (newCapacity - previousTotalHeatCapacity) * temperature);
+        }
     }
 
     /**
@@ -309,7 +326,7 @@ public class FusedNetwork {
     private void updateHeatCapacity() {
         //Topology or tier changes make the cached heat stats stale; recompute on the next read.
         heatStatsDirty = true;
-        heatCapacitor.setHeatCapacity(getTotalHeatCapacity(), false);
+        heatCapacitor.setHeatCapacity(getTotalHeatCapacity(), true);
     }
 
     /**
