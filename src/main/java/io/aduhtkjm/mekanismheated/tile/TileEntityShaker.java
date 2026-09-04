@@ -11,6 +11,7 @@ import java.util.List;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
+import mekanism.api.RelativeSide;
 import mekanism.api.SerializationConstants;
 import mekanism.api.inventory.IInventorySlot;
 import mekanism.api.recipes.cache.CachedRecipe;
@@ -36,7 +37,10 @@ import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.client.recipe_viewer.type.IRecipeViewerRecipeType;
 import mekanism.common.recipe.IMekanismRecipeTypeProvider;
 import mekanism.common.tile.component.TileComponentEjector;
+import mekanism.common.tile.component.config.ConfigInfo;
+import mekanism.common.tile.component.config.DataType;
 import mekanism.common.tile.prefab.TileEntityProgressMachine;
+import mekanism.common.util.EnumUtils;
 import mekanism.common.util.NBTUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -73,6 +77,23 @@ public class TileEntityShaker extends TileEntityProgressMachine<ShakerRecipe> {
     /** Capacity of the fluid input tank, in milli-buckets. */
     public static final int MAX_FLUID = 10 * FluidType.BUCKET_VOLUME;
 
+    /**
+     * Default per-face data type for each transmission type the shaker supports. Indexed to match the order of
+     * {@link RelativeSide} ({@link EnumUtils#SIDES}): FRONT, LEFT, RIGHT, BACK, TOP, BOTTOM. Players can still override
+     * any face via the side config GUI.
+     */
+    private static final List<SideDefaults> SIDE_DEFAULTS = List.of(
+          new SideDefaults(DataType.INPUT, DataType.INPUT, DataType.INPUT), //FRONT
+          new SideDefaults(DataType.INPUT, DataType.INPUT, DataType.INPUT), //LEFT
+          new SideDefaults(DataType.OUTPUT, DataType.INPUT, DataType.INPUT), //RIGHT
+          new SideDefaults(DataType.INPUT, DataType.INPUT, DataType.INPUT), //BACK
+          new SideDefaults(DataType.INPUT, DataType.INPUT, DataType.INPUT), //TOP
+          new SideDefaults(DataType.INPUT, DataType.INPUT, DataType.INPUT) //BOTTOM
+    );
+
+    /** Default per-face {@link DataType} for the shaker's item, fluid and energy transmission. */
+    private record SideDefaults(DataType item, DataType fluid, DataType energy) {}
+
     protected final IInputHandler<@NotNull ItemStack> inputHandler;
     protected final IInputHandler<@NotNull FluidStack> fluidInputHandler;
     protected final IOutputHandler<@NotNull List<ItemStack>> outputHandler;
@@ -90,6 +111,7 @@ public class TileEntityShaker extends TileEntityProgressMachine<ShakerRecipe> {
         configComponent.setupItemIOConfig(Arrays.asList(inputSlot, fluidSlot), Arrays.asList(outputSlots), energySlot, false);
         configComponent.setupInputConfig(TransmissionType.FLUID, inputFluidTank);
         configComponent.setupInputConfig(TransmissionType.ENERGY, energyContainer);
+        applySideDefaults();
 
         ejectorComponent = new TileComponentEjector(this);
         ejectorComponent.setOutputData(configComponent, TransmissionType.ITEM);
@@ -97,6 +119,28 @@ public class TileEntityShaker extends TileEntityProgressMachine<ShakerRecipe> {
         inputHandler = InputHelper.getInputHandler(inputSlot, RecipeError.NOT_ENOUGH_INPUT);
         fluidInputHandler = InputHelper.getInputHandler(inputFluidTank, NOT_ENOUGH_FLUID_INPUT_ERROR);
         outputHandler = new MultiSlotOutputHandler(Arrays.asList(outputSlots), RecipeError.NOT_ENOUGH_OUTPUT_SPACE);
+    }
+
+    /**
+     * Applies {@link #SIDE_DEFAULTS} to the side config, setting each face's data type for item, fluid and energy.
+     */
+    private void applySideDefaults() {
+        ConfigInfo itemConfig = configComponent.getConfig(TransmissionType.ITEM);
+        ConfigInfo fluidConfig = configComponent.getConfig(TransmissionType.FLUID);
+        ConfigInfo energyConfig = configComponent.getConfig(TransmissionType.ENERGY);
+        for (int i = 0; i < SIDE_DEFAULTS.size(); i++) {
+            RelativeSide side = EnumUtils.SIDES[i];
+            SideDefaults defaults = SIDE_DEFAULTS.get(i);
+            if (itemConfig != null) {
+                itemConfig.setDataType(defaults.item(), side);
+            }
+            if (fluidConfig != null) {
+                fluidConfig.setDataType(defaults.fluid(), side);
+            }
+            if (energyConfig != null) {
+                energyConfig.setDataType(defaults.energy(), side);
+            }
+        }
     }
 
     @Override

@@ -131,7 +131,7 @@ public class ModBlocks {
 
     public static final BlockRegistryObject<CoolerBlock, ItemBlockCooler> COOLER =
           BLOCKS.register("cooler", () -> new CoolerBlock(COOLER_TYPE, BlockBehaviour.Properties.of().mapColor(MapColor.METAL)),
-                (block, properties) -> new ItemBlockCooler(block, properties));
+              ItemBlockCooler::new);
 
     public static final Machine<TileEntityCondenser> CONDENSER_TYPE = MachineBuilder
           .createMachine(() -> ModTileEntityTypes.CONDENSER, ModLang.DESCRIPTION_CONDENSER)

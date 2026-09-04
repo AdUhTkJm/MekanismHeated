@@ -1,0 +1,15 @@
+{
+  "type": "mekanismheated:condensing",
+  "input": {
+    "tag": "c:fluids/molten_iron",
+    "amount": 10
+  },
+  "item_input": {
+    "tag": "c:ingots/iron",
+    "amount": 1
+  },
+  "output": {
+    "item": "c:ingots/compressed_iron",
+    "count": 1
+  }
+}

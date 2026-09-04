@@ -69,6 +69,23 @@ public class TileEntityCondenser extends TileEntityProgressMachine<CondenserReci
 
     public static final int MAX_FLUID = Config.Condenser.FLUID_CAPACITY.get() * FluidType.BUCKET_VOLUME;
 
+    /**
+     * Default per-face data type for each transmission type the condenser supports. Indexed to match the order of
+     * {@link RelativeSide} ({@link EnumUtils#SIDES}): FRONT, LEFT, RIGHT, BACK, TOP, BOTTOM. Players can still override
+     * any face via the side config GUI.
+     */
+    private static final List<SideDefaults> SIDE_DEFAULTS = List.of(
+          new SideDefaults(DataType.NONE, DataType.NONE, DataType.INPUT), //FRONT
+          new SideDefaults(DataType.NONE, DataType.INPUT, DataType.INPUT), //LEFT
+          new SideDefaults(DataType.OUTPUT, DataType.NONE, DataType.INPUT), //RIGHT
+          new SideDefaults(DataType.NONE, DataType.NONE, DataType.INPUT), //BACK
+          new SideDefaults(DataType.NONE, DataType.NONE, DataType.INPUT), //TOP
+          new SideDefaults(DataType.NONE, DataType.NONE, DataType.INPUT) //BOTTOM
+    );
+
+    /** Default per-face {@link DataType} for the condenser's item, fluid and heat transmission. */
+    private record SideDefaults(DataType item, DataType fluid, DataType heat) {}
+
     protected final IInputHandler<@NotNull FluidStack> fluidInputHandler;
     protected final IInputHandler<@NotNull ItemStack> itemInputHandler;
     protected final IOutputHandler<@NotNull ItemStack> outputHandler;
@@ -92,12 +109,7 @@ public class TileEntityCondenser extends TileEntityProgressMachine<CondenserReci
         }
         configComponent.setupInputConfig(TransmissionType.FLUID, inputFluidTank);
         configComponent.setupInputConfig(TransmissionType.HEAT, heatCapacitor);
-        ConfigInfo heatConfig = configComponent.getConfig(TransmissionType.HEAT);
-        if (heatConfig != null) {
-            for (RelativeSide side : EnumUtils.SIDES) {
-                heatConfig.setDataType(DataType.INPUT, side);
-            }
-        }
+        applySideDefaults();
 
         ejectorComponent = new TileComponentEjector(this);
         ejectorComponent.setOutputData(configComponent, TransmissionType.ITEM);
@@ -105,6 +117,28 @@ public class TileEntityCondenser extends TileEntityProgressMachine<CondenserReci
         fluidInputHandler = InputHelper.getInputHandler(inputFluidTank, NOT_ENOUGH_FLUID_INPUT_ERROR);
         itemInputHandler = InputHelper.getInputHandler(inputSlot, RecipeError.NOT_ENOUGH_INPUT);
         outputHandler = OutputHelper.getOutputHandler(outputSlot, RecipeError.NOT_ENOUGH_OUTPUT_SPACE);
+    }
+
+    /**
+     * Applies {@link #SIDE_DEFAULTS} to the side config, setting each face's data type for item, fluid and heat.
+     */
+    private void applySideDefaults() {
+        ConfigInfo itemConfig = configComponent.getConfig(TransmissionType.ITEM);
+        ConfigInfo fluidConfig = configComponent.getConfig(TransmissionType.FLUID);
+        ConfigInfo heatConfig = configComponent.getConfig(TransmissionType.HEAT);
+        for (int i = 0; i < SIDE_DEFAULTS.size(); i++) {
+            RelativeSide side = EnumUtils.SIDES[i];
+            SideDefaults defaults = SIDE_DEFAULTS.get(i);
+            if (itemConfig != null) {
+                itemConfig.setDataType(defaults.item(), side);
+            }
+            if (fluidConfig != null) {
+                fluidConfig.setDataType(defaults.fluid(), side);
+            }
+            if (heatConfig != null) {
+                heatConfig.setDataType(defaults.heat(), side);
+            }
+        }
     }
 
     @NotNull

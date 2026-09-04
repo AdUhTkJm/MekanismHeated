@@ -88,6 +88,23 @@ public class TileEntityHeatSmelter
     /** Capacity of the melting fluid output tank, in milli-buckets. */
     public static final int MAX_FLUID = Config.HeatSmelter.FLUID_CAPACITY.get() * FluidType.BUCKET_VOLUME;
 
+    /**
+     * Default per-face data type for each transmission type the smelter supports. Indexed to match the order of
+     * {@link RelativeSide} ({@link EnumUtils#SIDES}): FRONT, LEFT, RIGHT, BACK, TOP, BOTTOM. Players can still override
+     * any face via the side config GUI.
+     */
+    private static final List<SideDefaults> SIDE_DEFAULTS = List.of(
+          new SideDefaults(DataType.INPUT, DataType.OUTPUT, DataType.INPUT), //FRONT
+          new SideDefaults(DataType.INPUT, DataType.OUTPUT, DataType.INPUT), //LEFT
+          new SideDefaults(DataType.OUTPUT, DataType.OUTPUT, DataType.INPUT), //RIGHT
+          new SideDefaults(DataType.INPUT, DataType.OUTPUT, DataType.INPUT), //BACK
+          new SideDefaults(DataType.INPUT, DataType.OUTPUT, DataType.INPUT), //TOP
+          new SideDefaults(DataType.INPUT, DataType.OUTPUT, DataType.INPUT) //BOTTOM
+    );
+
+    /** Default per-face {@link DataType} for the smelter's item, fluid and heat transmission. */
+    private record SideDefaults(DataType item, DataType fluid, DataType heat) {}
+
     protected final IInputHandler<@NotNull ItemStack> inputHandler;
     protected final IOutputHandler<@NotNull ItemStack> outputHandler;
     protected final IOutputHandler<@NotNull FluidStack> fluidOutputHandler;
@@ -122,13 +139,7 @@ public class TileEntityHeatSmelter
             fluidConfig.addSlotInfo(DataType.OUTPUT, TileComponentConfig.createInfo(TransmissionType.FLUID, false, true, slotTanks));
         }
         configComponent.setupInputConfig(TransmissionType.HEAT, heatCapacitor);
-        //Default to accepting heat from all sides; players can still restrict it via the side config GUI
-        ConfigInfo heatConfig = configComponent.getConfig(TransmissionType.HEAT);
-        if (heatConfig != null) {
-            for (RelativeSide side : EnumUtils.SIDES) {
-                heatConfig.setDataType(DataType.INPUT, side);
-            }
-        }
+        applySideDefaults();
 
         ejectorComponent = new TileComponentEjector(this);
         ejectorComponent.setOutputData(configComponent, TransmissionType.ITEM);
@@ -160,6 +171,28 @@ public class TileEntityHeatSmelter
                 }
             }
         };
+    }
+
+    /**
+     * Applies {@link #SIDE_DEFAULTS} to the side config, setting each face's data type for item, fluid and heat.
+     */
+    private void applySideDefaults() {
+        ConfigInfo itemConfig = configComponent.getConfig(TransmissionType.ITEM);
+        ConfigInfo fluidConfig = configComponent.getConfig(TransmissionType.FLUID);
+        ConfigInfo heatConfig = configComponent.getConfig(TransmissionType.HEAT);
+        for (int i = 0; i < SIDE_DEFAULTS.size(); i++) {
+            RelativeSide side = EnumUtils.SIDES[i];
+            SideDefaults defaults = SIDE_DEFAULTS.get(i);
+            if (itemConfig != null) {
+                itemConfig.setDataType(defaults.item(), side);
+            }
+            if (fluidConfig != null) {
+                fluidConfig.setDataType(defaults.fluid(), side);
+            }
+            if (heatConfig != null) {
+                heatConfig.setDataType(defaults.heat(), side);
+            }
+        }
     }
 
     @NotNull
