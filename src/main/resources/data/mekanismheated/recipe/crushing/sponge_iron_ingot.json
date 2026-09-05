@@ -1,0 +1,12 @@
+{
+  "type": "mekanismheated:crushing",
+  "input": {
+    "count": 1,
+    "item": "mekanismheated:sponge_iron_ingot"
+  },
+  "catalyst": "minecraft:anvil",
+  "output": {
+    "id": "minecraft:iron_ingot",
+    "count": 3
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 200,
+  "experience": 0.7,
+  "ingredient": {
+    "item": "mekanismheated:fe2o3_dust"
+  },
+  "result": {
+    "id": "mekanismheated:sponge_iron_ingot"
+  }
+}

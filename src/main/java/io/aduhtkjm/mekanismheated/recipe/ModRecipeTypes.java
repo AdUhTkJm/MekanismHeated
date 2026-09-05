@@ -13,6 +13,7 @@ public class ModRecipeTypes {
     }
 
     public static final ResourceLocation NAME_FUEL_CONVERSION = Mod.rl("fuel_conversion");
+    public static final ResourceLocation NAME_CRUSHING = Mod.rl("crushing");
     public static final ResourceLocation NAME_HEATED_SMELTING = Mod.rl("heated_smelting");
     public static final ResourceLocation NAME_HEATED_MELTING = Mod.rl("heated_melting");
     public static final ResourceLocation NAME_SHAKING = Mod.rl("shaking");
@@ -24,6 +25,8 @@ public class ModRecipeTypes {
 
     public static final DeferredHolder<RecipeType<?>, RecipeType<ItemStackToHeatRecipe>> TYPE_FUEL_CONVERSION =
           RECIPE_TYPES.register(NAME_FUEL_CONVERSION.getPath(), () -> new RecipeType<>() {});
+    public static final DeferredHolder<RecipeType<?>, RecipeType<CrushingRecipe>> TYPE_CRUSHING =
+          RECIPE_TYPES.register(NAME_CRUSHING.getPath(), () -> new RecipeType<>() {});
     public static final DeferredHolder<RecipeType<?>, RecipeType<HeatedItemStackToItemStackRecipe>> TYPE_HEATED_SMELTING =
         RECIPE_TYPES.register(NAME_HEATED_SMELTING.getPath(), () -> new RecipeType<>() {});
     public static final DeferredHolder<RecipeType<?>, RecipeType<HeatedItemStackToFluidRecipe>> TYPE_HEATED_MELTING =

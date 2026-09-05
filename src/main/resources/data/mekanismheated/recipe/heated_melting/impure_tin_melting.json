@@ -1,0 +1,12 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "input": {
+    "count": 1,
+    "tag": "mekanismheated:impure_sn_ingot"
+  },
+  "output": {
+    "amount": 30,
+    "tag": "c:fluids/molten_tin"
+  },
+  "temperature": 712
+}

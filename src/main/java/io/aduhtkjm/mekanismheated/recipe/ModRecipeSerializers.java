@@ -9,6 +9,7 @@ import mekanism.api.SerializerHelper;
 import mekanism.api.recipes.ingredients.FluidStackIngredient;
 import mekanism.api.recipes.ingredients.ItemStackIngredient;
 import mekanism.common.recipe.serializer.MekanismRecipeSerializer;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -55,8 +56,22 @@ public class ModRecipeSerializers {
                 ).apply(instance, BasicItemStackToHeatRecipe::new)),
                 StreamCodec.composite(
                       ItemStackIngredient.STREAM_CODEC, BasicItemStackToHeatRecipe::getInput,
-                      ByteBufCodecs.VAR_LONG, BasicItemStackToHeatRecipe::getOutputRaw,
-                      BasicItemStackToHeatRecipe::new
+                       ByteBufCodecs.VAR_LONG, BasicItemStackToHeatRecipe::getOutputRaw,
+                       BasicItemStackToHeatRecipe::new
+                 )));
+
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BasicCrushingRecipe>> CRUSHING =
+          RECIPE_SERIALIZERS.register("crushing", () -> new MekanismRecipeSerializer<>(
+                RecordCodecBuilder.mapCodec(instance -> instance.group(
+                      ItemStackIngredient.CODEC.fieldOf(SerializationConstants.INPUT).forGetter(BasicCrushingRecipe::getInput),
+                      BuiltInRegistries.BLOCK.byNameCodec().fieldOf("catalyst").forGetter(BasicCrushingRecipe::getCatalyst),
+                      ItemStack.CODEC.fieldOf(SerializationConstants.OUTPUT).forGetter(BasicCrushingRecipe::getOutputRaw)
+                ).apply(instance, BasicCrushingRecipe::new)),
+                StreamCodec.composite(
+                      ItemStackIngredient.STREAM_CODEC, BasicCrushingRecipe::getInput,
+                      ByteBufCodecs.registry(Registries.BLOCK), BasicCrushingRecipe::getCatalyst,
+                      ItemStack.STREAM_CODEC, BasicCrushingRecipe::getOutputRaw,
+                      BasicCrushingRecipe::new
                 )));
 
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BasicHeatedItemStackToItemStackRecipe>> HEATED_SMELTING =

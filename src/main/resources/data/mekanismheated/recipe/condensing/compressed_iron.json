@@ -9,7 +9,7 @@
     "amount": 1
   },
   "output": {
-    "item": "c:ingots/compressed_iron",
+    "tag": "c:ingots/compressed_iron",
     "count": 1
   }
 }
