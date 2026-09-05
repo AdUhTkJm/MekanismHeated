@@ -9,6 +9,7 @@ import io.aduhtkjm.mekanismheated.block.cooler.CoolerBlock;
 import io.aduhtkjm.mekanismheated.block.creative.CreativeHeatBlock;
 import io.aduhtkjm.mekanismheated.block.fractionation.DistillationTrayBlock;
 import io.aduhtkjm.mekanismheated.block.heatsmelter.HeatSmelterBlock;
+import io.aduhtkjm.mekanismheated.block.reactionchamber.ReactionChamberBlock;
 import io.aduhtkjm.mekanismheated.block.shaker.ShakerBlock;
 import io.aduhtkjm.mekanismheated.item.ItemBlockCooler;
 import io.aduhtkjm.mekanismheated.item.ItemBlockFusedPipe;
@@ -18,6 +19,7 @@ import io.aduhtkjm.mekanismheated.tile.TileEntityCooler;
 import io.aduhtkjm.mekanismheated.tile.TileEntityCreativeHeatBlock;
 import io.aduhtkjm.mekanismheated.tile.TileEntityShaker;
 import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
+import io.aduhtkjm.mekanismheated.tile.TileEntityReactionChamber;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityFractionationBlock;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationController;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationValve;
@@ -141,5 +143,16 @@ public class ModBlocks {
 
     public static final BlockRegistryObject<CondenserBlock, ItemBlockTooltip<CondenserBlock>> CONDENSER =
           BLOCKS.register("condenser", () -> new CondenserBlock(CONDENSER_TYPE, BlockBehaviour.Properties.of().mapColor(MapColor.METAL)),
+                (block, properties) -> new ItemBlockTooltip<>(block, true, properties));
+
+    public static final Machine<TileEntityReactionChamber> REACTION_CHAMBER_TYPE = MachineBuilder
+          .createMachine(() -> ModTileEntityTypes.REACTION_CHAMBER, ModLang.DESCRIPTION_REACTION_CHAMBER)
+          .withGui(() -> ModContainerTypes.REACTION_CHAMBER)
+          .with(AttributeSideConfig.create(TransmissionType.ITEM, TransmissionType.FLUID, TransmissionType.CHEMICAL, TransmissionType.HEAT))
+          .without(AttributeUpgradeSupport.class)
+          .build();
+
+    public static final BlockRegistryObject<ReactionChamberBlock, ItemBlockTooltip<ReactionChamberBlock>> REACTION_CHAMBER =
+          BLOCKS.register("reaction_chamber", () -> new ReactionChamberBlock(REACTION_CHAMBER_TYPE, BlockBehaviour.Properties.of().mapColor(MapColor.METAL)),
                 (block, properties) -> new ItemBlockTooltip<>(block, true, properties));
 }

@@ -5,6 +5,7 @@ import io.aduhtkjm.mekanismheated.client.gui.machine.GuiCondenser;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiCooler;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiCreativeHeatBlock;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiHeatSmelter;
+import io.aduhtkjm.mekanismheated.client.gui.machine.GuiReactionChamber;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiShaker;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiThermalFractionationController;
 import io.aduhtkjm.mekanismheated.client.renderer.TileEntityHeatSmelterRenderer;
@@ -74,6 +75,7 @@ public class ModClient {
         ClientRegistrationUtil.registerScreen(event, ModContainerTypes.CREATIVE_HEAT_BLOCK, GuiCreativeHeatBlock::new);
         ClientRegistrationUtil.registerScreen(event, ModContainerTypes.COOLER, GuiCooler::new);
         ClientRegistrationUtil.registerScreen(event, ModContainerTypes.CONDENSER, GuiCondenser::new);
+        ClientRegistrationUtil.registerScreen(event, ModContainerTypes.REACTION_CHAMBER, GuiReactionChamber::new);
     }
 
     @SubscribeEvent

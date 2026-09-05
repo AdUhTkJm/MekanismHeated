@@ -7,6 +7,7 @@ import io.aduhtkjm.mekanismheated.tile.TileEntityCreativeHeatBlock;
 import io.aduhtkjm.mekanismheated.tile.TileEntityShaker;
 import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
 import io.aduhtkjm.mekanismheated.tile.TileEntityFusedPipe;
+import io.aduhtkjm.mekanismheated.tile.TileEntityReactionChamber;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityFractionationBlock;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationController;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationValve;
@@ -79,6 +80,13 @@ public class ModTileEntityTypes {
           .build();
 
     public static final TileEntityTypeRegistryObject<TileEntityCondenser> CONDENSER = TILE_ENTITY_TYPES.mekBuilder(ModBlocks.CONDENSER, TileEntityCondenser::new)
+          .clientTicker(TileEntityMekanism::tickClient)
+          .serverTicker(TileEntityMekanism::tickServer)
+          .withSimple(Capabilities.CONFIG_CARD)
+          .build();
+
+    public static final TileEntityTypeRegistryObject<TileEntityReactionChamber> REACTION_CHAMBER = TILE_ENTITY_TYPES
+          .mekBuilder(ModBlocks.REACTION_CHAMBER, TileEntityReactionChamber::new)
           .clientTicker(TileEntityMekanism::tickClient)
           .serverTicker(TileEntityMekanism::tickServer)
           .withSimple(Capabilities.CONFIG_CARD)

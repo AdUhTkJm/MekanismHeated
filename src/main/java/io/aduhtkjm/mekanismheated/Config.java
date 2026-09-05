@@ -58,6 +58,15 @@ public class Config {
         public static ModConfigSpec.DoubleValue INVERSE_INSULATION_COEFFICIENT;
     }
 
+    public static class ReactionChamber {
+        public static ModConfigSpec.IntValue REACTION_INTERVAL;
+        public static ModConfigSpec.IntValue CAPACITY;
+        public static ModConfigSpec.IntValue MAX_OPERATIONS;
+        public static ModConfigSpec.DoubleValue HEAT_CAPACITY;
+        public static ModConfigSpec.DoubleValue INVERSE_CONDUCTION_COEFFICIENT;
+        public static ModConfigSpec.DoubleValue INVERSE_INSULATION_COEFFICIENT;
+    }
+
     public static ModConfigSpec SPEC;
     static {
         BUILDER.push("heatSmelter");
@@ -169,6 +178,28 @@ public class Config {
         Cooler.INVERSE_INSULATION_COEFFICIENT = BUILDER
             .comment("Inverse insulation coefficient of the Cooler, controlling how readily it loses heat to the environment (smaller means slower). Must be at least one.")
             .defineInRange("inverseInsulationCoefficient", 10D, 1D, Double.MAX_VALUE);
+        BUILDER.pop();
+
+        BUILDER.push("reactionChamber");
+        ReactionChamber.REACTION_INTERVAL = BUILDER
+            .comment("How often (in game ticks) the reaction chamber executes its recipes. A reaction is also triggered immediately whenever the chamber's contents change.")
+            .defineInRange("reactionInterval", 10, 1, Integer.MAX_VALUE);
+        ReactionChamber.CAPACITY = BUILDER
+            .comment("The total capacity of the reaction chamber's mixed fluid/chemical buffer, in buckets. Fluids and chemicals share this pool.")
+            .defineInRange("capacity", 16, 1, Integer.MAX_VALUE);
+        ReactionChamber.MAX_OPERATIONS = BUILDER
+            .comment("Maximum number of reaction operations a single execution (tick-triggered or content-triggered) may perform before it stops and waits for the next execution. "
+                  + "Guards against recipes that cyclically regenerate their own inputs, which could otherwise keep reacting forever.")
+            .defineInRange("maxOperations", 4096, 1, Integer.MAX_VALUE);
+        ReactionChamber.HEAT_CAPACITY = BUILDER
+            .comment("Heat capacity of the reaction chamber in J/K, controlling how quickly its temperature changes. Must be at least one.")
+            .defineInRange("heatCapacity", 100D, 1D, Double.MAX_VALUE);
+        ReactionChamber.INVERSE_CONDUCTION_COEFFICIENT = BUILDER
+            .comment("Inverse conduction coefficient of the reaction chamber, controlling how readily it exchanges heat with adjacent blocks (smaller means slower). Must be at least one.")
+            .defineInRange("inverseConductionCoefficient", 5D, 1D, Double.MAX_VALUE);
+        ReactionChamber.INVERSE_INSULATION_COEFFICIENT = BUILDER
+            .comment("Inverse insulation coefficient of the reaction chamber, controlling how readily it loses heat to the environment (smaller means slower). Must be at least one.")
+            .defineInRange("inverseInsulationCoefficient", 5D, 1D, Double.MAX_VALUE);
         BUILDER.pop();
         SPEC = BUILDER.build();
     }
