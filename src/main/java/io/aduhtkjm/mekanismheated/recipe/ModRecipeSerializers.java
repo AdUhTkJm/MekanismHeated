@@ -4,13 +4,17 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.aduhtkjm.mekanismheated.Mod;
+import java.util.List;
+import java.util.Optional;
 import mekanism.api.SerializationConstants;
 import mekanism.api.SerializerHelper;
+import mekanism.api.recipes.ingredients.ChemicalStackIngredient;
 import mekanism.api.recipes.ingredients.FluidStackIngredient;
 import mekanism.api.recipes.ingredients.ItemStackIngredient;
 import mekanism.common.recipe.serializer.MekanismRecipeSerializer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
@@ -158,6 +162,54 @@ public class ModRecipeSerializers {
                       FluidStackIngredient.STREAM_CODEC, BasicCondenserRecipe::getFluidInput,
                       ByteBufCodecs.optional(ItemStackIngredient.STREAM_CODEC), BasicCondenserRecipe::getItemInput,
                       ItemStackIngredient.STREAM_CODEC, BasicCondenserRecipe::getOutputRaw,
-                      BasicCondenserRecipe::new
+                       BasicCondenserRecipe::new
+                 )));
+
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BasicReactionChamberRecipe>> REACTION =
+          RECIPE_SERIALIZERS.register("reaction", () -> new MekanismRecipeSerializer<>(
+                RecordCodecBuilder.<BasicReactionChamberRecipe>mapCodec(instance -> instance.group(
+                      ReactionIngredientGroup.CODEC.fieldOf("inputs")
+                            .forGetter(recipe -> new ReactionIngredientGroup(recipe.getItemInput(), recipe.getFluidInputs(), recipe.getChemicalInputs())),
+                      ReactionIngredientGroup.CODEC.fieldOf("outputs")
+                            .forGetter(recipe -> new ReactionIngredientGroup(recipe.getItemOutputIngredient(), recipe.getFluidOutputIngredients(), recipe.getChemicalOutputIngredients())),
+                      POSITIVE_TEMPERATURE_CODEC.fieldOf("min_temperature").forGetter(BasicReactionChamberRecipe::getMinTemperature),
+                      POSITIVE_TEMPERATURE_CODEC.fieldOf("max_temperature").forGetter(BasicReactionChamberRecipe::getMaxTemperature)
+                ).apply(instance, (inputs, outputs, minTemperature, maxTemperature) -> new BasicReactionChamberRecipe(
+                      inputs.item(), inputs.fluids(), inputs.chemicals(),
+                      outputs.item(), outputs.fluids(), outputs.chemicals(),
+                      minTemperature, maxTemperature
+                ))),
+                StreamCodec.composite(
+                      ReactionIngredientGroup.STREAM_CODEC,
+                      recipe -> new ReactionIngredientGroup(recipe.getItemInput(), recipe.getFluidInputs(), recipe.getChemicalInputs()),
+                      ReactionIngredientGroup.STREAM_CODEC,
+                      recipe -> new ReactionIngredientGroup(recipe.getItemOutputIngredient(), recipe.getFluidOutputIngredients(), recipe.getChemicalOutputIngredients()),
+                      ByteBufCodecs.DOUBLE, BasicReactionChamberRecipe::getMinTemperature,
+                      ByteBufCodecs.DOUBLE, BasicReactionChamberRecipe::getMaxTemperature,
+                      (inputs, outputs, minTemperature, maxTemperature) -> new BasicReactionChamberRecipe(
+                            inputs.item(), inputs.fluids(), inputs.chemicals(),
+                            outputs.item(), outputs.fluids(), outputs.chemicals(),
+                            minTemperature, maxTemperature
+                      )
                 )));
+
+    /**
+     * The shape of the {@code "inputs"} / {@code "outputs"} objects in a reaction recipe: an optional single item plus lists of
+     * fluids and chemicals. The item is "at most one" while the fluid and chemical lists may hold any number (including none).
+     */
+    private record ReactionIngredientGroup(Optional<ItemStackIngredient> item, List<FluidStackIngredient> fluids, List<ChemicalStackIngredient> chemicals) {
+
+        private static final Codec<ReactionIngredientGroup> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+              ItemStackIngredient.CODEC.optionalFieldOf("item").forGetter(ReactionIngredientGroup::item),
+              FluidStackIngredient.CODEC.listOf().fieldOf("fluids").forGetter(ReactionIngredientGroup::fluids),
+              ChemicalStackIngredient.CODEC.listOf().fieldOf("chemicals").forGetter(ReactionIngredientGroup::chemicals)
+        ).apply(instance, ReactionIngredientGroup::new));
+
+        private static final StreamCodec<RegistryFriendlyByteBuf, ReactionIngredientGroup> STREAM_CODEC = StreamCodec.composite(
+              ByteBufCodecs.optional(ItemStackIngredient.STREAM_CODEC), ReactionIngredientGroup::item,
+              FluidStackIngredient.STREAM_CODEC.apply(ByteBufCodecs.list()), ReactionIngredientGroup::fluids,
+              ChemicalStackIngredient.STREAM_CODEC.apply(ByteBufCodecs.list()), ReactionIngredientGroup::chemicals,
+              ReactionIngredientGroup::new
+        );
+    }
 }
