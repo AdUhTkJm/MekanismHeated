@@ -8,6 +8,7 @@ import io.aduhtkjm.mekanismheated.network.PacketSetHeatTarget;
 import io.aduhtkjm.mekanismheated.recipe.ModRecipeSerializers;
 import io.aduhtkjm.mekanismheated.recipe.ModRecipeTypes;
 import io.aduhtkjm.mekanismheated.registries.ModBlocks;
+import io.aduhtkjm.mekanismheated.registries.ModChemicals;
 import io.aduhtkjm.mekanismheated.registries.ModContainerTypes;
 import io.aduhtkjm.mekanismheated.registries.ModFluids;
 import io.aduhtkjm.mekanismheated.registries.ModItems;
@@ -54,6 +55,7 @@ public class Mod {
         ModFluids.FLUIDS.register(modEventBus);
         ModTileEntityTypes.TILE_ENTITY_TYPES.register(modEventBus);
         ModContainerTypes.CONTAINER_TYPES.register(modEventBus);
+        ModChemicals.CHEMICALS.register(modEventBus);
         ModRecipeTypes.RECIPE_TYPES.register(modEventBus);
         ModRecipeSerializers.RECIPE_SERIALIZERS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);

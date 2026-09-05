@@ -37,6 +37,7 @@
   "config.jade.plugin_mekanismheated.fused_pipe_remover": "Remove Default Renderers for Fused Pipe",
   "config.jade.plugin_mekanismheated.heat_smelter_mek_data": "Heat Smelter Storage Data",
   "config.jade.plugin_mekanismheated.heat_smelter_remover": "Remove Default Renderers for Heat Smelter",
+  "chemical.mekanismheated.carbon_monoxide": "Carbon Monoxide",
   "container.mekanismheated.condenser": "Condenser",
   "container.mekanismheated.cooler": "Cooler",
   "container.mekanismheated.creative_heat_block": "Creative Heat Block",

@@ -37,6 +37,7 @@
   "config.jade.plugin_mekanismheated.fused_pipe_remover": "移除融合管道的默认渲染器",
   "config.jade.plugin_mekanismheated.heat_smelter_mek_data": "热力熔炼炉存储数据",
   "config.jade.plugin_mekanismheated.heat_smelter_remover": "移除热力熔炼炉的默认渲染器",
+  "chemical.mekanismheated.carbon_monoxide": "一氧化碳",
   "container.mekanismheated.condenser": "冷凝器",
   "container.mekanismheated.cooler": "冷却器",
   "container.mekanismheated.creative_heat_block": "创造热源",
