@@ -112,8 +112,8 @@ dependencies {
     runtimeOnly "maven.modrinth:jade:${jade_version}"
 
     // PneumaticCraft Repressurized Integration (optional).
-    compileOnly "me.desht.pneumaticcraft:pneumaticcraft-repressurized:${pneumaticcraft_version}"
-    runtimeOnly "me.desht.pneumaticcraft:pneumaticcraft-repressurized:${pneumaticcraft_version}"
+    // compileOnly "me.desht.pneumaticcraft:pneumaticcraft-repressurized:${pneumaticcraft_version}"
+    // runtimeOnly "me.desht.pneumaticcraft:pneumaticcraft-repressurized:${pneumaticcraft_version}"
 
     // Spark. For easier performance test, but no API reference, so only runtime.
     runtimeOnly "maven.modrinth:l6YH9Als:v5qtqRQi"

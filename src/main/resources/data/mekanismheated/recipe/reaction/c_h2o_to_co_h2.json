@@ -1,9 +1,10 @@
 {
+  "type": "mekanismheated:reaction",
   "comment": "C (90) + H2O (90) = CO (90) + H2 (90)",
   "inputs": {
     "item": {
-      "id": "minecraft:coal",
-      "amount": 1
+      "count": 1,
+      "item": "minecraft:coal"
     },
     "fluids": [{
       "fluid": "minecraft:water",

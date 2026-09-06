@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @NothingNullByDefault
+@SuppressWarnings("all") // Using optional as field type
 public class BasicReactionChamberRecipe extends ReactionChamberRecipe {
 
     private final Optional<ItemStackIngredient> itemInput;

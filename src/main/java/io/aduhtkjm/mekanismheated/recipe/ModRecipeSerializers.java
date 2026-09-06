@@ -138,6 +138,7 @@ public class ModRecipeSerializers {
                        BasicFractionationRecipe::new
                  )));
 
+    @SuppressWarnings("all") // get(0) -> getFirst()
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BasicAlloyRecipe>> ALLOYING =
           RECIPE_SERIALIZERS.register("alloying", () -> new MekanismRecipeSerializer<>(
                 RecordCodecBuilder.mapCodec(instance -> instance.group(
