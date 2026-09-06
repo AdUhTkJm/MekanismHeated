@@ -1,0 +1,27 @@
+{
+  "type": "mekanismheated:reaction",
+  "comment": "4 FeS2 (90) + 5 O2 (112.5) = 2 Fe2O3 (45) + 8 SO2 (180)",
+  "inputs": {
+    "item": {
+      "item": "mekanismheated:fes2_dust",
+      "count": 1
+    },
+    "fluids": [],
+    "chemicals": [{
+      "chemical": "mekanism:oxygen",
+      "amount": 113
+    }]
+  },
+  "outputs": {
+    "fluids": [],
+    "chemicals": [{
+      "chemical": "mekanism:sulfur_dioxide",
+      "amount": 180
+    }, {
+      "chemical": "mekanismheated:fe2o3_slurry",
+      "amount": 45
+    }]
+  },
+  "min_temperature": 1570,
+  "max_temperature": 4000
+}

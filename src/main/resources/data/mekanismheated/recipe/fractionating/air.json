@@ -1,9 +1,5 @@
 {
-  "type": "mekanismheated:fractionating",
-  "input": {
-    "amount": 100,
-    "fluid": "mekanismheated:dummy_liquid"
-  },
+  "type": "mekanismheated:fractionating_passive",
   "outputs": [
     {
       "bank": 0,

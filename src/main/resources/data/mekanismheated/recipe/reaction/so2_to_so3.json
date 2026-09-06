@@ -1,0 +1,23 @@
+{
+  "type": "mekanismheated:reaction",
+  "comment": "2 SO2 (180) + O2 (90) = 2 SO3 (180); very slow, so divided by 45.",
+  "inputs": {
+    "fluids": [],
+    "chemicals": [{
+      "chemical": "mekanism:sulfur_dioxide",
+      "amount": 4
+    }, {
+      "chemical": "mekanism:oxygen",
+      "amount": 2
+    }]
+  },
+  "outputs": {
+    "fluids": [],
+    "chemicals": [{
+      "chemical": "mekanism:sulfur_trioxide",
+      "amount": 4
+    }]
+  },
+  "min_temperature": 300,
+  "max_temperature": 4000
+}

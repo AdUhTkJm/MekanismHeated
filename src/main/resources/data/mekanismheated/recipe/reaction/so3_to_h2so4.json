@@ -1,0 +1,23 @@
+{
+  "type": "mekanismheated:reaction",
+  "comment": "SO3 (90) + H2O (90) = H2SO4 (90); very slow, so divided by 90.",
+  "inputs": {
+    "fluids": [{
+      "fluid": "minecraft:water",
+      "amount": 1
+    }],
+    "chemicals": [{
+      "chemical": "mekanism:sulfur_trioxide",
+      "amount": 1
+    }]
+  },
+  "outputs": {
+    "fluids": [{
+      "fluid": "mekanism:sulfuric_acid",
+      "amount": 1
+    }],
+    "chemicals": []
+  },
+  "min_temperature": 300,
+  "max_temperature": 4000
+}

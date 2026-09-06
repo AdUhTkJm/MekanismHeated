@@ -91,6 +91,7 @@ public class ModClient {
         ItemBlockRenderTypes.setRenderLayer(ModBlocks.HEAT_SMELTER.get(), RenderType.cutout());
         ItemBlockRenderTypes.setRenderLayer(ModBlocks.COOLER.get(), RenderType.cutout());
         ItemBlockRenderTypes.setRenderLayer(ModBlocks.REACTION_CHAMBER.get(), RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.DISTILLATION_TRAY.get(), RenderType.cutout());
     }
 
     @SubscribeEvent
