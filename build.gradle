@@ -180,3 +180,13 @@ idea {
         downloadJavadoc = true
     }
 }
+
+def modpackModsDir = file("D:/Minecraft/.minecraft/versions/1.21.1-NeoForge/mods")
+
+tasks.register('copyToModpack', Copy) {
+    dependsOn tasks.jar
+    from tasks.jar.archiveFile
+    into modpackModsDir
+    rename { String fileName -> "MekanismHeated-latest.jar" }
+}
+tasks.jar.finalizedBy(copyToModpack)

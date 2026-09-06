@@ -8,7 +8,10 @@ import io.aduhtkjm.mekanismheated.registries.ModBlocks;
 import io.aduhtkjm.mekanismheated.tank.MultiFluidChemicalTank;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Set;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
@@ -41,6 +44,9 @@ import mekanism.common.tile.component.config.slot.InventorySlotInfo;
 import mekanism.common.tile.prefab.TileEntityConfigurableMachine;
 import mekanism.common.util.EnumUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
@@ -51,20 +57,24 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * A machine that automatically runs every {@link ReactionChamberRecipe} it can, as fast as it can.
+ * A machine that automatically runs its {@link ReactionChamberRecipe}s on a fixed cadence.
  *
  * <p>The chamber's contents are a single item input slot, a single item output slot and a {@link MultiFluidChemicalTank} that
  * mixes fluids and chemicals in one shared pool. Every {@code reactionInterval} ticks (and immediately whenever the contents
  * change) it executes its recipes: each recipe whose temperature window contains the chamber's current heat-capacitor
- * temperature is applied one operation at a time, and the whole list is re-scanned until nothing can react any more (or the
- * per-execution operation cap is hit). Inputs are consumed from the slots/tank, outputs are inserted into them, and anything
- * that does not fit is silently discarded.
+ * temperature is applied once, and the list is re-scanned so that one recipe's output can feed another's input, until no
+ * recipe that has not yet reacted this execution can react (or the per-execution operation cap is hit). A recipe that reacts
+ * in an execution will not react again in that same execution; it only runs on a later one. Inputs are consumed from the
+ * slots/tank, outputs are inserted into them, and anything that does not fit is silently discarded.
  */
 public class TileEntityReactionChamber extends TileEntityConfigurableMachine {
 
     /** Capacity of the shared fluid/chemical pool, in milli-buckets. */
     public static final int MAX_CAPACITY = (int) Math.min(Integer.MAX_VALUE,
           (long) Config.ReactionChamber.CAPACITY.get() * FluidType.BUCKET_VOLUME);
+
+    /** Update-tag key carrying the serialized {@link MultiFluidChemicalTank}, so clients can render the contents in-world. */
+    private static final String CONTENTS_TAG = "reaction_contents";
 
     /**
      * Default per-face data type for each transmission type the chamber supports. Indexed to match the order of
@@ -87,6 +97,8 @@ public class TileEntityReactionChamber extends TileEntityConfigurableMachine {
     private boolean needsReaction;
     /** Counts ticks since the last periodic execution. */
     private int tickCount;
+    /** Set when the shared pool's contents change; the next server tick forwards them to clients for the in-world render. */
+    private boolean needsSync;
 
     private BasicHeatCapacitor heatCapacitor;
     private double lastEnvironmentLoss;
@@ -235,17 +247,25 @@ public class TileEntityReactionChamber extends TileEntityConfigurableMachine {
         } else if (getActive()) {
             setActive(false);
         }
+        //Batch content changes into a single update packet per tick for the in-world render
+        if (needsSync) {
+            needsSync = false;
+            sendUpdatePacket();
+        }
         return sendUpdatePacket;
     }
 
     /**
-     * Executes the chamber's recipes until nothing can react any more (or the per-execution operation cap is hit).
+     * Executes the chamber's recipes, applying each eligible recipe at most once (or until the per-execution operation cap is
+     * hit).
      *
-     * <p>Each pass walks every recipe in order and applies a single operation to each recipe whose temperature window contains
-     * the current temperature. A pass that performed at least one operation is followed by another pass, so recipes keep
-     * running until a full pass changes nothing. Successful operations change the contents (see {@link #onContentsChanged()}),
-     * which keeps {@link #needsReaction} set during the loop; it is cleared once we stop so the machine idles until the next
-     * content change or interval.
+     * <p>Each pass walks every recipe in order and applies a single operation to each recipe that has not yet reacted this
+     * execution, is complete, and whose temperature window contains the current temperature. A pass that applied at least one
+     * operation is followed by another, so one recipe's output can feed another's input even when the consuming recipe comes
+     * first in the list; the scan stops once a full pass reacts nothing new. A recipe that reacts is recorded and skipped for
+     * the rest of this execution, so it only runs again on a later (interval- or content-triggered) execution. Successful
+     * operations change the contents (see {@link #onContentsChanged()}), which keeps {@link #needsReaction} set during the
+     * loop; it is cleared once we stop so the machine idles until the next content change or interval.
      *
      * @return {@code true} if at least one operation was applied.
      */
@@ -270,10 +290,16 @@ public class TileEntityReactionChamber extends TileEntityConfigurableMachine {
         int maxOperations = Config.ReactionChamber.MAX_OPERATIONS.get();
         int operations = 0;
         boolean processed = false;
+        //A recipe that reacts is skipped for the rest of this execution so it only runs again on a later one. Tracked by
+        // identity, since value-equal but distinct recipes must each be allowed to react.
+        Set<ReactionChamberRecipe> reacted = Collections.newSetFromMap(new IdentityHashMap<>());
         boolean progressed;
         do {
             progressed = false;
             for (ReactionChamberRecipe recipe : recipes) {
+                if (reacted.contains(recipe)) {
+                    continue;
+                }
                 if (recipe.isIncomplete()) {
                     continue;
                 }
@@ -281,6 +307,7 @@ public class TileEntityReactionChamber extends TileEntityConfigurableMachine {
                     continue;
                 }
                 if (applyRecipe(recipe)) {
+                    reacted.add(recipe);
                     progressed = true;
                     processed = true;
                     if (++operations >= maxOperations) {
@@ -368,7 +395,6 @@ public class TileEntityReactionChamber extends TileEntityConfigurableMachine {
      * @return For each required ingredient, the index into {@code available} it is satisfied by, or {@code null} if the
      *         requirements cannot all be satisfied.
      */
-    @Nullable
     private static <T> int[] matchRequirements(List<? extends InputIngredient<T>> required, List<T> available) {
         int requiredCount = required.size();
         if (requiredCount == 0) {
@@ -472,6 +498,26 @@ public class TileEntityReactionChamber extends TileEntityConfigurableMachine {
         //Note: State updates only matter on the server; the client simply updates its copy of the contents.
         if (level != null && !level.isClientSide) {
             needsReaction = true;
+            //The pool's contents are rendered through the glass in-world, so changes need to reach clients even when no
+            // player currently has the GUI open. Batching into a single packet per tick avoids flooding while a batch of
+            // reactions mutates the pool several times in one tick.
+            needsSync = true;
+        }
+    }
+
+    @NotNull
+    @Override
+    public CompoundTag getReducedUpdateTag(@NotNull HolderLookup.Provider provider) {
+        CompoundTag updateTag = super.getReducedUpdateTag(provider);
+        updateTag.put(CONTENTS_TAG, contentsTank.serializeNBT(provider));
+        return updateTag;
+    }
+
+    @Override
+    public void handleUpdateTag(@NotNull CompoundTag tag, @NotNull HolderLookup.Provider provider) {
+        super.handleUpdateTag(tag, provider);
+        if (tag.contains(CONTENTS_TAG, Tag.TAG_COMPOUND)) {
+            contentsTank.deserializeNBT(provider, tag.getCompound(CONTENTS_TAG));
         }
     }
 

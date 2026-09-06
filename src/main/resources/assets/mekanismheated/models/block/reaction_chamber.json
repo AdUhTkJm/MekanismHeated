@@ -1,10 +1,12 @@
 {
   "parent": "block/block",
+  "render_type": "minecraft:cutout",
   "textures": {
-    "particle": "block/stone",
-    "cap": "block/stone",
-    "pillar": "block/oak_log",
-    "glass": "block/glass"
+    "particle": "mekanismheated:block/reaction_chamber/top",
+    "top": "mekanismheated:block/reaction_chamber/top",
+    "bottom": "mekanismheated:block/reaction_chamber/bottom",
+    "pillar": "mekanism:block/purification_chamber/right",
+    "glass": "mekanismheated:block/reaction_chamber/glass"
   },
   "elements": [
     {
@@ -12,12 +14,12 @@
       "from": [0, 0, 0],
       "to": [16, 2, 16],
       "faces": {
-        "down":  {"uv": [0, 0, 16, 16], "texture": "#cap", "cullface": "down"},
-        "up":    {"uv": [0, 0, 16, 16], "texture": "#cap"},
-        "north": {"uv": [0, 14, 16, 16], "texture": "#cap", "cullface": "north"},
-        "south": {"uv": [0, 14, 16, 16], "texture": "#cap", "cullface": "south"},
-        "west":  {"uv": [0, 14, 16, 16], "texture": "#cap", "cullface": "west"},
-        "east":  {"uv": [0, 14, 16, 16], "texture": "#cap", "cullface": "east"}
+        "down":  {"uv": [0, 0, 16, 16], "texture": "#bottom", "cullface": "down"},
+        "up":    {"uv": [0, 0, 16, 16], "texture": "#bottom"},
+        "north": {"uv": [0, 14, 16, 16], "texture": "#bottom", "cullface": "north"},
+        "south": {"uv": [0, 14, 16, 16], "texture": "#bottom", "cullface": "south"},
+        "west":  {"uv": [0, 14, 16, 16], "texture": "#bottom", "cullface": "west"},
+        "east":  {"uv": [0, 14, 16, 16], "texture": "#bottom", "cullface": "east"}
       }
     },
     {
@@ -25,12 +27,12 @@
       "from": [0, 14, 0],
       "to": [16, 16, 16],
       "faces": {
-        "down":  {"uv": [0, 0, 16, 16], "texture": "#cap"},
-        "up":    {"uv": [0, 0, 16, 16], "texture": "#cap", "cullface": "up"},
-        "north": {"uv": [0, 0, 16, 2], "texture": "#cap", "cullface": "north"},
-        "south": {"uv": [0, 0, 16, 2], "texture": "#cap", "cullface": "south"},
-        "west":  {"uv": [0, 0, 16, 2], "texture": "#cap", "cullface": "west"},
-        "east":  {"uv": [0, 0, 16, 2], "texture": "#cap", "cullface": "east"}
+        "down":  {"uv": [0, 0, 16, 16], "texture": "#top"},
+        "up":    {"uv": [0, 0, 16, 16], "texture": "#top", "cullface": "up"},
+        "north": {"uv": [0, 0, 16, 2], "texture": "#top", "cullface": "north"},
+        "south": {"uv": [0, 0, 16, 2], "texture": "#top", "cullface": "south"},
+        "west":  {"uv": [0, 0, 16, 2], "texture": "#top", "cullface": "west"},
+        "east":  {"uv": [0, 0, 16, 2], "texture": "#top", "cullface": "east"}
       }
     },
     {
@@ -47,45 +49,12 @@
     {
       "comment": "玻璃-北侧",
       "from": [1, 2, 1],
-      "to": [15, 14, 6.5],
-      "faces": {
-        "north": {"uv": [1, 2, 15, 14], "texture": "#glass"},
-        "south": {"uv": [1, 2, 15, 14], "texture": "#glass"},
-        "west":  {"uv": [1, 2, 6.5, 14], "texture": "#glass"},
-        "east":  {"uv": [9.5, 2, 15, 14], "texture": "#glass"}
-      }
-    },
-    {
-      "comment": "玻璃-南侧",
-      "from": [1, 2, 9.5],
       "to": [15, 14, 15],
       "faces": {
-        "north": {"uv": [1, 2, 15, 14], "texture": "#glass"},
-        "south": {"uv": [1, 2, 15, 14], "texture": "#glass"},
-        "west":  {"uv": [9.5, 2, 15, 14], "texture": "#glass"},
-        "east":  {"uv": [1, 2, 6.5, 14], "texture": "#glass"}
-      }
-    },
-    {
-      "comment": "玻璃-西侧",
-      "from": [1, 2, 6.5],
-      "to": [6.5, 14, 9.5],
-      "faces": {
-        "north": {"uv": [1, 2, 6.5, 14], "texture": "#glass"},
-        "south": {"uv": [9.5, 2, 15, 14], "texture": "#glass"},
-        "west":  {"uv": [6.5, 2, 9.5, 14], "texture": "#glass"},
-        "east":  {"uv": [6.5, 2, 9.5, 14], "texture": "#glass"}
-      }
-    },
-    {
-      "comment": "玻璃-东侧",
-      "from": [9.5, 2, 6.5],
-      "to": [15, 14, 9.5],
-      "faces": {
-        "north": {"uv": [9.5, 2, 15, 14], "texture": "#glass"},
-        "south": {"uv": [1, 2, 6.5, 14], "texture": "#glass"},
-        "west":  {"uv": [6.5, 2, 9.5, 14], "texture": "#glass"},
-        "east":  {"uv": [6.5, 2, 9.5, 14], "texture": "#glass"}
+        "north": {"uv": [0, 0, 16, 16], "texture": "#glass"},
+        "south": {"uv": [0, 0, 16, 16], "texture": "#glass"},
+        "west":  {"uv": [0, 0, 16, 16], "texture": "#glass"},
+        "east":  {"uv": [0, 0, 16, 16], "texture": "#glass"}
       }
     }
   ]

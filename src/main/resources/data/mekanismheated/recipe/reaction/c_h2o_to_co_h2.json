@@ -9,9 +9,11 @@
     "fluids": [{
       "fluid": "minecraft:water",
       "amount": 90
-    }]
+    }],
+    "chemicals": []
   },
   "outputs": {
+    "fluids": [],
     "chemicals": [{
       "chemical": "mekanismheated:carbon_monoxide",
       "amount": 90
