@@ -13,4 +13,5 @@ public class ModChemicals {
     public static final ChemicalDeferredRegister CHEMICALS = new ChemicalDeferredRegister(Mod.MODID);
 
     public static final DeferredChemical<Chemical> CARBON_MONOXIDE = CHEMICALS.register("carbon_monoxide", 0x4A4A4A);
+    public static final DeferredChemical<Chemical> NITROGEN = CHEMICALS.register("nitrogen", 0x85CBEE);
 }

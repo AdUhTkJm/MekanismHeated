@@ -1,0 +1,17 @@
+{
+  "type": "mekanismheated:shaking",
+  "input": {
+    "count": 3,
+    "item": "minecraft:clay"
+  },
+  "fluid_input": {
+    "fluid": "minecraft:water",
+    "amount": 4000
+  },
+  "output": [
+    {
+      "id": "mekanismheated:sno2_dust",
+      "count": 4
+    }
+  ]
+}

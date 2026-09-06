@@ -1,8 +1,8 @@
 {
   "type": "mekanismheated:shaking",
   "input": {
-    "count": 20,
-    "item": "minecraft:clay_ball"
+    "count": 5,
+    "item": "minecraft:clay"
   },
   "output": {
     "id": "mekanismheated:sno2_dust",

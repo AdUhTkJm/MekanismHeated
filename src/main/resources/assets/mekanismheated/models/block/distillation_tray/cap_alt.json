@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/iron_bars_cap_alt",
+  "textures": {
+    "particle": "mekanismheated:block/distillation_tray",
+    "bars": "mekanismheated:block/distillation_tray",
+    "edge": "mekanismheated:block/distillation_tray"
+  }
+}

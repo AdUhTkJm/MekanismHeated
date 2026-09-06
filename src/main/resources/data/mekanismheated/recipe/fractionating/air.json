@@ -1,0 +1,33 @@
+{
+  "type": "mekanismheated:fractionating",
+  "input": {
+    "amount": 100,
+    "fluid": "mekanismheated:dummy_liquid"
+  },
+  "outputs": [
+    {
+      "bank": 0,
+      "fluid": {
+        "amount": 78,
+        "id": "mekanismheated:liquid_nitrogen"
+      }
+    },
+    {
+      "bank": 1,
+      "fluid": {
+        "amount": 21,
+        "id": "mekanism:liquid_oxygen"
+      }
+    },
+    {
+      "bank": 2,
+      "fluid": {
+        "amount": 1,
+        "id": "mekanismheated:liquid_air_remnant"
+      }
+    }
+  ],
+  "min_temperature": 1,
+  "base_temperature": 1,
+  "max_temperature": 85
+}

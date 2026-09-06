@@ -29,6 +29,13 @@ public class ModFluids {
         FLUIDS.register("acetic_acid", (fluid, properties) -> new ChemicalFormulaBucketItem(fluid, properties, "CH\u2083COOH"),
             UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFFEEF0C7));
 
+    // Liquid from gases
+    public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ChemicalFormulaBucketItem> LIQUID_NITROGEN =
+        FLUIDS.register("liquid_nitrogen", (fluid, properties) -> new ChemicalFormulaBucketItem(fluid, properties, "N\u2082"),
+            UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFF85CBEE));
+    public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, BucketItem> LIQUID_AIR_REMNANT =
+        FLUIDS.register("liquid_air_remnant", renderProperties -> renderProperties.tint(0xFFF7F7F7));
+
     // Molten fluids
     public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ChemicalFormulaBucketItem> MOLTEN_IRON =
         FLUIDS.register("molten_iron", (fluid, properties) -> new ChemicalFormulaBucketItem(fluid, properties, "Fe"),
@@ -52,4 +59,8 @@ public class ModFluids {
         FLUIDS.register("molten_infused_alloy", renderProperties -> renderProperties.tint(0xFFE64141));
     public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, BucketItem> MOLTEN_REINFORCED_ALLOY =
         FLUIDS.register("molten_reinforced_alloy", renderProperties -> renderProperties.tint(0xFF58D7F0));
+
+    // Placeholder. We deliberately do not display its bucket item in creative tab.
+    public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, BucketItem> DUMMY_LIQUID =
+        FLUIDS.register("dummy_liquid", renderProperties -> renderProperties.tint(0xFF010101));
 }

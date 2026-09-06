@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/iron_bars_post_ends",
+  "textures": {
+    "particle": "mekanismheated:block/distillation_tray",
+    "edge": "mekanismheated:block/distillation_tray"
+  }
+}

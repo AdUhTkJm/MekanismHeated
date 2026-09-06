@@ -1,7 +1,7 @@
 {
   "type": "mekanismheated:shaking",
   "input": {
-    "count": 1,
+    "count": 3,
     "item": "minecraft:sand"
   },
   "fluid_input": {
@@ -10,7 +10,7 @@
   },
   "output": [
     {
-      "id": "minecraft:clay_ball",
+      "id": "minecraft:clay",
       "count": 3
     },
     {

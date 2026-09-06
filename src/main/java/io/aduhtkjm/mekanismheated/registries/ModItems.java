@@ -49,6 +49,8 @@ public class ModItems {
         output.accept(ModFluids.ASPHALT.getBucket());
         output.accept(ModFluids.METHANOL.getBucket());
         output.accept(ModFluids.ACETIC_ACID.getBucket());
+        output.accept(ModFluids.LIQUID_NITROGEN.getBucket());
+        output.accept(ModFluids.LIQUID_AIR_REMNANT.getBucket());
         output.accept(ModFluids.MOLTEN_IRON.getBucket());
         output.accept(ModFluids.MOLTEN_COPPER.getBucket());
         output.accept(ModFluids.MOLTEN_TIN.getBucket());
