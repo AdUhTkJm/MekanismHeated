@@ -15,4 +15,5 @@ public class ModChemicals {
     public static final DeferredChemical<Chemical> CARBON_MONOXIDE = CHEMICALS.register("carbon_monoxide", 0x4A4A4A);
     public static final DeferredChemical<Chemical> NITROGEN = CHEMICALS.register("nitrogen", 0x85CBEE);
     public static final DeferredChemical<Chemical> METHANOL = CHEMICALS.register("gas_methanol", 0xCDCDB2);
+    public static final DeferredChemical<Chemical> UNSTABLE_LAVA = CHEMICALS.register("gas_unstable_lava", 0xFF8C00);
 }

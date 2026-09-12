@@ -10,6 +10,10 @@
     "mekanismheated:unstable_lava_tin",
     "mekanismheated:flowing_unstable_lava_tin",
     "mekanismheated:unstable_lava_osmium",
-    "mekanismheated:flowing_unstable_lava_osmium"
+    "mekanismheated:flowing_unstable_lava_osmium",
+    "mekanismheated:unstable_lava_lead",
+    "mekanismheated:flowing_unstable_lava_lead",
+    "mekanismheated:unstable_lava_gold",
+    "mekanismheated:flowing_unstable_lava_gold"
   ]
 }

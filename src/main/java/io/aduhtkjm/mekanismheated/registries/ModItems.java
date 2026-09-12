@@ -33,10 +33,13 @@ public class ModItems {
     public static final ObsidianDustVariant COPPER_OBSIDIAN_DUST = ObsidianDustVariant.register(ITEMS, "copper", "Cu");
     public static final ObsidianDustVariant TIN_OBSIDIAN_DUST = ObsidianDustVariant.register(ITEMS, "tin", "Sn");
     public static final ObsidianDustVariant OSMIUM_OBSIDIAN_DUST = ObsidianDustVariant.register(ITEMS, "osmium", "Os");
+    public static final ObsidianDustVariant GOLD_OBSIDIAN_DUST = ObsidianDustVariant.register(ITEMS, "gold", "Au");
+    public static final ObsidianDustVariant LEAD_OBSIDIAN_DUST = ObsidianDustVariant.register(ITEMS, "lead", "Pb");
 
     /** Every obsidian dust variant, in the order they are shown in the creative tab. */
     public static final List<ObsidianDustVariant> OBSIDIAN_DUSTS =
-          List.of(IRON_OBSIDIAN_DUST, COPPER_OBSIDIAN_DUST, TIN_OBSIDIAN_DUST, OSMIUM_OBSIDIAN_DUST);
+          List.of(IRON_OBSIDIAN_DUST, COPPER_OBSIDIAN_DUST, TIN_OBSIDIAN_DUST, OSMIUM_OBSIDIAN_DUST,
+              GOLD_OBSIDIAN_DUST, LEAD_OBSIDIAN_DUST);
 
     public static void registerDisplayedItems(CreativeModeTab.ItemDisplayParameters itemDisplayParameters, CreativeModeTab.Output output) {
         output.accept(ModBlocks.HEAT_SMELTER);

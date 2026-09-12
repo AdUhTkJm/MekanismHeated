@@ -28,7 +28,7 @@ public class GuiCreativeChunkHeater extends GuiMekanismTile<TileEntityCreativeCh
     @Override
     protected void addGuiElements() {
         super.addGuiElements();
-        addRenderableWidget(new GuiInnerScreen(this, 48, 23, 80, 42, () -> List.of(
+        addRenderableWidget(new GuiInnerScreen(this, 48, 23, 80, 52, () -> List.of(
               ModLang.GUI_CHUNK_AMBIENT.translate(MekanismUtils.getTemperatureDisplay(tile.getChunkAmbientTemperature(), TemperatureUnit.KELVIN, true)),
               ModLang.GUI_TARGET_TEMPERATURE.translate(MekanismUtils.getTemperatureDisplay(tile.getTargetTemperature(), TemperatureUnit.KELVIN, true)),
               ModLang.GUI_CHUNK_DELTA.translate(MekanismUtils.getTemperatureDisplay(tile.getLastAppliedDelta(), TemperatureUnit.KELVIN, false))

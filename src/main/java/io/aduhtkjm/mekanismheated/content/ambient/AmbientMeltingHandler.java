@@ -125,10 +125,15 @@ public final class AmbientMeltingHandler {
                 continue;
             }
             ChunkPos chunkPos = new ChunkPos(packed);
+            // We don't do cascade melting outside the melting chunk.
+            if (!isAboveThreshold(level, chunkPos)) {
+                continue;
+            }
+
             if (sourcePass && sourceSamples > 0) {
                 cascadeMelting(level, chunkPos, sourceSamples, filter, random);
             }
-            if (meltPass && meltSamples > 0 && isAboveThreshold(level, chunkPos)) {
+            if (meltPass && meltSamples > 0) {
                 meltBlocks(level, chunkPos, meltSamples, filter, random);
             }
         }
@@ -141,12 +146,12 @@ public final class AmbientMeltingHandler {
         for (int i = 0; i < samples; i++) {
             BlockPos pos = randomPosition(level, chunkPos, random);
             FluidState fluid = level.getFluidState(pos);
-            if (fluid.getType() instanceof UnstableLavaFluid unstable) {
+            if (fluid.getType() instanceof UnstableLavaFluid) {
                 BlockPos adjacent = pos.relative(Direction.getRandom(random));
                 if (!filter.test(level.getBlockState(adjacent))) {
                     continue;
                 }
-                level.setBlock(adjacent, unstable.getVariant().block().get().defaultBlockState(), Block.UPDATE_ALL);
+                level.setBlock(adjacent, ModFluids.UNSTABLE_LAVA.block().get().defaultBlockState(), Block.UPDATE_ALL);
             }
         }
     }

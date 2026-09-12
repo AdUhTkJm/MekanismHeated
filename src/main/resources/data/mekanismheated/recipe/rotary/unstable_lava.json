@@ -2,18 +2,18 @@
   "type": "mekanism:rotary",
   "chemical_input": {
     "amount": 1,
-    "chemical": "mekanismheated:gas_methanol"
+    "chemical": "mekanismheated:gas_unstable_lava"
   },
   "chemical_output": {
     "amount": 1,
-    "id": "mekanismheated:gas_methanol"
+    "id": "mekanismheated:gas_unstable_lava"
   },
   "fluid_input": {
     "amount": 1,
-    "fluid": "mekanismheated:methanol"
+    "fluid": "mekanismheated:unstable_lava"
   },
   "fluid_output": {
     "amount": 1,
-    "id": "mekanismheated:methanol"
+    "id": "mekanismheated:unstable_lava"
   }
 }

@@ -1,7 +1,7 @@
 {
   "type": "mekanismheated:condensing",
   "input": {
-    "fluid": "mekanismheated:unstable_lava_gold",
+    "fluid": "mekanismheated:unstable_lava_lead",
     "amount": 15
   },
   "item_input": {
@@ -9,7 +9,7 @@
     "count": 1
   },
   "output": {
-    "item": "mekanismheated:gold_obsidian_dust",
+    "item": "mekanismheated:lead_obsidian_dust",
     "count": 1
   }
 }

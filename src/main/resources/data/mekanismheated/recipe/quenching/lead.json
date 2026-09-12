@@ -1,7 +1,7 @@
 {
   "type": "mekanismheated:quenching",
   "input": {
-    "tag": "c:raw_materials/gold",
+    "tag": "c:raw_materials/lead",
     "count": 1
   },
   "fluid_input": {
@@ -9,7 +9,7 @@
     "amount": 90
   },
   "output": {
-    "fluid": "mekanismheated:unstable_lava_gold",
+    "fluid": "mekanismheated:unstable_lava_lead",
     "amount": 90
   }
 }

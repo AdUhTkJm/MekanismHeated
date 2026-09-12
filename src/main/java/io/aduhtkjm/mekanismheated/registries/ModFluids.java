@@ -103,23 +103,19 @@ public class ModFluids {
         UnstableLavaVariant.register(UNSTABLE_LAVA_REGISTERS, "unstable_lava_tin", 0xFFE0A46B);
     public static final UnstableLavaVariant UNSTABLE_LAVA_OSMIUM =
         UnstableLavaVariant.register(UNSTABLE_LAVA_REGISTERS, "unstable_lava_osmium", 0xFFFFA13B);
+    public static final UnstableLavaVariant UNSTABLE_LAVA_GOLD =
+        UnstableLavaVariant.register(UNSTABLE_LAVA_REGISTERS, "unstable_lava_gold", 0xFFFFA13B);
+    public static final UnstableLavaVariant UNSTABLE_LAVA_LEAD =
+        UnstableLavaVariant.register(UNSTABLE_LAVA_REGISTERS, "unstable_lava_lead", 0xFFFFA13B);
 
     /** Every unstable lava variant, in registration order. */
     public static final List<UnstableLavaVariant> UNSTABLE_LAVA_VARIANTS =
-          List.of(UNSTABLE_LAVA, UNSTABLE_LAVA_IRON, UNSTABLE_LAVA_COPPER, UNSTABLE_LAVA_TIN,  UNSTABLE_LAVA_OSMIUM);
+          List.of(UNSTABLE_LAVA, UNSTABLE_LAVA_IRON, UNSTABLE_LAVA_COPPER, UNSTABLE_LAVA_TIN,  UNSTABLE_LAVA_OSMIUM,
+              UNSTABLE_LAVA_GOLD,  UNSTABLE_LAVA_LEAD);
 
     /** Registers all four unstable lava registries with the mod event bus. */
     public static void registerUnstableLavaRegisters(IEventBus bus) {
         UNSTABLE_LAVA_REGISTERS.register(bus);
-    }
-
-    /**
-     * @return the unstable lava variant  the given fluid belongs to, or {@code null} if the fluid is not unstable
-     *       lava.
-     */
-    @Nullable
-    public static UnstableLavaVariant unstableLavaVariant(Fluid fluid) {
-        return fluid instanceof UnstableLavaFluid unstableLava ? unstableLava.getVariant() : null;
     }
 
     /**
