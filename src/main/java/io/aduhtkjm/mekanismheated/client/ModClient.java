@@ -66,6 +66,7 @@ public class ModClient {
 
         ClientRegistrationUtil.registerItemColorHandler(event, (stack, tintIndex) -> tintIndex == 1 ? ItemImpureSnIngot.TINT : -1, ModItems.IMPURE_SN_INGOT);
         ClientRegistrationUtil.registerItemColorHandler(event, (stack, tintIndex) -> tintIndex == 1 ? ItemSpongeIronIngot.TINT : -1, ModItems.SPONGE_IRON_INGOT);
+        ClientRegistrationUtil.registerItemColorHandler(event, (stack, tintIndex) -> tintIndex == 1 ? ItemThermoenergeticAlloyIngot.TINT : -1, ModItems.THERMOENERGETIC_ALLOY_INGOT);
     }
 
     @SubscribeEvent

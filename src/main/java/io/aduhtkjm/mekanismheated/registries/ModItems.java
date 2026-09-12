@@ -17,6 +17,8 @@ public class ModItems {
 
     public static final ItemRegistryObject<ItemSpongeIronIngot> SPONGE_IRON_INGOT = ITEMS.registerItem("sponge_iron_ingot", ItemSpongeIronIngot::new);
     public static final ItemRegistryObject<ItemImpureSnIngot> IMPURE_SN_INGOT = ITEMS.registerItem("impure_sn_ingot", ItemImpureSnIngot::new);
+    public static final ItemRegistryObject<ItemThermoenergeticAlloyIngot> THERMOENERGETIC_ALLOY_INGOT =
+          ITEMS.registerItem("thermoenergetic_alloy_ingot", ItemThermoenergeticAlloyIngot::new);
 
     public static final ItemRegistryObject<ItemCuODust> CUO_DUST = ITEMS.registerItem("cuo_dust", ItemCuODust::new);
     public static final ItemRegistryObject<ItemFe2O3Dust> FE2O3_DUST = ITEMS.registerItem("fe2o3_dust", ItemFe2O3Dust::new);
@@ -49,6 +51,7 @@ public class ModItems {
         output.accept(ModBlocks.THERMAL_FRACTIONATION_CONTROLLER);
         output.accept(ModBlocks.THERMAL_FRACTIONATION_VALVE);
         output.accept(ModBlocks.THERMAL_FRACTIONATION_CASING);
+        output.accept(ModBlocks.THERMAL_CASING);
         output.accept(ModBlocks.DISTILLATION_TRAY);
         output.accept(ModBlocks.CREATIVE_HEAT_BLOCK);
         output.accept(ModBlocks.CREATIVE_CHUNK_HEATER);
@@ -60,6 +63,7 @@ public class ModItems {
 
         output.accept(ModItems.SPONGE_IRON_INGOT.get());
         output.accept(ModItems.IMPURE_SN_INGOT.get());
+        output.accept(ModItems.THERMOENERGETIC_ALLOY_INGOT.get());
         output.accept(ModItems.CUO_DUST.get());
         output.accept(ModItems.PURE_CUO_DUST.get());
         output.accept(ModItems.FE2O3_DUST.get());
@@ -84,6 +88,7 @@ public class ModItems {
         output.accept(ModFluids.MOLTEN_BRONZE.getBucket());
         output.accept(ModFluids.MOLTEN_OSMIUM.getBucket());
         output.accept(ModFluids.MOLTEN_THERMOENERGETIC_ALLOY.getBucket());
+        output.accept(ModFluids.MOLTEN_CASING_ALLOY.getBucket());
         output.accept(ModFluids.MOLTEN_INFUSED_ALLOY.getBucket());
         output.accept(ModFluids.MOLTEN_REINFORCED_ALLOY.getBucket());
         for (UnstableLavaVariant variant : ModFluids.UNSTABLE_LAVA_VARIANTS) {

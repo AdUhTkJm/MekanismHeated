@@ -1,6 +1,8 @@
 package io.aduhtkjm.mekanismheated.integration.jei;
 
 import io.aduhtkjm.mekanismheated.Mod;
+import io.aduhtkjm.mekanismheated.ModLang;
+import io.aduhtkjm.mekanismheated.recipe.AlloyRecipe;
 import io.aduhtkjm.mekanismheated.recipe.AtmosphereFuelRecipe;
 import io.aduhtkjm.mekanismheated.recipe.CondenserRecipe;
 import io.aduhtkjm.mekanismheated.recipe.FractionationRecipe;
@@ -21,6 +23,9 @@ public final class ModRecipeViewerTypes {
           new ModRecipeViewerType<>(Mod.rl("heated_smelting"), ModBlocks.HEAT_SMELTER, -28, -16, 144, 54);
     public static final ModRecipeViewerType<HeatedItemStackToFluidRecipe> HEATED_MELTING =
           new ModRecipeViewerType<>(Mod.rl("heated_melting"), ModBlocks.HEAT_SMELTER, -28, -16, 144, 54);
+    //Shares the heat smelter with the two categories above, so it needs its own title instead of the machine's name
+    public static final ModRecipeViewerType<AlloyRecipe> ALLOYING =
+          new ModRecipeViewerType<>(Mod.rl("alloying"), ModBlocks.HEAT_SMELTER, ModLang.GUI_ALLOYING.translate(), -28, -16, 144, 54);
     public static final ModRecipeViewerType<ShakerRecipe> SHAKING =
           new ModRecipeViewerType<>(Mod.rl("shaking"), ModBlocks.SHAKER, -6, -10, 164, 62);
     public static final ModRecipeViewerType<CondenserRecipe> CONDENSING =

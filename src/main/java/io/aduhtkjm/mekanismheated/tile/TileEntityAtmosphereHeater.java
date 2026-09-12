@@ -10,6 +10,7 @@ import java.util.List;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
+import mekanism.api.RelativeSide;
 import mekanism.api.chemical.BasicChemicalTank;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IChemicalTank;
@@ -26,7 +27,10 @@ import mekanism.common.capabilities.holder.slot.InventorySlotHelper;
 import mekanism.common.inventory.slot.InputInventorySlot;
 import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.tile.component.TileComponentEjector;
+import mekanism.common.tile.component.config.ConfigInfo;
+import mekanism.common.tile.component.config.DataType;
 import mekanism.common.tile.prefab.TileEntityConfigurableMachine;
+import mekanism.common.util.EnumUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -72,12 +76,47 @@ public class TileEntityAtmosphereHeater extends TileEntityConfigurableMachine {
     private static final int INTERVAL = Config.AtmosphereHeater.WORK_INTERVAL.get();
     private static final long BASE_COST = Config.AtmosphereHeater.ENERGY_PER_TICK.get();
 
+    private static final List<TileEntityAtmosphereHeater.SideDefaults> SIDE_DEFAULTS = List.of(
+        new TileEntityAtmosphereHeater.SideDefaults(DataType.INPUT, DataType.INPUT, DataType.INPUT), //FRONT
+        new TileEntityAtmosphereHeater.SideDefaults(DataType.INPUT, DataType.INPUT, DataType.INPUT), //LEFT
+        new TileEntityAtmosphereHeater.SideDefaults(DataType.INPUT, DataType.INPUT, DataType.INPUT), //RIGHT
+        new TileEntityAtmosphereHeater.SideDefaults(DataType.INPUT, DataType.INPUT, DataType.INPUT), //BACK
+        new TileEntityAtmosphereHeater.SideDefaults(DataType.INPUT, DataType.INPUT, DataType.INPUT), //TOP
+        new TileEntityAtmosphereHeater.SideDefaults(DataType.INPUT, DataType.INPUT, DataType.INPUT) //BOTTOM
+    );
+
+    /** Default per-face {@link DataType} for the smelter's item, fluid and energy transmission. */
+    private record SideDefaults(DataType item, DataType fluid, DataType energy) {}
+
     public TileEntityAtmosphereHeater(BlockPos pos, BlockState state) {
         super(ModBlocks.ATMOSPHERE_HEATER, pos, state);
         configComponent.setupInputConfig(TransmissionType.ITEM, inputSlot);
         configComponent.setupInputConfig(TransmissionType.CHEMICAL, gasTank);
         configComponent.setupInputConfig(TransmissionType.ENERGY, energyContainer);
         ejectorComponent = new TileComponentEjector(this);
+        applySideDefaults();
+    }
+
+    /**
+     * Applies {@link #SIDE_DEFAULTS} to the side config, setting each face's data type for item, fluid and heat.
+     */
+    private void applySideDefaults() {
+        ConfigInfo itemConfig = configComponent.getConfig(TransmissionType.ITEM);
+        ConfigInfo fluidConfig = configComponent.getConfig(TransmissionType.FLUID);
+        ConfigInfo energyConfig = configComponent.getConfig(TransmissionType.ENERGY);
+        for (int i = 0; i < SIDE_DEFAULTS.size(); i++) {
+            RelativeSide side = EnumUtils.SIDES[i];
+            TileEntityAtmosphereHeater.SideDefaults defaults = SIDE_DEFAULTS.get(i);
+            if (itemConfig != null) {
+                itemConfig.setDataType(defaults.item(), side);
+            }
+            if (fluidConfig != null) {
+                fluidConfig.setDataType(defaults.fluid(), side);
+            }
+            if (energyConfig != null) {
+                energyConfig.setDataType(defaults.energy(), side);
+            }
+        }
     }
 
     @NotNull

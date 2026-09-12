@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " C ",
+    "CEC",
+    " C "
+  ],
+  "key": {
+    "C": {
+      "item": "mekanismheated:cooler"
+    },
+    "E": {
+      "item": "mekanism:enrichment_chamber"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "mekanismheated:quenching_enrichment_chamber"
+  }
+}

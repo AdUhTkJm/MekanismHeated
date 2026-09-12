@@ -16,6 +16,7 @@ public enum ModLang implements ILangEntry {
     MULTIBLOCK_INVALID_TRAY_SPACING("multiblock", "invalid.tray_spacing"),
     GUI_FRACTIONATION_HEIGHT("gui", "fractionation.height"),
     GUI_FRACTIONATION_LAYERS("gui", "fractionation.layers"),
+    GUI_ALLOYING("gui", "alloying"),
     HEAT_SMELTER_TEMPERATURE("gui", "heat_smelter.temperature"),
     HEAT_SMELTER_BUFFER("gui", "heat_smelter.buffer"),
     MIN_TEMPERATURE("gui", "min_temperature"),

@@ -51,6 +51,7 @@ public final class MoltenFluidHandler {
         add(set, ModFluids.MOLTEN_BRONZE);
         add(set, ModFluids.MOLTEN_OSMIUM);
         add(set, ModFluids.MOLTEN_THERMOENERGETIC_ALLOY);
+        add(set, ModFluids.MOLTEN_CASING_ALLOY);
         add(set, ModFluids.MOLTEN_INFUSED_ALLOY);
         add(set, ModFluids.MOLTEN_REINFORCED_ALLOY);
         //Unstable lava is not registered through FluidDeferredRegister, so its variants are added directly.

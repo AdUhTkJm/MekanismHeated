@@ -18,8 +18,18 @@ import org.lwjgl.system.NonnullDefault;
  * our recipes are registered in the recipe manager.</p>
  */
 @NonnullDefault
-public record ModRecipeViewerType<RECIPE>(ResourceLocation id, ItemLike iconItem, int xOffset, int yOffset, int width, int height)
+public record ModRecipeViewerType<RECIPE>(ResourceLocation id, ItemLike iconItem, @Nullable Component title, int xOffset, int yOffset,
+                                          int width, int height)
       implements IRecipeViewerRecipeType<RECIPE> {
+
+    /**
+     * Creates a recipe viewer type titled after its icon item, which is what every category showing a single machine
+     * wants. Categories that share a machine (the heat smelter's three) pass an explicit title through the canonical
+     * constructor instead.
+     */
+    public ModRecipeViewerType(ResourceLocation id, ItemLike iconItem, int xOffset, int yOffset, int width, int height) {
+        this(id, iconItem, null, xOffset, yOffset, width, height);
+    }
 
     @Override
     public Class<? extends RECIPE> recipeClass() {
@@ -46,7 +56,7 @@ public record ModRecipeViewerType<RECIPE>(ResourceLocation id, ItemLike iconItem
 
     @Override
     public Component getTextComponent() {
-        return Component.translatable(iconItem.asItem().getDescriptionId());
+        return title == null ? Component.translatable(iconItem.asItem().getDescriptionId()) : title;
     }
 
     @Override

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "mekanism:item/dust_obsidian",
+    "layer1": "mekanismheated:item/obsidian_dust/lead"
+  }
+}

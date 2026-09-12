@@ -1,6 +1,7 @@
 package io.aduhtkjm.mekanismheated.integration.jei;
 
 import io.aduhtkjm.mekanismheated.Mod;
+import io.aduhtkjm.mekanismheated.integration.jei.category.AlloyingRecipeCategory;
 import io.aduhtkjm.mekanismheated.integration.jei.category.AtmosphereFuelRecipeCategory;
 import io.aduhtkjm.mekanismheated.integration.jei.category.CondenserRecipeCategory;
 import io.aduhtkjm.mekanismheated.integration.jei.category.FractionationRecipeCategory;
@@ -71,6 +72,7 @@ public class MekanismHeatedJEI implements IModPlugin {
         registry.addRecipeCategories(
               new HeatedSmeltingRecipeCategory(guiHelper, ModRecipeViewerTypes.HEATED_SMELTING),
               new HeatedMeltingRecipeCategory(guiHelper, ModRecipeViewerTypes.HEATED_MELTING),
+              new AlloyingRecipeCategory(guiHelper, ModRecipeViewerTypes.ALLOYING),
               new ShakerRecipeCategory(guiHelper, ModRecipeViewerTypes.SHAKING),
                new CondenserRecipeCategory(guiHelper, ModRecipeViewerTypes.CONDENSING),
                new QuenchingRecipeCategory(guiHelper, ModRecipeViewerTypes.QUENCHING),
@@ -83,6 +85,7 @@ public class MekanismHeatedJEI implements IModPlugin {
     public void registerRecipes(IRecipeRegistration registry) {
         registerRecipes(registry, ModRecipeViewerTypes.HEATED_SMELTING, ModRecipeTypes.TYPE_HEATED_SMELTING);
         registerRecipes(registry, ModRecipeViewerTypes.HEATED_MELTING, ModRecipeTypes.TYPE_HEATED_MELTING);
+        registerRecipes(registry, ModRecipeViewerTypes.ALLOYING, ModRecipeTypes.TYPE_ALLOYING);
         registerRecipes(registry, ModRecipeViewerTypes.SHAKING, ModRecipeTypes.TYPE_SHAKING);
         registerRecipes(registry, ModRecipeViewerTypes.CONDENSING, ModRecipeTypes.TYPE_CONDENSING);
         registerRecipes(registry, ModRecipeViewerTypes.QUENCHING, ModRecipeTypes.TYPE_QUENCHING);
@@ -95,8 +98,8 @@ public class MekanismHeatedJEI implements IModPlugin {
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registry) {
         CatalystRegistryHelper.register(registry, ModRecipeViewerTypes.HEATED_SMELTING, ModRecipeViewerTypes.HEATED_MELTING,
-              ModRecipeViewerTypes.SHAKING, ModRecipeViewerTypes.CONDENSING, ModRecipeViewerTypes.QUENCHING, ModRecipeViewerTypes.REACTION,
-              ModRecipeViewerTypes.ATMOSPHERE_FUEL, ModRecipeViewerTypes.FRACTIONATING);
+              ModRecipeViewerTypes.ALLOYING, ModRecipeViewerTypes.SHAKING, ModRecipeViewerTypes.CONDENSING, ModRecipeViewerTypes.QUENCHING,
+              ModRecipeViewerTypes.REACTION, ModRecipeViewerTypes.ATMOSPHERE_FUEL, ModRecipeViewerTypes.FRACTIONATING);
     }
 
     private static <I extends RecipeInput, RECIPE extends Recipe<I>>

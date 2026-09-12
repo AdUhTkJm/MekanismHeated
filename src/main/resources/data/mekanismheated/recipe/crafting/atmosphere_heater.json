@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ECE",
+    "TST",
+    "ELE"
+  ],
+  "key": {
+    "C": {
+      "item": "mekanism:elite_chemical_tank"
+    },
+    "E": {
+      "item": "mekanism:alloy_reinforced"
+    },
+    "T": {
+      "tag": "c:circuits/elite"
+    },
+    "S": {
+      "tag": "mekanismheated:thermal_casing"
+    },
+    "L": {
+      "item": "minecraft:water_bucket"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "mekanismheated:atmosphere_heater"
+  }
+}

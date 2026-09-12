@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "mekanismheated:molten_casing_alloy",
+    "mekanismheated:flowing_molten_casing_alloy"
+  ]
+}

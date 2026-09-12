@@ -1,0 +1,12 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "input": {
+    "count": 1,
+    "item": "mekanismheated:thermoenergetic_alloy_ingot"
+  },
+  "output": {
+    "amount": 90,
+    "tag": "c:fluids/molten_thermoenergetic_alloy"
+  },
+  "temperature": 1600
+}

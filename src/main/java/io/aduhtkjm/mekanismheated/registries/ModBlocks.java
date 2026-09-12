@@ -47,6 +47,8 @@ import mekanism.common.registration.impl.BlockRegistryObject;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 
@@ -56,6 +58,13 @@ public class ModBlocks {
     }
 
     public static final BlockDeferredRegister BLOCKS = new BlockDeferredRegister(Mod.MODID);
+
+    /**
+     * An orange counterpart to Mekanism's steel casing: a plain decorative building block with no behaviour. The
+     * texture is baked from the steel casing's by {@code scripts/thermal_casing_texture.py}.
+     */
+    public static final BlockRegistryObject<Block, BlockItem> THERMAL_CASING =
+          BLOCKS.register("thermal_casing", BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(3.5F, 9F).sound(SoundType.METAL));
 
     public static final Machine<TileEntityHeatSmelter> HEAT_SMELTER_TYPE = MachineBuilder
           .createMachine(() -> ModTileEntityTypes.HEAT_SMELTER, ModLang.DESCRIPTION_HEAT_SMELTER)

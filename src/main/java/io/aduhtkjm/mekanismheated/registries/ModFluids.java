@@ -68,6 +68,9 @@ public class ModFluids {
     public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ItemChemicalFormulaBucket> MOLTEN_THERMOENERGETIC_ALLOY =
         FLUIDS.register("molten_thermoenergetic_alloy", (fluid, properties) -> new ItemChemicalFormulaBucket(fluid, properties, "Fe-Cu"),
             UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFFFC7E11));
+    public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ItemChemicalFormulaBucket> MOLTEN_CASING_ALLOY =
+        FLUIDS.register("molten_casing_alloy", (fluid, properties) -> new ItemChemicalFormulaBucket(fluid, properties, "Fe-Cu-Os"),
+            UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFFF0973A));
     public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, BucketItem> MOLTEN_INFUSED_ALLOY =
         FLUIDS.register("molten_infused_alloy", renderProperties -> renderProperties.tint(0xFFE64141));
     public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, BucketItem> MOLTEN_REINFORCED_ALLOY =

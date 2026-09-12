@@ -1,0 +1,11 @@
+{
+  "type": "mekanismheated:condensing",
+  "input": {
+    "tag": "c:fluids/molten_thermoenergetic_alloy",
+    "amount": 90
+  },
+  "output": {
+    "item": "mekanismheated:thermoenergetic_alloy_ingot",
+    "count": 1
+  }
+}
