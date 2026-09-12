@@ -12,6 +12,7 @@ import io.aduhtkjm.mekanismheated.tile.TileEntityFusedPipe;
 import io.aduhtkjm.mekanismheated.tile.TileEntityPhaseChangeBlock;
 import io.aduhtkjm.mekanismheated.tile.TileEntityQuenchingEnrichmentChamber;
 import io.aduhtkjm.mekanismheated.tile.TileEntityReactionChamber;
+import io.aduhtkjm.mekanismheated.tile.TileEntityTemperatureController;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityFractionationBlock;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationController;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationValve;
@@ -110,6 +111,14 @@ public class ModTileEntityTypes {
 
     public static final TileEntityTypeRegistryObject<TileEntityAtmosphereHeater> ATMOSPHERE_HEATER = TILE_ENTITY_TYPES
           .mekBuilder(ModBlocks.ATMOSPHERE_HEATER, TileEntityAtmosphereHeater::new)
+          .clientTicker(TileEntityMekanism::tickClient)
+          .serverTicker(TileEntityMekanism::tickServer)
+          .withSimple(Capabilities.CONFIG_CARD)
+          .build();
+
+    //No heat capability is registered: the controller reads its neighbours' heat capacitors, it does not own any.
+    public static final TileEntityTypeRegistryObject<TileEntityTemperatureController> TEMPERATURE_CONTROLLER = TILE_ENTITY_TYPES
+          .mekBuilder(ModBlocks.TEMPERATURE_CONTROLLER, TileEntityTemperatureController::new)
           .clientTicker(TileEntityMekanism::tickClient)
           .serverTicker(TileEntityMekanism::tickServer)
           .withSimple(Capabilities.CONFIG_CARD)

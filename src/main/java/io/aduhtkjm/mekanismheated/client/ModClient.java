@@ -11,6 +11,7 @@ import io.aduhtkjm.mekanismheated.client.gui.machine.GuiPhaseChangeBlock;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiQuenchingEnrichmentChamber;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiReactionChamber;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiShaker;
+import io.aduhtkjm.mekanismheated.client.gui.machine.GuiTemperatureController;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiThermalFractionationController;
 import io.aduhtkjm.mekanismheated.client.renderer.TileEntityHeatSmelterRenderer;
 import io.aduhtkjm.mekanismheated.client.renderer.TileEntityReactionChamberRenderer;
@@ -96,6 +97,7 @@ public class ModClient {
         ClientRegistrationUtil.registerScreen(event, ModContainerTypes.QUENCHING_ENRICHMENT_CHAMBER, GuiQuenchingEnrichmentChamber::new);
         ClientRegistrationUtil.registerScreen(event, ModContainerTypes.REACTION_CHAMBER, GuiReactionChamber::new);
         ClientRegistrationUtil.registerScreen(event, ModContainerTypes.ATMOSPHERE_HEATER, GuiAtmosphereHeater::new);
+        ClientRegistrationUtil.registerScreen(event, ModContainerTypes.TEMPERATURE_CONTROLLER, GuiTemperatureController::new);
         ClientRegistrationUtil.registerScreen(event, ModContainerTypes.PHASE_CHANGE_BLOCK, GuiPhaseChangeBlock::new);
     }
 

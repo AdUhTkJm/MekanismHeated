@@ -15,6 +15,7 @@ import io.aduhtkjm.mekanismheated.block.phasechange.PhaseChangeBlock;
 import io.aduhtkjm.mekanismheated.block.quenchingenrichmentchamber.QuenchingEnrichmentChamberBlock;
 import io.aduhtkjm.mekanismheated.block.reactionchamber.ReactionChamberBlock;
 import io.aduhtkjm.mekanismheated.block.shaker.ShakerBlock;
+import io.aduhtkjm.mekanismheated.block.temperaturecontroller.TemperatureControllerBlock;
 import io.aduhtkjm.mekanismheated.content.phasechange.PhaseChangeTier;
 import io.aduhtkjm.mekanismheated.item.ItemBlockCooler;
 import io.aduhtkjm.mekanismheated.item.ItemBlockFusedPipe;
@@ -29,14 +30,19 @@ import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
 import io.aduhtkjm.mekanismheated.tile.TileEntityPhaseChangeBlock;
 import io.aduhtkjm.mekanismheated.tile.TileEntityQuenchingEnrichmentChamber;
 import io.aduhtkjm.mekanismheated.tile.TileEntityReactionChamber;
+import io.aduhtkjm.mekanismheated.tile.TileEntityTemperatureController;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityFractionationBlock;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationController;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationValve;
+import mekanism.common.block.attribute.AttributeParticleFX;
 import mekanism.common.block.attribute.AttributeSideConfig;
 import mekanism.common.block.attribute.AttributeStateFacing;
 import mekanism.common.block.attribute.AttributeUpgradeSupport;
 import mekanism.common.block.attribute.Attributes;
+import mekanism.common.block.attribute.Attributes.AttributeComparator;
 import mekanism.common.block.attribute.Attributes.AttributeCustomResistance;
+import mekanism.common.block.attribute.Attributes.AttributeInventory;
+import mekanism.common.block.attribute.Attributes.AttributeRedstoneEmitter;
 import mekanism.common.block.prefab.BlockBasicMultiblock;
 import mekanism.common.config.MekanismConfig;
 import mekanism.common.content.blocktype.Machine;
@@ -207,6 +213,22 @@ public class ModBlocks {
 
     public static final BlockRegistryObject<AtmosphereHeaterBlock, BlockItem> ATMOSPHERE_HEATER =
           BLOCKS.register("atmosphere_heater", () -> new AtmosphereHeaterBlock(ATMOSPHERE_HEATER_TYPE, BlockBehaviour.Properties.of().mapColor(MapColor.METAL)));
+
+    //Only the five attributes this block actually uses, plus the redstone emitter that lets a plain BlockTile expose
+    //the controller's output as a signal source (which is what makes BlockTile#isSignalSource true). The inventory,
+    //upgrade, particle and comparator attributes a Machine comes with by default are all removed: the controller has no
+    //slots to configure, nothing to upgrade, and its comparator output would always read 0 because it has no inventory.
+    public static final Machine<TileEntityTemperatureController> TEMPERATURE_CONTROLLER_TYPE = MachineBuilder
+          .createMachine(() -> ModTileEntityTypes.TEMPERATURE_CONTROLLER, ModLang.DESCRIPTION_TEMPERATURE_CONTROLLER)
+          .withGui(() -> ModContainerTypes.TEMPERATURE_CONTROLLER)
+          .without(AttributeInventory.class, AttributeUpgradeSupport.class, AttributeParticleFX.class, AttributeComparator.class)
+          .with(new AttributeRedstoneEmitter<>((tile, side) -> tile.getRedstoneOutput()))
+          .build();
+
+    public static final BlockRegistryObject<TemperatureControllerBlock, ItemBlockTooltip<TemperatureControllerBlock>> TEMPERATURE_CONTROLLER =
+          BLOCKS.register("temperature_controller",
+                () -> new TemperatureControllerBlock(TEMPERATURE_CONTROLLER_TYPE, BlockBehaviour.Properties.of().mapColor(MapColor.METAL)),
+                (block, properties) -> new ItemBlockTooltip<>(block, true, properties));
 
     // Phase-change blocks. The three tiers only differ by melting point (see Config.PhaseChange); the block itself
     // stores the tier, which the shared TileEntityPhaseChangeBlock reads back out of its block state.

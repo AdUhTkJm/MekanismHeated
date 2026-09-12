@@ -60,6 +60,7 @@ public class ModItems {
         output.accept(ModBlocks.QUENCHING_ENRICHMENT_CHAMBER);
         output.accept(ModBlocks.REACTION_CHAMBER);
         output.accept(ModBlocks.ATMOSPHERE_HEATER);
+        output.accept(ModBlocks.TEMPERATURE_CONTROLLER);
         output.accept(ModBlocks.PHASE_CHANGE_LOW);
         output.accept(ModBlocks.PHASE_CHANGE_MEDIUM);
         output.accept(ModBlocks.PHASE_CHANGE_HIGH);

@@ -22,6 +22,7 @@ public enum ModLang implements ILangEntry {
     DESCRIPTION_CREATIVE_HEAT_BLOCK("description", "creative_heat_block"),
     DESCRIPTION_CREATIVE_CHUNK_HEATER("description", "creative_chunk_heater"),
     DESCRIPTION_COOLER("description", "cooler"),
+    DESCRIPTION_TEMPERATURE_CONTROLLER("description", "temperature_controller"),
 
     // Strings used in GUI.
     GUI_ALLOYING("gui", "alloying"),
@@ -45,6 +46,28 @@ public enum ModLang implements ILangEntry {
     REACTION_DURATION("gui", "reaction_duration"),
     ATMOSPHERE_HEATER_REDUCTION("gui", "atmosphere_heater.reduction"),
     ATMOSPHERE_HEATER_CONSUMPTION("gui", "atmosphere_heater.consumption"),
+
+    GUI_TEMPERATURE_CONTROLLER_AMBIENT("gui", "temperature_controller.ambient"),
+    GUI_TEMPERATURE_CONTROLLER_OUTPUT("gui", "temperature_controller.output"),
+    GUI_TEMPERATURE_CONTROLLER_OUTPUT_REDSTONE("gui", "temperature_controller.output.redstone"),
+    GUI_TEMPERATURE_CONTROLLER_STATUS("gui", "temperature_controller.status"),
+    GUI_TEMPERATURE_CONTROLLER_STATUS_OK("gui", "temperature_controller.status.ok"),
+    GUI_TEMPERATURE_CONTROLLER_STATUS_EMPTY("gui", "temperature_controller.status.empty"),
+    GUI_TEMPERATURE_CONTROLLER_STATUS_GATED("gui", "temperature_controller.status.gated"),
+    GUI_TEMPERATURE_CONTROLLER_MODE_ENERGY("gui", "temperature_controller.mode.energy"),
+    GUI_TEMPERATURE_CONTROLLER_MODE_REDSTONE("gui", "temperature_controller.mode.redstone"),
+    GUI_TEMPERATURE_CONTROLLER_MODE_ENERGY_TOOLTIP("gui", "temperature_controller.mode.energy.tooltip"),
+    GUI_TEMPERATURE_CONTROLLER_MODE_REDSTONE_TOOLTIP("gui", "temperature_controller.mode.redstone.tooltip"),
+    GUI_TEMPERATURE_CONTROLLER_INPUT_HINT("gui", "temperature_controller.input_hint"),
+    GUI_TEMPERATURE_CONTROLLER_ERROR_SYNTAX("gui", "temperature_controller.error.syntax"),
+    GUI_TEMPERATURE_CONTROLLER_ERROR_NO_HEAT("gui", "temperature_controller.error.no_heat"),
+    GUI_TEMPERATURE_CONTROLLER_ERROR_NOT_FINITE("gui", "temperature_controller.error.not_finite"),
+    GUI_TEMPERATURE_CONTROLLER_ERROR_UNEXPECTED_CHARACTER("gui", "temperature_controller.error.unexpected_character"),
+    GUI_TEMPERATURE_CONTROLLER_ERROR_UNEXPECTED_TOKEN("gui", "temperature_controller.error.unexpected_token"),
+    GUI_TEMPERATURE_CONTROLLER_ERROR_UNEXPECTED_END("gui", "temperature_controller.error.unexpected_end"),
+    GUI_TEMPERATURE_CONTROLLER_ERROR_UNKNOWN_VARIABLE("gui", "temperature_controller.error.unknown_variable"),
+    GUI_TEMPERATURE_CONTROLLER_ERROR_TOO_DEEP("gui", "temperature_controller.error.too_deep"),
+    GUI_TEMPERATURE_CONTROLLER_ERROR_TOO_LARGE("gui", "temperature_controller.error.too_large"),
 
     // Miscellanous.
     MULTIBLOCK_INVALID_INCOMPLETE_TRAY_LAYER("multiblock", "invalid.incomplete_tray_layer"),

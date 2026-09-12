@@ -111,6 +111,13 @@ public class Config {
         public static ModConfigSpec.IntValue MELT_SAMPLES;
     }
 
+    public static class TemperatureController {
+        public static ModConfigSpec.LongValue MAX_ENERGY_OUTPUT;
+        public static ModConfigSpec.DoubleValue DISPLAY_MIN_TEMPERATURE;
+        public static ModConfigSpec.DoubleValue DISPLAY_MAX_TEMPERATURE;
+        public static ModConfigSpec.IntValue MAX_EXPRESSION_LENGTH;
+    }
+
     public static ModConfigSpec SPEC;
     static {
         BUILDER.push("heatSmelter");
@@ -339,6 +346,21 @@ public class Config {
         AmbientMelting.MELT_SAMPLES = BUILDER
             .comment("How many random positions per hot chunk are checked on each melt pass.")
             .defineInRange("meltSamples", 1, 0, Integer.MAX_VALUE);
+        BUILDER.pop();
+
+        BUILDER.push("temperatureController");
+        TemperatureController.MAX_ENERGY_OUTPUT = BUILDER
+            .comment("Upper clamp on the value the Temperature Controller writes to adjacent coolers and resistive heaters, in the player's configured energy unit per tick. The expression's result is clamped to this range before being converted to Joules.")
+            .defineInRange("maxEnergyOutput", 1_000_000L, 0L, Long.MAX_VALUE);
+        TemperatureController.DISPLAY_MIN_TEMPERATURE = BUILDER
+            .comment("Ambient temperature in Kelvin at or below which the Temperature Controller's front window is entirely unlit.")
+            .defineInRange("displayMinTemperature", 300D, 0D, Double.MAX_VALUE);
+        TemperatureController.DISPLAY_MAX_TEMPERATURE = BUILDER
+            .comment("Ambient temperature in Kelvin at which every row of the Temperature Controller's front window is lit. Must be above displayMinTemperature for the window to light up at all.")
+            .defineInRange("displayMaxTemperature", 1_800D, 0D, Double.MAX_VALUE);
+        TemperatureController.MAX_EXPRESSION_LENGTH = BUILDER
+            .comment("Maximum number of characters the Temperature Controller accepts for its expression, both in the GUI text field and on the server. The expression parser has its own, much larger, safety bounds.")
+            .defineInRange("maxExpressionLength", 256, 1, 1_024);
         BUILDER.pop();
         SPEC = BUILDER.build();
     }

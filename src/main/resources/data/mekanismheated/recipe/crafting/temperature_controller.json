@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "TAT",
+    "SES",
+    "TAT"
+  ],
+  "key": {
+    "A": {
+      "tag": "c:circuits/advanced"
+    },
+    "E": {
+      "item": "mekanism:enrichment_chamber"
+    },
+    "S": {
+      "item": "mekanism:steel_casing"
+    },
+    "T": {
+      "tag": "mekanismheated:thermal_casing"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "mekanismheated:temperature_controller"
+  }
+}

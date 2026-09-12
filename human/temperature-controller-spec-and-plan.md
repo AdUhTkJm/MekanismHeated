@@ -5,9 +5,34 @@
 `TileEntityResistiveHeater` / `Attributes.AttributeRedstoneEmitter` / `Capabilities.HEAT`,
 and the per-chunk ambient feature (`content/ambient/`).*
 
-**Implementation status:** Phase 1 done (2026-09-12) — the expression engine in
-`content/expression/` (nine files). Phases 2–6 not started. Verified standalone under WSL JDK 21 with a 167-check
-harness; no build or test was run under `/mnt`.
+**Implementation status:** Phases 1–4 done — the expression engine in `content/expression/` (nine files, verified
+standalone under WSL JDK 21 with a 167-check harness), the tile + block + registration, the assets and data, and the
+GUI + packets. Phase 5 (front strip renderer) and phase 6 (polish) not started. No build or test has been run under
+`/mnt`; nothing here has been verified in-game yet.
+
+Notes from the phase 2–4 implementation, where the code deliberately differs from the spec below:
+
+- **`T`/side reads are not `tile.getAmbientTemperature(null)`** (§5.2). The controller owns no heat capacitors, so
+  `TileEntityMekanism.getAmbientTemperature` falls through to `ITileHeatHandler`'s default of a constant 300 K, which
+  would silently drop the per-chunk delta. The tile calls `HeatAPI.getAmbientTemp(level, getBlockPos())` directly
+  (which `MixinHeatAPI` patches) and stores the result in `lastAmbientTemperature` once per tick, so all of the
+  expression and the front window see one consistent value.
+- **Side reads go through `WorldUtils.getCapability`,** not `level.getCapability`, so an unloaded neighbour is a
+  clean `NO_HEAT_CAPACITOR` rather than a chunk lookup.
+- **`displayLevel` and its update tag are in the tile already** (spec §5.1 and §5.4 put them in phase 2), so phase 5
+  is only the renderer.
+- **The tile also calls `setActive(isWorking())`.** The spec includes `ACTIVE_LIGHT` and an `active` blockstate
+  variant but never says what drives it; the light now follows "the gate is open, the expression parsed, and it
+  evaluated cleanly".
+- **`redstoneOutput` changes do not `markForSave()`.** The field is not persisted, so the spec's `markForSave()` there
+  would dirty the chunk for nothing.
+- **Three lang keys beyond §9**: `temperature_controller.output.redstone` for the redstone value line, and
+  `temperature_controller.mode.{energy,redstone}.tooltip` for the mode button's tooltip that §6.1 asks for but §9 has
+  no string for.
+- **The status line describes the text in the field**, not the synced expression. They are the same whenever the
+  player is not editing, and this is what makes a typo turn the line red without a round trip (§13 phase 4).
+- **The result must still parse locally for the field to be red**, and the GUI's `Ambient` line shows the synced
+  server value, not a client-side calculation (the client cannot see the chunk delta).
 
 The **Temperature Controller** is a single-block, enrichment-chamber-shaped machine that
 reads the ambient temperature and the temperature of the heat capacitors of the six blocks
@@ -745,21 +770,26 @@ src/main/java/io/aduhtkjm/mekanismheated/
   content/expression/VariableResolver.java         [DONE]
   content/expression/Side.java                     [DONE]
   content/expression/OutputMode.java               [DONE]
-  block/temperaturecontroller/TemperatureControllerBlock.java
-  tile/TileEntityTemperatureController.java
-  client/gui/machine/GuiTemperatureController.java
-  client/renderer/TileEntityTemperatureControllerRenderer.java
-  network/PacketSetTemperatureExpression.java
-  network/PacketSetTemperatureControllerMode.java
+  block/temperaturecontroller/TemperatureControllerBlock.java  [DONE]
+  tile/TileEntityTemperatureController.java                    [DONE]
+  client/gui/machine/GuiTemperatureController.java             [DONE]
+  client/renderer/TileEntityTemperatureControllerRenderer.java  // phase 5
+  network/PacketSetTemperatureExpression.java                  [DONE]
+  network/PacketSetTemperatureControllerMode.java               [DONE]
 
 src/main/resources/assets/mekanismheated/
-  blockstates/temperature_controller.json
-  models/block/temperature_controller.json
-  models/item/temperature_controller.json
+  blockstates/temperature_controller.json                      [DONE]
+  models/block/temperature_controller.json                     [DONE]
+  models/item/temperature_controller.json                      [DONE]
 
-src/main/resources/data/mekanismheated/loot_table/blocks/temperature_controller.json
-src/main/resources/data/mekanismheated/recipe/crafting/temperature_controller.json
+src/main/resources/data/mekanismheated/loot_table/blocks/temperature_controller.json  [DONE]
+src/main/resources/data/mekanismheated/recipe/crafting/temperature_controller.json     [DONE]
 ```
+
+The recipe from §3.3 is implemented as a shaped recipe (`"TAT"/"SES"/"TAT"` with `T` =
+`mekanismheated:thermal_casing`, `A` = `c:circuits/advanced`, `S` = `mekanism:steel_casing` and `E` =
+`mekanism:enrichment_chamber`), which uses all four proposed ingredients and matches the price level of the other
+machines in the mod.
 
 Modified files:
 
@@ -834,10 +864,14 @@ These were not settled by the Q&A; each has a default in this spec, all are chea
 - **Verify (author, in-game):** nothing yet — Phase 1 has no gameplay surface. The engine is exercised for real in
   Phase 2.
 
-### Phase 2 — tile + block + registration, no GUI
+### Phase 2 — tile + block + registration, no GUI — **DONE**
 `TileEntityTemperatureController` (state, tick, `emit`, persistence, config card,
 trackers), `TemperatureControllerBlock`, `TemperatureControllerType`, tile type,
 `Mod.registerPayloadHandlers`.
+- Implemented as specified apart from the deviations listed at the top of this document. The rule from §12 question 3
+  holds: `setControlType(RedstoneControl.HIGH)` in `presetVariables()` runs after `setSupportedTypes` and before
+  `applyImplicitComponents`, and `applyImplicitComponents` defaults to the existing `getControlType()`, so `HIGH`
+  survives placement and the data component round trip.
 - **Verify:** place the block, confirm it renders as an enrichment chamber with the white
   window; `/data get block` shows the expression/mode; a hard-coded `T` drives an adjacent
   cooler (watch its GUI usage) and an adjacent Mekanism resistive heater; the redstone tab
@@ -845,22 +879,26 @@ trackers), `TemperatureControllerBlock`, `TemperatureControllerType`, tile type,
   crash; repeated ticks do not spam chunk saves (check with a debugger or by watching
   `markForSave` indirectly via the neighbour's GUI not flickering).
 
-### Phase 3 — assets
+### Phase 3 — assets — **DONE**
 Blockstate, block/item models, loot table, recipe, creative tab, lang (both files).
 - **Verify:** item appears in the tab with the right name and tooltip description; block
   faces are enrichment-chamber on five sides and ours on the front; rotating with a wrench
   keeps the front correct; breaking drops the block.
 
-### Phase 4 — GUI + packets
+### Phase 4 — GUI + packets — **DONE**
 `GuiTemperatureController`, both payloads, container type, screen registration.
+- The status line, the field colour and the mode button label are refreshed from `containerTick()`, so the field and
+  the status line react to a typo as it is typed. `MAX_EXPRESSION_LENGTH` is applied both in the text field and in
+  `setExpressionFromPacket`.
 - **Verify:** the widened window lines up with the player inventory (slots are where they
   look like they are — this is the classic `offset`/`imageWidth` trap); typing an invalid
   expression turns the status line and the field red without a round-trip; a valid
   expression shows the output; the mode button flips and survives reopening the GUI and a
   world reload; the expression survives reopening; right-click clears the field.
 
-### Phase 5 — front strip renderer
-`TileEntityTemperatureControllerRenderer`, reduced update tag, `computeDisplayLevel`.
+### Phase 5 — front strip renderer — **NOT STARTED**
+`TileEntityTemperatureControllerRenderer` is the only piece left: `displayLevel`, its reduced update tag entry and
+`computeDisplayLevel` are already in the tile (see the top of this document).
 - **Verify:** at 300 K the strip is fully grey; artificially heating the chunk (creative
   chunk heater / `/mekanismheated` chunk-temperature command from `ChunkTemperatureCommand`)
   lights rows bottom-up and the colours sweep green → yellow → orange → red; the display
@@ -868,7 +906,7 @@ Blockstate, block/item models, loot table, recipe, creative tab, lang (both file
   a second player joining (i.e. it comes from `sendUpdatePacket` while the chunk is
   tracked).
 
-### Phase 6 — polish
+### Phase 6 — polish — **NOT STARTED**
 Config card round-trip, `en_us`/`zh_cn` completeness, and optional Jade provider.
 - **Verify:** config card copy/paste moves the expression and mode; no missing lang keys
   (`F3+T` + `en_us` sanity check).

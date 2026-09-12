@@ -7,6 +7,7 @@ import io.aduhtkjm.mekanismheated.tile.TileEntityCooler;
 import io.aduhtkjm.mekanismheated.tile.TileEntityCreativeChunkHeater;
 import io.aduhtkjm.mekanismheated.tile.TileEntityCreativeHeatBlock;
 import io.aduhtkjm.mekanismheated.tile.TileEntityReactionChamber;
+import io.aduhtkjm.mekanismheated.tile.TileEntityTemperatureController;
 import io.aduhtkjm.mekanismheated.tile.TileEntityQuenchingEnrichmentChamber;
 import io.aduhtkjm.mekanismheated.tile.TileEntityShaker;
 import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
@@ -63,4 +64,9 @@ public class ModContainerTypes {
 
     public static final ContainerTypeRegistryObject<MekanismTileContainer<TileEntityAtmosphereHeater>> ATMOSPHERE_HEATER =
           CONTAINER_TYPES.custom(ModBlocks.ATMOSPHERE_HEATER, TileEntityAtmosphereHeater.class).offset(0, 5).build();
+
+    //The GUI is 20 pixels wider than the default and the player inventory is shifted 10 pixels right, so that the two
+    //extra columns of width appear on either side of the slots rather than on one side only.
+    public static final ContainerTypeRegistryObject<MekanismTileContainer<TileEntityTemperatureController>> TEMPERATURE_CONTROLLER =
+          CONTAINER_TYPES.custom("temperature_controller", TileEntityTemperatureController.class).offset(10, 0).build();
 }
