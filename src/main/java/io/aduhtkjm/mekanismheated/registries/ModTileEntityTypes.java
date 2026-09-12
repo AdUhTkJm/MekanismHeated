@@ -9,6 +9,7 @@ import io.aduhtkjm.mekanismheated.tile.TileEntityCreativeHeatBlock;
 import io.aduhtkjm.mekanismheated.tile.TileEntityShaker;
 import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
 import io.aduhtkjm.mekanismheated.tile.TileEntityFusedPipe;
+import io.aduhtkjm.mekanismheated.tile.TileEntityPhaseChangeBlock;
 import io.aduhtkjm.mekanismheated.tile.TileEntityQuenchingEnrichmentChamber;
 import io.aduhtkjm.mekanismheated.tile.TileEntityReactionChamber;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityFractionationBlock;
@@ -112,5 +113,21 @@ public class ModTileEntityTypes {
           .clientTicker(TileEntityMekanism::tickClient)
           .serverTicker(TileEntityMekanism::tickServer)
           .withSimple(Capabilities.CONFIG_CARD)
+          .build();
+
+    //The three phase-change blocks share one tile class; the block they belong to supplies the tier.
+    public static final TileEntityTypeRegistryObject<TileEntityPhaseChangeBlock> PHASE_CHANGE_LOW = TILE_ENTITY_TYPES
+          .mekBuilder(ModBlocks.PHASE_CHANGE_LOW, TileEntityPhaseChangeBlock::new)
+          .serverTicker(TileEntityMekanism::tickServer)
+          .build();
+
+    public static final TileEntityTypeRegistryObject<TileEntityPhaseChangeBlock> PHASE_CHANGE_MEDIUM = TILE_ENTITY_TYPES
+          .mekBuilder(ModBlocks.PHASE_CHANGE_MEDIUM, TileEntityPhaseChangeBlock::new)
+          .serverTicker(TileEntityMekanism::tickServer)
+          .build();
+
+    public static final TileEntityTypeRegistryObject<TileEntityPhaseChangeBlock> PHASE_CHANGE_HIGH = TILE_ENTITY_TYPES
+          .mekBuilder(ModBlocks.PHASE_CHANGE_HIGH, TileEntityPhaseChangeBlock::new)
+          .serverTicker(TileEntityMekanism::tickServer)
           .build();
 }

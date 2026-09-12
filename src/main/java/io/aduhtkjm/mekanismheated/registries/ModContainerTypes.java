@@ -10,6 +10,7 @@ import io.aduhtkjm.mekanismheated.tile.TileEntityReactionChamber;
 import io.aduhtkjm.mekanismheated.tile.TileEntityQuenchingEnrichmentChamber;
 import io.aduhtkjm.mekanismheated.tile.TileEntityShaker;
 import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
+import io.aduhtkjm.mekanismheated.tile.TileEntityPhaseChangeBlock;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationController;
 import mekanism.common.inventory.container.tile.EmptyTileContainer;
 import mekanism.common.inventory.container.tile.MekanismTileContainer;
@@ -37,6 +38,12 @@ public class ModContainerTypes {
 
     public static final ContainerTypeRegistryObject<EmptyTileContainer<TileEntityCreativeChunkHeater>> CREATIVE_CHUNK_HEATER =
           CONTAINER_TYPES.registerEmpty(ModBlocks.CREATIVE_CHUNK_HEATER, TileEntityCreativeChunkHeater.class);
+
+    //One container type serves all three phase-change blocks, as they share a tile class and have no slots. The GUI
+    //title still comes from each block's own name (TileEntityMekanism#getDisplayName uses container.<block>), so the
+    //lang file needs a container.mekanismheated.phase_change_block_<tier> entry for each tier.
+    public static final ContainerTypeRegistryObject<EmptyTileContainer<TileEntityPhaseChangeBlock>> PHASE_CHANGE_BLOCK =
+          CONTAINER_TYPES.registerEmpty("phase_change_block", TileEntityPhaseChangeBlock.class);
 
     public static final ContainerTypeRegistryObject<MekanismTileContainer<TileEntityCooler>> COOLER =
           CONTAINER_TYPES.register(ModBlocks.COOLER, TileEntityCooler.class);

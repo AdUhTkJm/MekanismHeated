@@ -1,10 +1,11 @@
 package io.aduhtkjm.mekanismheated.integration.jei.category;
 
 import io.aduhtkjm.mekanismheated.recipe.AlloyRecipe;
-import mekanism.client.gui.element.GuiUpArrow;
 import mekanism.client.gui.element.gauge.GaugeType;
 import mekanism.client.gui.element.gauge.GuiFluidGauge;
 import mekanism.client.gui.element.gauge.GuiGauge;
+import mekanism.client.gui.element.progress.GuiProgress;
+import mekanism.client.gui.element.progress.ProgressType;
 import mekanism.client.recipe_viewer.jei.HolderRecipeCategory;
 import mekanism.client.recipe_viewer.type.IRecipeViewerRecipeType;
 import mekanism.common.tile.component.config.DataType;
@@ -32,8 +33,7 @@ public class AlloyingRecipeCategory extends HolderRecipeCategory<AlloyRecipe> {
         //Two small gauges rather than full height ones so the pair fits the category's height
         input1 = addElement(GuiFluidGauge.getDummy(GaugeType.SMALL_MED.with(DataType.INPUT_1), this, 30, 17));
         input2 = addElement(GuiFluidGauge.getDummy(GaugeType.SMALL_MED.with(DataType.INPUT_2), this, 50, 17));
-        //Static arrow: alloying has no progress bar of its own, it consumes matching fluids as soon as they are present
-        addElement(new GuiUpArrow(this, 68, 38));
+        addSimpleProgress(ProgressType.BAR, 86, 38);
         output = addElement(GuiFluidGauge.getDummy(GaugeType.STANDARD.with(DataType.OUTPUT), this, 139, 13));
     }
 

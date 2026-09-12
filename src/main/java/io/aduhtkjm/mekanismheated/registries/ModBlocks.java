@@ -11,9 +11,11 @@ import io.aduhtkjm.mekanismheated.block.creative.CreativeChunkHeaterBlock;
 import io.aduhtkjm.mekanismheated.block.creative.CreativeHeatBlock;
 import io.aduhtkjm.mekanismheated.block.fractionation.DistillationTrayBlock;
 import io.aduhtkjm.mekanismheated.block.heatsmelter.HeatSmelterBlock;
+import io.aduhtkjm.mekanismheated.block.phasechange.PhaseChangeBlock;
 import io.aduhtkjm.mekanismheated.block.quenchingenrichmentchamber.QuenchingEnrichmentChamberBlock;
 import io.aduhtkjm.mekanismheated.block.reactionchamber.ReactionChamberBlock;
 import io.aduhtkjm.mekanismheated.block.shaker.ShakerBlock;
+import io.aduhtkjm.mekanismheated.content.phasechange.PhaseChangeTier;
 import io.aduhtkjm.mekanismheated.item.ItemBlockCooler;
 import io.aduhtkjm.mekanismheated.item.ItemBlockFusedPipe;
 import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedPipeConfig;
@@ -24,6 +26,7 @@ import io.aduhtkjm.mekanismheated.tile.TileEntityCreativeChunkHeater;
 import io.aduhtkjm.mekanismheated.tile.TileEntityCreativeHeatBlock;
 import io.aduhtkjm.mekanismheated.tile.TileEntityShaker;
 import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
+import io.aduhtkjm.mekanismheated.tile.TileEntityPhaseChangeBlock;
 import io.aduhtkjm.mekanismheated.tile.TileEntityQuenchingEnrichmentChamber;
 import io.aduhtkjm.mekanismheated.tile.TileEntityReactionChamber;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityFractionationBlock;
@@ -204,4 +207,43 @@ public class ModBlocks {
 
     public static final BlockRegistryObject<AtmosphereHeaterBlock, BlockItem> ATMOSPHERE_HEATER =
           BLOCKS.register("atmosphere_heater", () -> new AtmosphereHeaterBlock(ATMOSPHERE_HEATER_TYPE, BlockBehaviour.Properties.of().mapColor(MapColor.METAL)));
+
+    // Phase-change blocks. The three tiers only differ by melting point (see Config.PhaseChange); the block itself
+    // stores the tier, which the shared TileEntityPhaseChangeBlock reads back out of its block state.
+    public static final Machine<TileEntityPhaseChangeBlock> PHASE_CHANGE_LOW_TYPE = MachineBuilder
+          .createMachine(() -> ModTileEntityTypes.PHASE_CHANGE_LOW, ModLang.DESCRIPTION_PHASE_CHANGE_LOW)
+          .withGui(() -> ModContainerTypes.PHASE_CHANGE_BLOCK)
+          .without(AttributeUpgradeSupport.class)
+          .build();
+
+    public static final Machine<TileEntityPhaseChangeBlock> PHASE_CHANGE_MEDIUM_TYPE = MachineBuilder
+          .createMachine(() -> ModTileEntityTypes.PHASE_CHANGE_MEDIUM, ModLang.DESCRIPTION_PHASE_CHANGE_MEDIUM)
+          .withGui(() -> ModContainerTypes.PHASE_CHANGE_BLOCK)
+          .without(AttributeUpgradeSupport.class)
+          .build();
+
+    public static final Machine<TileEntityPhaseChangeBlock> PHASE_CHANGE_HIGH_TYPE = MachineBuilder
+          .createMachine(() -> ModTileEntityTypes.PHASE_CHANGE_HIGH, ModLang.DESCRIPTION_PHASE_CHANGE_HIGH)
+          .withGui(() -> ModContainerTypes.PHASE_CHANGE_BLOCK)
+          .without(AttributeUpgradeSupport.class)
+          .build();
+
+    public static final BlockRegistryObject<PhaseChangeBlock, ItemBlockTooltip<PhaseChangeBlock>> PHASE_CHANGE_LOW =
+          BLOCKS.register("phase_change_block_low",
+                () -> new PhaseChangeBlock(PhaseChangeTier.LOW, PHASE_CHANGE_LOW_TYPE, phaseChangeProperties(MapColor.COLOR_LIGHT_BLUE)),
+                (block, properties) -> new ItemBlockTooltip<>(block, true, properties));
+
+    public static final BlockRegistryObject<PhaseChangeBlock, ItemBlockTooltip<PhaseChangeBlock>> PHASE_CHANGE_MEDIUM =
+          BLOCKS.register("phase_change_block_medium",
+                () -> new PhaseChangeBlock(PhaseChangeTier.MEDIUM, PHASE_CHANGE_MEDIUM_TYPE, phaseChangeProperties(MapColor.QUARTZ)),
+                (block, properties) -> new ItemBlockTooltip<>(block, true, properties));
+
+    public static final BlockRegistryObject<PhaseChangeBlock, ItemBlockTooltip<PhaseChangeBlock>> PHASE_CHANGE_HIGH =
+          BLOCKS.register("phase_change_block_high",
+                () -> new PhaseChangeBlock(PhaseChangeTier.HIGH, PHASE_CHANGE_HIGH_TYPE, phaseChangeProperties(MapColor.COLOR_ORANGE)),
+                (block, properties) -> new ItemBlockTooltip<>(block, true, properties));
+
+    private static BlockBehaviour.Properties phaseChangeProperties(MapColor mapColor) {
+        return BlockBehaviour.Properties.of().mapColor(mapColor).strength(3.5F, 9F).sound(SoundType.METAL);
+    }
 }

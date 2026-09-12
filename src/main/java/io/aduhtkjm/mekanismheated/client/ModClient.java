@@ -7,6 +7,7 @@ import io.aduhtkjm.mekanismheated.client.gui.machine.GuiCooler;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiCreativeChunkHeater;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiCreativeHeatBlock;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiHeatSmelter;
+import io.aduhtkjm.mekanismheated.client.gui.machine.GuiPhaseChangeBlock;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiQuenchingEnrichmentChamber;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiReactionChamber;
 import io.aduhtkjm.mekanismheated.client.gui.machine.GuiShaker;
@@ -95,6 +96,7 @@ public class ModClient {
         ClientRegistrationUtil.registerScreen(event, ModContainerTypes.QUENCHING_ENRICHMENT_CHAMBER, GuiQuenchingEnrichmentChamber::new);
         ClientRegistrationUtil.registerScreen(event, ModContainerTypes.REACTION_CHAMBER, GuiReactionChamber::new);
         ClientRegistrationUtil.registerScreen(event, ModContainerTypes.ATMOSPHERE_HEATER, GuiAtmosphereHeater::new);
+        ClientRegistrationUtil.registerScreen(event, ModContainerTypes.PHASE_CHANGE_BLOCK, GuiPhaseChangeBlock::new);
     }
 
     @SubscribeEvent

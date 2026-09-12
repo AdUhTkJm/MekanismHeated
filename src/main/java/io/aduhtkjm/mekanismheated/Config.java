@@ -91,6 +91,16 @@ public class Config {
         public static ModConfigSpec.IntValue CHUNK_RADIUS;
     }
 
+    public static class PhaseChange {
+        public static ModConfigSpec.DoubleValue LOW_MELTING_POINT;
+        public static ModConfigSpec.DoubleValue MEDIUM_MELTING_POINT;
+        public static ModConfigSpec.DoubleValue HIGH_MELTING_POINT;
+        public static ModConfigSpec.DoubleValue BUFFER_CAPACITY;
+        public static ModConfigSpec.DoubleValue HEAT_CAPACITY;
+        public static ModConfigSpec.DoubleValue INVERSE_CONDUCTION_COEFFICIENT;
+        public static ModConfigSpec.DoubleValue INVERSE_INSULATION_COEFFICIENT;
+    }
+
     public static class AmbientMelting {
         public static ModConfigSpec.EnumValue<BlockMeltFilter.Mode> MODE;
         public static ModConfigSpec.ConfigValue<List<? extends String>> BLOCKS;
@@ -281,6 +291,30 @@ public class Config {
         AtmosphereHeater.CHUNK_RADIUS = BUILDER
             .comment("Radius in chunks around the machine's own chunk that receive the outer effect. 1 corresponds to a 3x3 chunk area.")
             .defineInRange("chunkRadius", 1, 0, 32);
+        BUILDER.pop();
+
+        BUILDER.push("phaseChange");
+        PhaseChange.LOW_MELTING_POINT = BUILDER
+            .comment("Melting point in Kelvin of the low-temperature phase-change block. Below it the block is an ordinary heat capacitor; at it the block absorbs heat into its latent heat buffer without warming up.")
+            .defineInRange("lowMeltingPoint", 1_000D, 0D, Double.MAX_VALUE);
+        PhaseChange.MEDIUM_MELTING_POINT = BUILDER
+            .comment("Melting point in Kelvin of the medium-temperature phase-change block.")
+            .defineInRange("mediumMeltingPoint", 1_750D, 0D, Double.MAX_VALUE);
+        PhaseChange.HIGH_MELTING_POINT = BUILDER
+            .comment("Melting point in Kelvin of the high-temperature phase-change block.")
+            .defineInRange("highMeltingPoint", 3_000D, 0D, Double.MAX_VALUE);
+        PhaseChange.BUFFER_CAPACITY = BUILDER
+            .comment("Latent heat in Joules every phase-change block can absorb at its melting point before its temperature starts rising again. Shared by all three tiers.")
+            .defineInRange("bufferCapacity", 1_000_000D, 0D, Double.MAX_VALUE);
+        PhaseChange.HEAT_CAPACITY = BUILDER
+            .comment("Heat capacity of the phase-change blocks in J/K, controlling how quickly their temperature changes. Shared by all three tiers. Must be at least one.")
+            .defineInRange("heatCapacity", 100D, 1D, Double.MAX_VALUE);
+        PhaseChange.INVERSE_CONDUCTION_COEFFICIENT = BUILDER
+            .comment("Inverse conduction coefficient of the phase-change blocks, controlling how readily they exchange heat with adjacent blocks (smaller means faster). Shared by all three tiers. Must be at least one.")
+            .defineInRange("inverseConductionCoefficient", 5D, 1D, Double.MAX_VALUE);
+        PhaseChange.INVERSE_INSULATION_COEFFICIENT = BUILDER
+            .comment("Inverse insulation coefficient of the phase-change blocks, controlling how readily they lose heat to the environment (smaller means faster). Shared by all three tiers. Must be at least one.")
+            .defineInRange("inverseInsulationCoefficient", 5D, 1D, Double.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.push("ambientMelting");

@@ -44,6 +44,17 @@ This is a fractionation tower with a creative heat source attached to it.
 
 Like resistive heater, but uses energy to cool things down.
 
+## Phase-Change Blocks
+
+Three heat capacitors that melt at different temperatures (1000 K, 1750 K and 3000 K by default). Below its melting
+point a block behaves like any other heat capacitor, but at the melting point it starts absorbing heat as latent heat
+instead of warming up, until its internal buffer (1,000,000 J by default) is full. After that its temperature rises
+again as normal. When it cools down or gives heat to its neighbours, the buffer is drained first, so the block stays at
+its melting point until the latent heat is gone.
+
+The three tiers differ only in their melting point; the melting points are configurable, and the buffer size and
+thermal properties are shared by all three (see the `phaseChange` config section).
+
 ## Shaker
 
 A normal Mekanism-like machine that produces chemical instances (Fe2O3, SnO2, CuO etc) from cobblestone, gravel, sand or clay. These are then fed into other machines to extract ingots. In Create you can get iron and gold out of cobblestone, so why in Mekanism you can't?

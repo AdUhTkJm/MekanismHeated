@@ -2,12 +2,15 @@
   "type": "minecraft:crafting_shaped",
   "pattern": [
     " C ",
-    "CEC",
+    "SES",
     " C "
   ],
   "key": {
     "C": {
       "item": "mekanismheated:cooler"
+    },
+    "S": {
+      "item": "mekanismheated:thermal_casing"
     },
     "E": {
       "item": "mekanism:enrichment_chamber"
