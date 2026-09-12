@@ -1,0 +1,19 @@
+{
+  "type": "mekanism:rotary",
+  "chemical_input": {
+    "amount": 1,
+    "chemical": "mekanismheated:gas_methanol"
+  },
+  "chemical_output": {
+    "amount": 1,
+    "id": "mekanismheated:gas_methanol"
+  },
+  "fluid_input": {
+    "amount": 1,
+    "fluid": "mekanismheated:methanol"
+  },
+  "fluid_output": {
+    "amount": 1,
+    "id": "mekanismheated:methanol"
+  }
+}

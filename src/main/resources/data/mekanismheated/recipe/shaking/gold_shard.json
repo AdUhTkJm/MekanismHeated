@@ -1,0 +1,14 @@
+{
+  "type": "mekanismheated:shaking",
+  "input": {
+    "item": "mekanismheated:osmium_obsidian_dust",
+    "count": 1
+  },
+  "output": [{
+    "id": "mekanism:dust_obsidian",
+    "count": 1
+  }, {
+    "id": "mekanism:shard_osmium",
+    "count": 1
+  }]
+}

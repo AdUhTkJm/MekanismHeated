@@ -53,8 +53,10 @@ TEXTURE_SIZE = 16
 INGOTS = {
     "iron": ("vanilla", "iron_ingot.png"),
     "copper": ("vanilla", "copper_ingot.png"),
+    "gold": ("vanilla", "gold_ingot.png"),
     "tin": ("mekanism", "ingot_tin.png"),
     "osmium": ("mekanism", "ingot_osmium.png"),
+    "lead": ("mekanism", "ingot_lead.png"),
 }
 
 

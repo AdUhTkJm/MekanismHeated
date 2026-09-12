@@ -1,0 +1,15 @@
+{
+  "type": "mekanismheated:quenching",
+  "input": {
+    "tag": "c:raw_materials/gold",
+    "count": 1
+  },
+  "fluid_input": {
+    "fluid": "mekanismheated:unstable_lava",
+    "amount": 90
+  },
+  "output": {
+    "fluid": "mekanismheated:unstable_lava_gold",
+    "amount": 90
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "type": "mekanismheated:condensing",
+  "input": {
+    "fluid": "mekanismheated:unstable_lava_tin",
+    "amount": 15
+  },
+  "item_input": {
+    "item": "minecraft:ice",
+    "count": 1
+  },
+  "output": {
+    "item": "mekanismheated:tin_obsidian_dust",
+    "count": 1
+  }
+}
