@@ -1,33 +1,33 @@
 {
   "variants": {
     "facing=north,active=false": {
-      "model": "mekanismheated:block/atmomsphere_heater"
+      "model": "mekanismheated:block/atmosphere_heater"
     },
     "facing=south,active=false": {
-      "model": "mekanismheated:block/atmomsphere_heater",
+      "model": "mekanismheated:block/atmosphere_heater",
       "y": 180
     },
     "facing=east,active=false": {
-      "model": "mekanismheated:block/atmomsphere_heater",
+      "model": "mekanismheated:block/atmosphere_heater",
       "y": 90
     },
     "facing=west,active=false": {
-      "model": "mekanismheated:block/atmomsphere_heater",
+      "model": "mekanismheated:block/atmosphere_heater",
       "y": -90
     },
     "facing=north,active=true": {
-      "model": "mekanismheated:block/atmomsphere_heater_active"
+      "model": "mekanismheated:block/atmosphere_heater_active"
     },
     "facing=south,active=true": {
-      "model": "mekanismheated:block/atmomsphere_heater_active",
+      "model": "mekanismheated:block/atmosphere_heater_active",
       "y": 180
     },
     "facing=east,active=true": {
-      "model": "mekanismheated:block/atmomsphere_heater_active",
+      "model": "mekanismheated:block/atmosphere_heater_active",
       "y": 90
     },
     "facing=west,active=true": {
-      "model": "mekanismheated:block/atmomsphere_heater_active",
+      "model": "mekanismheated:block/atmosphere_heater_active",
       "y": -90
     }
   }

@@ -1,7 +1,7 @@
 {
   "type": "mekanismheated:condensing",
   "input": {
-    "fluid": "mekanismheated:fe2o3_slurry",
+    "fluid": "mekanismheated:slurry_fe2o3",
     "amount": 90
   },
   "output": {
