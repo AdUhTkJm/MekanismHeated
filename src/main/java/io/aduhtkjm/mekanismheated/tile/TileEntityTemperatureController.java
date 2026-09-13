@@ -75,11 +75,9 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
     /**
      * The text {@link #compiled} was built from, while {@link #expression} is the current expression. <p>
      *
-     * When they're different then we rebuild. <p>
-     *
-     * We must rebuild when the block is placed, to ensure the `lastAmbientTemperature` gets updated properly.
+     * When they're different then we rebuild.
      */
-    private HashedString compiledFrom = new HashedString("_");
+    private HashedString compiledFrom = new HashedString("");
 
     private OutputMode outputMode = OutputMode.REDSTONE;
     private ExpressionRuntimeError runtimeError = ExpressionRuntimeError.NONE;
@@ -108,6 +106,11 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
 
     public TileEntityTemperatureController(BlockPos pos, BlockState state) {
         super(ModBlocks.TEMPERATURE_CONTROLLER, pos, state);
+        updateLastAmbientTemperature(getLevel());
+    }
+
+    private void updateLastAmbientTemperature(@Nullable Level level) {
+        lastAmbientTemperature = level == null ? HeatAPI.AMBIENT_TEMP : HeatAPI.getAmbientTemp(level, getBlockPos());
     }
 
     @Override
@@ -126,10 +129,7 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
         ticks = Config.TemperatureController.INTERVAL.get();
 
         // Evaluate and emit.
-        // The ambient temperature is read out of the world once per tick and reused by every T in the expression, and
-        // it is also what the front window displays, so it is needed whether or not the expression is evaluated.
-        Level world = getLevel();
-        lastAmbientTemperature = world == null ? HeatAPI.AMBIENT_TEMP : HeatAPI.getAmbientTemp(world, getBlockPos());
+        updateLastAmbientTemperature(getLevel());
         double value = 0;
         runtimeError = ExpressionRuntimeError.NONE;
         errorSide = null;
