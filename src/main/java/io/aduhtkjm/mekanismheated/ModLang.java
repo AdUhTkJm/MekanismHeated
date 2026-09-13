@@ -54,6 +54,7 @@ public enum ModLang implements ILangEntry {
     GUI_TEMPERATURE_CONTROLLER_STATUS_OK("gui", "temperature_controller.status.ok"),
     GUI_TEMPERATURE_CONTROLLER_STATUS_EMPTY("gui", "temperature_controller.status.empty"),
     GUI_TEMPERATURE_CONTROLLER_STATUS_GATED("gui", "temperature_controller.status.gated"),
+    GUI_TEMPERATURE_CONTROLLER_MODE("gui", "temperature_controller.mode"),
     GUI_TEMPERATURE_CONTROLLER_MODE_ENERGY("gui", "temperature_controller.mode.energy"),
     GUI_TEMPERATURE_CONTROLLER_MODE_REDSTONE("gui", "temperature_controller.mode.redstone"),
     GUI_TEMPERATURE_CONTROLLER_MODE_ENERGY_TOOLTIP("gui", "temperature_controller.mode.energy.tooltip"),

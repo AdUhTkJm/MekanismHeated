@@ -16,6 +16,7 @@ import io.aduhtkjm.mekanismheated.client.gui.machine.GuiThermalFractionationCont
 import io.aduhtkjm.mekanismheated.client.renderer.TileEntityHeatSmelterRenderer;
 import io.aduhtkjm.mekanismheated.client.renderer.TileEntityReactionChamberRenderer;
 import io.aduhtkjm.mekanismheated.client.renderer.TileEntityShakerRenderer;
+import io.aduhtkjm.mekanismheated.client.renderer.TileEntityTemperatureControllerRenderer;
 import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedPipeConfig;
 import io.aduhtkjm.mekanismheated.content.unstablelava.UnstableLavaVariant;
 import io.aduhtkjm.mekanismheated.item.*;
@@ -106,6 +107,7 @@ public class ModClient {
         event.registerBlockEntityRenderer(ModTileEntityTypes.HEAT_SMELTER.get(), TileEntityHeatSmelterRenderer::new);
         event.registerBlockEntityRenderer(ModTileEntityTypes.REACTION_CHAMBER.get(), TileEntityReactionChamberRenderer::new);
         event.registerBlockEntityRenderer(ModTileEntityTypes.SHAKER.get(), TileEntityShakerRenderer::new);
+        event.registerBlockEntityRenderer(ModTileEntityTypes.TEMPERATURE_CONTROLLER.get(), TileEntityTemperatureControllerRenderer::new);
     }
 
     @SubscribeEvent

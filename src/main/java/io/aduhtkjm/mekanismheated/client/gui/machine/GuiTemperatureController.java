@@ -2,11 +2,11 @@ package io.aduhtkjm.mekanismheated.client.gui.machine;
 
 import io.aduhtkjm.mekanismheated.Config;
 import io.aduhtkjm.mekanismheated.ModLang;
+import io.aduhtkjm.mekanismheated.client.TemperatureControllerText;
 import io.aduhtkjm.mekanismheated.content.expression.ExpressionParseException;
 import io.aduhtkjm.mekanismheated.content.expression.ExpressionParser;
 import io.aduhtkjm.mekanismheated.content.expression.ExpressionRuntimeError;
 import io.aduhtkjm.mekanismheated.content.expression.OutputMode;
-import io.aduhtkjm.mekanismheated.content.expression.Side;
 import io.aduhtkjm.mekanismheated.network.PacketSetTemperatureControllerMode;
 import io.aduhtkjm.mekanismheated.network.PacketSetTemperatureExpression;
 import io.aduhtkjm.mekanismheated.tile.TileEntityTemperatureController;
@@ -22,7 +22,6 @@ import mekanism.common.inventory.container.tile.MekanismTileContainer;
 import mekanism.common.network.PacketUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.UnitDisplayUtils.TemperatureUnit;
-import mekanism.common.util.text.EnergyDisplay;
 import mekanism.common.util.text.InputValidator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
@@ -132,18 +131,9 @@ public class GuiTemperatureController extends GuiMekanismTile<TileEntityTemperat
         return List.of(
               ModLang.GUI_TEMPERATURE_CONTROLLER_AMBIENT.translate(
                     MekanismUtils.getTemperatureDisplay(tile.getLastAmbientTemperature(), TemperatureUnit.KELVIN, true)),
-              outputLine(),
+              TemperatureControllerText.output(tile.getOutputMode(), tile.getLastOutput()),
               statusLine()
         );
-    }
-
-    private Component outputLine() {
-        if (tile.getOutputMode() == OutputMode.ENERGY) {
-            long joules = MekanismUtils.convertToJoules(TileEntityTemperatureController.clampToEnergyUsage(tile.getLastOutput()));
-            return ModLang.GUI_TEMPERATURE_CONTROLLER_OUTPUT.translate(EnergyDisplay.of(joules));
-        }
-        return ModLang.GUI_TEMPERATURE_CONTROLLER_OUTPUT.translate(ModLang.GUI_TEMPERATURE_CONTROLLER_OUTPUT_REDSTONE.translate(
-              TileEntityTemperatureController.clampToSignal(tile.getLastOutput())));
     }
 
     /**
@@ -153,46 +143,22 @@ public class GuiTemperatureController extends GuiMekanismTile<TileEntityTemperat
     private Component statusLine() {
         String expression = expressionField.getText();
         if (expression.isEmpty()) {
-            return status(colored(ModLang.GUI_TEMPERATURE_CONTROLLER_STATUS_EMPTY.translate(), ChatFormatting.YELLOW));
+            return status(TemperatureControllerText.colored(ModLang.GUI_TEMPERATURE_CONTROLLER_STATUS_EMPTY.translate(), ChatFormatting.YELLOW));
         }
         ExpressionParseException error = parseError(expression);
         if (error != null) {
-            return status(colored(ModLang.GUI_TEMPERATURE_CONTROLLER_ERROR_SYNTAX.translate(error.column(), describe(error)), ChatFormatting.RED));
+            return status(TemperatureControllerText.parseError(error));
         }
         return switch (tile.getRuntimeError()) {
-            case NO_HEAT_CAPACITOR -> {
-                Side side = tile.getErrorSide();
-                //The tile only ever reports this kind together with the side it applies to; the placeholder keeps a
-                //corrupt sync from taking the GUI down.
-                yield status(colored(ModLang.GUI_TEMPERATURE_CONTROLLER_ERROR_NO_HEAT.translate(side == null ? "?" : side.displayName()), ChatFormatting.RED));
-            }
-            case RESULT_NOT_FINITE -> status(colored(ModLang.GUI_TEMPERATURE_CONTROLLER_ERROR_NOT_FINITE.translate(), ChatFormatting.RED));
+            case NO_HEAT_CAPACITOR, RESULT_NOT_FINITE -> status(TemperatureControllerText.runtimeError(tile.getRuntimeError(), tile.getErrorSide()));
             case NONE -> tile.isRedstoneActivated()
-                  ? status(colored(ModLang.GUI_TEMPERATURE_CONTROLLER_STATUS_OK.translate(), ChatFormatting.GREEN))
-                  : status(colored(ModLang.GUI_TEMPERATURE_CONTROLLER_STATUS_GATED.translate(), ChatFormatting.YELLOW));
+                  ? status(TemperatureControllerText.colored(ModLang.GUI_TEMPERATURE_CONTROLLER_STATUS_OK.translate(), ChatFormatting.GREEN))
+                  : status(TemperatureControllerText.colored(ModLang.GUI_TEMPERATURE_CONTROLLER_STATUS_GATED.translate(), ChatFormatting.YELLOW));
         };
     }
 
     private static Component status(Component status) {
         return ModLang.GUI_TEMPERATURE_CONTROLLER_STATUS.translate(status);
-    }
-
-    /**
-     * Explains a parse failure using the client's own language, from the kind, column and offending text of the
-     * exception.
-     */
-    private static Component describe(ExpressionParseException error) {
-        ModLang message = switch (error.kind()) {
-            case UNEXPECTED_CHARACTER -> ModLang.GUI_TEMPERATURE_CONTROLLER_ERROR_UNEXPECTED_CHARACTER;
-            case UNEXPECTED_TOKEN -> ModLang.GUI_TEMPERATURE_CONTROLLER_ERROR_UNEXPECTED_TOKEN;
-            case UNEXPECTED_END -> ModLang.GUI_TEMPERATURE_CONTROLLER_ERROR_UNEXPECTED_END;
-            case UNKNOWN_VARIABLE -> ModLang.GUI_TEMPERATURE_CONTROLLER_ERROR_UNKNOWN_VARIABLE;
-            case TOO_DEEP -> ModLang.GUI_TEMPERATURE_CONTROLLER_ERROR_TOO_DEEP;
-            case TOO_LARGE -> ModLang.GUI_TEMPERATURE_CONTROLLER_ERROR_TOO_LARGE;
-        };
-        //The kinds that have no detail of their own have no placeholder in their message either, so the empty string
-        //is simply unused.
-        return message.translate(error.detail());
     }
 
     /**
@@ -211,10 +177,6 @@ public class GuiTemperatureController extends GuiMekanismTile<TileEntityTemperat
             }
         }
         return parseError;
-    }
-
-    private static Component colored(Component component, ChatFormatting color) {
-        return component.copy().withStyle(color);
     }
 
     private static Component modeLabel(OutputMode mode) {
