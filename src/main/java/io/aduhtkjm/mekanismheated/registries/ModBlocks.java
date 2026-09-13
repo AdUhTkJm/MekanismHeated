@@ -17,7 +17,6 @@ import io.aduhtkjm.mekanismheated.block.reactionchamber.ReactionChamberBlock;
 import io.aduhtkjm.mekanismheated.block.shaker.ShakerBlock;
 import io.aduhtkjm.mekanismheated.block.temperaturecontroller.TemperatureControllerBlock;
 import io.aduhtkjm.mekanismheated.content.phasechange.PhaseChangeTier;
-import io.aduhtkjm.mekanismheated.item.ItemBlockCooler;
 import io.aduhtkjm.mekanismheated.item.ItemBlockFusedPipe;
 import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedPipeConfig;
 import io.aduhtkjm.mekanismheated.tile.TileEntityAtmosphereHeater;
@@ -163,9 +162,8 @@ public class ModBlocks {
           .withEnergyConfig(() -> TileEntityCooler.BASE_USAGE, null)
           .build();
 
-    public static final BlockRegistryObject<CoolerBlock, ItemBlockCooler> COOLER =
-          BLOCKS.register("cooler", () -> new CoolerBlock(COOLER_TYPE, BlockBehaviour.Properties.of().mapColor(MapColor.METAL)),
-              ItemBlockCooler::new);
+    public static final BlockRegistryObject<CoolerBlock, BlockItem> COOLER =
+          BLOCKS.register("cooler", () -> new CoolerBlock(COOLER_TYPE, BlockBehaviour.Properties.of().mapColor(MapColor.METAL)));
 
     public static final Machine<TileEntityCondenser> CONDENSER_TYPE = MachineBuilder
           .createMachine(() -> ModTileEntityTypes.CONDENSER, ModLang.DESCRIPTION_CONDENSER)

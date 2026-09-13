@@ -68,7 +68,7 @@ public class TileEntityAtmosphereHeater extends TileEntityConfigurableMachine {
     private InputInventorySlot inputSlot;
 
     /** Counts ticks towards the next work cycle. */
-    private int tickCounter;
+    private int ticks;
 
     /** Energy-consumption reduction (FE/t) applied during the last completed work cycle, for display/debug purposes. */
     private long reduction;
@@ -189,8 +189,8 @@ public class TileEntityAtmosphereHeater extends TileEntityConfigurableMachine {
     protected boolean onUpdateServer() {
         boolean sendUpdatePacket = super.onUpdateServer();
         if (level instanceof ServerLevel serverLevel) {
-            if (++tickCounter >= INTERVAL) {
-                tickCounter = 0;
+            if (++ticks >= INTERVAL) {
+                ticks = 0;
                 setActive(doWork(serverLevel));
             }
         }

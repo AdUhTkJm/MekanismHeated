@@ -1,6 +1,7 @@
 package io.aduhtkjm.mekanismheated.client.gui.machine;
 
 import io.aduhtkjm.mekanismheated.ModLang;
+import io.aduhtkjm.mekanismheated.network.PacketCoolerSetEnergy;
 import io.aduhtkjm.mekanismheated.tile.TileEntityCooler;
 import java.util.List;
 import mekanism.client.gui.GuiMekanismTile;
@@ -14,7 +15,6 @@ import mekanism.common.capabilities.energy.MachineEnergyContainer;
 import mekanism.common.inventory.container.tile.MekanismTileContainer;
 import mekanism.common.inventory.warning.IWarningTracker;
 import mekanism.common.inventory.warning.WarningTracker.WarningType;
-import io.aduhtkjm.mekanismheated.network.PacketCoolerSetEnergy;
 import mekanism.common.network.PacketUtils;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.UnitDisplayUtils.TemperatureUnit;

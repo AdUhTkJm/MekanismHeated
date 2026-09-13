@@ -66,6 +66,7 @@ public class Config {
     }
 
     public static class Cooler {
+        public static ModConfigSpec.LongValue MAX_ENERGY;
         public static ModConfigSpec.DoubleValue EFFICIENCY;
         public static ModConfigSpec.DoubleValue HEAT_CAPACITY;
         public static ModConfigSpec.DoubleValue INVERSE_CONDUCTION_COEFFICIENT;
@@ -130,28 +131,28 @@ public class Config {
             .defineInRange("fluidCapacity", 36, 1, Integer.MAX_VALUE);
         HeatSmelter.FULL_SPEED_TEMPERATURE = BUILDER
             .comment("Temperature in Kelvin the Heat Smelter must reach to process recipes at 100% base speed.")
-            .defineInRange("fullSpeedTemperature", 1_000D, 0D, Double.MAX_VALUE);
+            .defineInRange("fullSpeedTemperature", 1000, 0, Double.MAX_VALUE);
         HeatSmelter.BASE_TEMPERATURE = BUILDER
             .comment("Temperature in Kelvin below which the Heat Smelter cannot process recipes.")
-            .defineInRange("baseTemperature", 300D, 0D, Double.MAX_VALUE);
+            .defineInRange("baseTemperature", 300, 0, Double.MAX_VALUE);
         HeatSmelter.HEAT_CAPACITY = BUILDER
-            .comment("Heat capacity of the Heat Smelter in J/K, controlling how quickly its temperature changes. Must be at least one.")
-            .defineInRange("heatCapacity", 50D, 1D, Double.MAX_VALUE);
+            .comment("Heat capacity of the Heat Smelter in J/K, controlling how quickly its temperature changes.")
+            .defineInRange("heatCapacity", 50, 1, Double.MAX_VALUE);
         HeatSmelter.INVERSE_CONDUCTION_COEFFICIENT = BUILDER
-            .comment("Inverse conduction coefficient of the Heat Smelter, controlling how readily it exchanges heat with adjacent blocks (smaller means slower). Must be at least one.")
-            .defineInRange("inverseConductionCoefficient", 5D, 1D, Double.MAX_VALUE);
+            .comment("Inverse conduction coefficient of the Heat Smelter, controlling how readily it exchanges heat with adjacent blocks.")
+            .defineInRange("inverseConductionCoefficient", 5, 1, Double.MAX_VALUE);
         HeatSmelter.INVERSE_INSULATION_COEFFICIENT = BUILDER
-            .comment("Inverse insulation coefficient of the Heat Smelter, controlling how readily it loses heat to the environment (smaller means slower). Must be at least one.")
-            .defineInRange("inverseInsulationCoefficient", 3D, 1D, Double.MAX_VALUE);
+            .comment("Inverse insulation coefficient of the Heat Smelter, controlling how readily it loses heat to the environment.")
+            .defineInRange("inverseInsulationCoefficient", 3, 1, Double.MAX_VALUE);
         HeatSmelter.MAX_FUEL_TEMPERATURE = BUILDER
             .comment("Temperature in Kelvin at which the Heat Smelter stops burning fuel. Note the temperature can be raised by, e.g., resistive heaters beyond this point.")
-            .defineInRange("maxFuelTemperature", 1_000D, 0D, Double.MAX_VALUE);
+            .defineInRange("maxFuelTemperature", 1000, 0, Double.MAX_VALUE);
         HeatSmelter.HEAT_PER_SMELT = BUILDER
             .comment("Total heat consumed by the Heat Smelter per plain smelting recipe (spread over the recipe's processing ticks). Heated smelting and melting recipes can override their heat cost via their recipe's optional \"heat\" field; omitted values fall back to this.")
-            .defineInRange("heatPerSmelt", 120D, 0D, Double.MAX_VALUE);
+            .defineInRange("heatPerSmelt", 120, 0, Double.MAX_VALUE);
         HeatSmelter.MAX_HEAT_MULTIPLIER = BUILDER
             .comment("Cap on the large heat smelter's parallel processing heat multiplier. A batch of operations costs sqrt(operationCount)x one operation's heat (e.g. 8 operations cost sqrt(8)x, 64 operations cost 8x), making a large smelter more heat-efficient than the equivalent number of separate smelters. This caps the multiplier: 8 corresponds to sqrt(64), so structures larger than 64 blocks stop paying more heat while still processing everything at once.")
-            .defineInRange("maxHeatMultiplier", 8D, 1D, Double.MAX_VALUE);
+            .defineInRange("maxHeatMultiplier", 8, 1, Double.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.push("shaker");
@@ -175,19 +176,19 @@ public class Config {
             .defineInRange("fluidCapacity", 10, 1, Integer.MAX_VALUE);
         Condenser.MAX_TEMPERATURE = BUILDER
             .comment("Temperature in Kelvin at which the Condenser cannot process recipes (0% speed).")
-            .defineInRange("maxTemperature", 500D, 0D, Double.MAX_VALUE);
+            .defineInRange("maxTemperature", 500, 0, Double.MAX_VALUE);
         Condenser.FULL_SPEED_TEMPERATURE = BUILDER
             .comment("Temperature in Kelvin at which the Condenser processes recipes at 100% base speed.")
-            .defineInRange("fullSpeedTemperature", 100D, 0D, Double.MAX_VALUE);
+            .defineInRange("fullSpeedTemperature", 100, 0, Double.MAX_VALUE);
         Condenser.HEAT_CAPACITY = BUILDER
-            .comment("Heat capacity of the Condenser in J/K, controlling how quickly its temperature changes. Must be at least one.")
-            .defineInRange("heatCapacity", 50D, 1D, Double.MAX_VALUE);
+            .comment("Heat capacity of the Condenser in J/K, controlling how quickly its temperature changes.")
+            .defineInRange("heatCapacity", 50, 1, Double.MAX_VALUE);
         Condenser.INVERSE_CONDUCTION_COEFFICIENT = BUILDER
-            .comment("Inverse conduction coefficient of the Condenser, controlling how readily it exchanges heat with adjacent blocks (smaller means faster). Must be at least one.")
-            .defineInRange("inverseConductionCoefficient", 5D, 1D, Double.MAX_VALUE);
+            .comment("Inverse conduction coefficient of the Condenser, controlling how readily it exchanges heat with adjacent blocks.")
+            .defineInRange("inverseConductionCoefficient", 5, 1, Double.MAX_VALUE);
         Condenser.INVERSE_INSULATION_COEFFICIENT = BUILDER
-            .comment("Inverse insulation coefficient of the Condenser, controlling how readily it exchanges heat with the environment (smaller means faster). Must be at least one.")
-            .defineInRange("inverseInsulationCoefficient", 5D, 1D, Double.MAX_VALUE);
+            .comment("Inverse insulation coefficient of the Condenser, controlling how readily it exchanges heat with the environment.")
+            .defineInRange("inverseInsulationCoefficient", 5, 1, Double.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.push("quenchingEnrichmentChamber");
@@ -216,11 +217,11 @@ public class Config {
             .comment("Fluid capacity in mB each interior block of height contributes to the feed sump or an output bank.")
             .defineInRange("fluidPerLayer", 10_000, 1, Integer.MAX_VALUE);
         Fractionation.HEAT_CAPACITY_PER_HEIGHT = BUILDER
-            .comment("Heat capacity in J/K added per block of tower height. Must be at least one.")
-            .defineInRange("heatCapacityPerHeight", 100D, 1D, Double.MAX_VALUE);
+            .comment("Heat capacity in J/K added per block of tower height.")
+            .defineInRange("heatCapacityPerHeight", 100, 1, Double.MAX_VALUE);
         Fractionation.HEAT_DISSIPATION = BUILDER
             .comment("Coefficient controlling how quickly the tower loses heat to the environment (larger means faster loss). Must be positive.")
-            .defineInRange("heatDissipation", 1.0E-6D, 0D, Double.MAX_VALUE);
+            .defineInRange("heatDissipation", 1.0E-6, 0, Double.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.push("fusedNetwork");
@@ -242,18 +243,21 @@ public class Config {
         BUILDER.pop();
 
         BUILDER.push("cooler");
+        Cooler.MAX_ENERGY = BUILDER
+            .comment("Maximum amount of energy the cooler can hold in Joules.")
+            .defineInRange("maxenergy", 1_000_000, 1, Long.MAX_VALUE);
         Cooler.EFFICIENCY = BUILDER
             .comment("Heat pump coefficient of performance (COP). Heat moved per joule of energy consumed.")
-            .defineInRange("efficiency", 2.0D, 0, Double.MAX_VALUE);
+            .defineInRange("efficiency", 2.0, 0, Double.MAX_VALUE);
         Cooler.HEAT_CAPACITY = BUILDER
-            .comment("Heat capacity of the Cooler in J/K, controlling how quickly its temperature changes. Must be at least one.")
-            .defineInRange("heatCapacity", 100D, 1D, Double.MAX_VALUE);
+            .comment("Heat capacity of the Cooler in J/K, controlling how quickly its temperature changes.")
+            .defineInRange("heatCapacity", 100, 1, Double.MAX_VALUE);
         Cooler.INVERSE_CONDUCTION_COEFFICIENT = BUILDER
-            .comment("Inverse conduction coefficient of the Cooler, controlling how readily it exchanges heat with adjacent blocks (smaller means faster). Must be at least one.")
-            .defineInRange("inverseConductionCoefficient", 5D, 1D, Double.MAX_VALUE);
+            .comment("Inverse conduction coefficient of the Cooler, controlling how readily it exchanges heat with adjacent blocks.")
+            .defineInRange("inverseConductionCoefficient", 5, 1, Double.MAX_VALUE);
         Cooler.INVERSE_INSULATION_COEFFICIENT = BUILDER
-            .comment("Inverse insulation coefficient of the Cooler, controlling how readily it loses heat to the environment (smaller means slower). Must be at least one.")
-            .defineInRange("inverseInsulationCoefficient", 10D, 1D, Double.MAX_VALUE);
+            .comment("Inverse insulation coefficient of the Cooler, controlling how readily it loses heat to the environment.")
+            .defineInRange("inverseInsulationCoefficient", 10, 1, Double.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.push("reactionChamber");
@@ -264,14 +268,14 @@ public class Config {
             .comment("The total capacity of the reaction chamber's mixed fluid/chemical buffer, in buckets. Fluids and chemicals share this pool.")
             .defineInRange("capacity", 16, 1, Integer.MAX_VALUE);
         ReactionChamber.HEAT_CAPACITY = BUILDER
-            .comment("Heat capacity of the reaction chamber in J/K, controlling how quickly its temperature changes. Must be at least one.")
-            .defineInRange("heatCapacity", 100D, 1D, Double.MAX_VALUE);
+            .comment("Heat capacity of the reaction chamber in J/K, controlling how quickly its temperature changes.")
+            .defineInRange("heatCapacity", 100, 1, Double.MAX_VALUE);
         ReactionChamber.INVERSE_CONDUCTION_COEFFICIENT = BUILDER
-            .comment("Inverse conduction coefficient of the reaction chamber, controlling how readily it exchanges heat with adjacent blocks (smaller means slower). Must be at least one.")
-            .defineInRange("inverseConductionCoefficient", 5D, 1D, Double.MAX_VALUE);
+            .comment("Inverse conduction coefficient of the reaction chamber, controlling how readily it exchanges heat with adjacent blocks.")
+            .defineInRange("inverseConductionCoefficient", 5, 1, Double.MAX_VALUE);
         ReactionChamber.INVERSE_INSULATION_COEFFICIENT = BUILDER
-            .comment("Inverse insulation coefficient of the reaction chamber, controlling how readily it loses heat to the environment (smaller means slower). Must be at least one.")
-            .defineInRange("inverseInsulationCoefficient", 5D, 1D, Double.MAX_VALUE);
+            .comment("Inverse insulation coefficient of the reaction chamber, controlling how readily it loses heat to the environment.")
+            .defineInRange("inverseInsulationCoefficient", 5, 1, Double.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.push("atmosphereHeater");
@@ -286,16 +290,16 @@ public class Config {
             .defineInRange("maxEnergy", 1_000_000, 0, Long.MAX_VALUE);
         AtmosphereHeater.BASE_TEMP_RISE = BUILDER
             .comment("Ambient temperature rise in Kelvin per work cycle at 0 K ambient, following dT = baseTempRise / 2^(T / temperatureScale) where T is the current effective ambient temperature in Kelvin.")
-            .defineInRange("baseTempRise", 5D, 0D, Double.MAX_VALUE);
+            .defineInRange("baseTempRise", 5, 0, Double.MAX_VALUE);
         AtmosphereHeater.TEMPERATURE_SCALE = BUILDER
             .comment("Temperature scale (Kelvin) in the denominator of the heater's dT formula: larger values make the temperature rise fall off more slowly as the ambient temperature climbs. Must be greater than zero.")
-            .defineInRange("temperatureScale", 1_000D, 1.0E-9D, Double.MAX_VALUE);
+            .defineInRange("temperatureScale", 1_000, 1.0E-9, Double.MAX_VALUE);
         AtmosphereHeater.CENTER_EFFECT = BUILDER
             .comment("Fraction of the temperature rise applied to the chunk containing the machine (1.0 = 100%).")
-            .defineInRange("centerEffect", 1.0D, 0D, 1D);
+            .defineInRange("centerEffect", 1.0, 0, 1);
         AtmosphereHeater.OUTER_EFFECT = BUILDER
             .comment("Fraction of the temperature rise applied to each chunk surrounding the machine's chunk (0.5 = 50%).")
-            .defineInRange("outerEffect", 0.5D, 0D, 1D);
+            .defineInRange("outerEffect", 0.5, 0, 1);
         AtmosphereHeater.CHUNK_RADIUS = BUILDER
             .comment("Radius in chunks around the machine's own chunk that receive the outer effect. 1 corresponds to a 3x3 chunk area.")
             .defineInRange("chunkRadius", 1, 0, 32);
@@ -304,25 +308,25 @@ public class Config {
         BUILDER.push("phaseChange");
         PhaseChange.LOW_MELTING_POINT = BUILDER
             .comment("Melting point in Kelvin of the low-temperature phase-change block. Below it the block is an ordinary heat capacitor; at it the block absorbs heat into its latent heat buffer without warming up.")
-            .defineInRange("lowMeltingPoint", 1_000D, 0D, Double.MAX_VALUE);
+            .defineInRange("lowMeltingPoint", 1_000, 0, Double.MAX_VALUE);
         PhaseChange.MEDIUM_MELTING_POINT = BUILDER
             .comment("Melting point in Kelvin of the medium-temperature phase-change block.")
-            .defineInRange("mediumMeltingPoint", 1_750D, 0D, Double.MAX_VALUE);
+            .defineInRange("mediumMeltingPoint", 1_750, 0, Double.MAX_VALUE);
         PhaseChange.HIGH_MELTING_POINT = BUILDER
             .comment("Melting point in Kelvin of the high-temperature phase-change block.")
-            .defineInRange("highMeltingPoint", 3_000D, 0D, Double.MAX_VALUE);
+            .defineInRange("highMeltingPoint", 3_000, 0, Double.MAX_VALUE);
         PhaseChange.BUFFER_CAPACITY = BUILDER
             .comment("Latent heat in Joules every phase-change block can absorb at its melting point before its temperature starts rising again. Shared by all three tiers.")
-            .defineInRange("bufferCapacity", 1_000_000D, 0D, Double.MAX_VALUE);
+            .defineInRange("bufferCapacity", 1_000_000, 0, Double.MAX_VALUE);
         PhaseChange.HEAT_CAPACITY = BUILDER
-            .comment("Heat capacity of the phase-change blocks in J/K, controlling how quickly their temperature changes. Shared by all three tiers. Must be at least one.")
-            .defineInRange("heatCapacity", 100D, 1D, Double.MAX_VALUE);
+            .comment("Heat capacity of the phase-change blocks in J/K, controlling how quickly their temperature changes. Shared by all three tiers.")
+            .defineInRange("heatCapacity", 100, 1, Double.MAX_VALUE);
         PhaseChange.INVERSE_CONDUCTION_COEFFICIENT = BUILDER
-            .comment("Inverse conduction coefficient of the phase-change blocks, controlling how readily they exchange heat with adjacent blocks (smaller means faster). Shared by all three tiers. Must be at least one.")
-            .defineInRange("inverseConductionCoefficient", 5D, 1D, Double.MAX_VALUE);
+            .comment("Inverse conduction coefficient of the phase-change blocks, controlling how readily they exchange heat with adjacent blocks. Shared by all three tiers.")
+            .defineInRange("inverseConductionCoefficient", 5, 1, Double.MAX_VALUE);
         PhaseChange.INVERSE_INSULATION_COEFFICIENT = BUILDER
-            .comment("Inverse insulation coefficient of the phase-change blocks, controlling how readily they lose heat to the environment (smaller means faster). Shared by all three tiers. Must be at least one.")
-            .defineInRange("inverseInsulationCoefficient", 5D, 1D, Double.MAX_VALUE);
+            .comment("Inverse insulation coefficient of the phase-change blocks, controlling how readily they lose heat to the environment. Shared by all three tiers.")
+            .defineInRange("inverseInsulationCoefficient", 5, 1, Double.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.push("ambientMelting");
@@ -334,7 +338,7 @@ public class Config {
             .defineListAllowEmpty("blocks", List.of("minecraft"), () -> "minecraft:stone", BlockMeltFilter::isValidEntry);
         AmbientMelting.MELT_THRESHOLD = BUILDER
             .comment("Ambient temperature in Kelvin above which a chunk's blocks start melting into unstable lava.")
-            .defineInRange("meltThreshold", 1_800D, 0D, Double.MAX_VALUE);
+            .defineInRange("meltThreshold", 1_800, 0, Double.MAX_VALUE);
         AmbientMelting.SOURCE_INTERVAL = BUILDER
             .comment("How often (in game ticks) every ticking chunk is sampled to turn the block below unstable lava back into another unstable lava source, essentially cascading the melting process.")
             .defineInRange("sourceInterval", 5, 1, Integer.MAX_VALUE);
@@ -352,13 +356,13 @@ public class Config {
         BUILDER.push("temperatureController");
         TemperatureController.MAX_ENERGY_OUTPUT = BUILDER
             .comment("Max Joules that Temperature Controller writes to adjacent coolers and resistive heaters in energy output mode.")
-            .defineInRange("maxEnergyOutput", 1_000_000L, 0L, Long.MAX_VALUE);
+            .defineInRange("maxEnergyOutput", 1_000_000, 1, Long.MAX_VALUE);
         TemperatureController.DISPLAY_MIN_TEMPERATURE = BUILDER
             .comment("Ambient temperature in Kelvin at or below which the Temperature Controller's front window is entirely unlit.")
-            .defineInRange("displayMinTemperature", 0D, 0D, Double.MAX_VALUE);
+            .defineInRange("displayMinTemperature", 0, 0, Double.MAX_VALUE);
         TemperatureController.DISPLAY_MAX_TEMPERATURE = BUILDER
             .comment("Ambient temperature in Kelvin at which every row of the Temperature Controller's front window is lit. Must be above displayMinTemperature for the window to light up at all.")
-            .defineInRange("displayMaxTemperature", 1_800D, 0D, Double.MAX_VALUE);
+            .defineInRange("displayMaxTemperature", 1_800, 0, Double.MAX_VALUE);
         TemperatureController.MAX_EXPRESSION_LENGTH = BUILDER
             .comment("Maximum number of characters the Temperature Controller accepts for its expression, both in the GUI text field and on the server.")
             .defineInRange("maxExpressionLength", 256, 1, 1_024);

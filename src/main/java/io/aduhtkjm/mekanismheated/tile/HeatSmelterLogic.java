@@ -85,7 +85,7 @@ public final class HeatSmelterLogic {
      * block of the structure, limited by the input items actually available (and, by the caller, by output space).
      */
     public static int parallelOperations(int smelterCount, int inputCount) {
-        return Math.min(Math.max(smelterCount, 0), Math.max(inputCount, 0));
+        return Math.clamp(smelterCount, 0, Math.max(inputCount, 0));
     }
 
     /**
@@ -99,10 +99,7 @@ public final class HeatSmelterLogic {
      * @param operations the number of recipe operations performed in parallel this cycle (1 or fewer means no scaling).
      */
     public static double heatMultiplier(int operations) {
-        if (operations <= 1) {
-            return 1.0D;
-        }
-        return Math.min(Math.sqrt(operations), Config.HeatSmelter.MAX_HEAT_MULTIPLIER.get());
+        return operations <= 1 ? 1 : Math.min(Math.sqrt(operations), Config.HeatSmelter.MAX_HEAT_MULTIPLIER.get());
     }
 
     /**
@@ -161,13 +158,13 @@ public final class HeatSmelterLogic {
         if (level == null || level.isClientSide || tank.isEmpty()) {
             return lastApplied;
         }
-        //Snapshot once; safe because we stop after the first operation applied this tick
+        // Snapshot once; safe because we stop after the first operation applied this tick
         List<FluidStack> fluids = tank.getFluids();
-        //Fast path: if the last-applied recipe still matches, reuse it instead of re-scanning every alloy recipe
+        // Fast path: if the last-applied recipe still matches, reuse it instead of re-scanning every alloy recipe
         if (lastApplied != null && applyAlloy(tank, lastApplied.input1(), lastApplied.input2(), lastApplied.output(), fluids)) {
             return lastApplied;
         }
-        //Full scan: find any applicable recipe and remember it for the next tick
+        // Full scan: find any applicable recipe and remember it for the next tick
         for (RecipeHolder<AlloyRecipe> holder : level.getRecipeManager().getAllRecipesFor(ModRecipeTypes.TYPE_ALLOYING.value())) {
             AlloyRecipe recipe = holder.value();
             if (applyAlloy(tank, recipe.getInput1(), recipe.getInput2(), recipe.getOutput(), fluids)) {
@@ -209,13 +206,13 @@ public final class HeatSmelterLogic {
         if (outAmount <= 0) {
             return false;
         }
-        //Room available once the inputs have been drained (the alloy is typically volume-neutral, but need not be)
+        // Room available once the inputs have been drained (the alloy is typically volume-neutral, but need not be)
         int projectedFree = tank.getTotalNeeded() + need1 + need2;
         if (projectedFree < outAmount) {
             return false;
         }
         if (!tank.containsFluid(outProbe)) {
-            //A new fluid type can only occupy an empty slot; verify draining frees one up (or one already exists)
+            // A new fluid type can only occupy an empty slot; verify draining frees one up (or one already exists)
             int projectedEmpty = tank.getSlots().size() - tank.getFluidCount();
             if (sameFluid) {
                 if (match1.getAmount() == need1 + need2) {
