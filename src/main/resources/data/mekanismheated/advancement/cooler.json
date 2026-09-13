@@ -1,0 +1,38 @@
+{
+  "parent": "mekanismheated:heat_smelter",
+  "criteria": {
+    "cooler": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "mekanismheated:cooler"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.mekanismheated.cooler.description"
+    },
+    "frame": "task",
+    "icon": {
+      "count": 1,
+      "id": "mekanismheated:cooler"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.mekanismheated.cooler.title"
+    }
+  },
+  "requirements": [
+    [
+      "cooler"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

@@ -1,0 +1,38 @@
+{
+  "parent": "mekanismheated:thermoenergetic_alloy",
+  "criteria": {
+    "thermal_casing": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "mekanismheated:thermal_casing"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.mekanismheated.thermal_casing.description"
+    },
+    "frame": "task",
+    "icon": {
+      "count": 1,
+      "id": "mekanismheated:thermal_casing"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.mekanismheated.thermal_casing.title"
+    }
+  },
+  "requirements": [
+    [
+      "thermal_casing"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

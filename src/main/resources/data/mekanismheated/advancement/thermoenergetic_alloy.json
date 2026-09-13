@@ -1,0 +1,38 @@
+{
+  "parent": "mekanismheated:cooler",
+  "criteria": {
+    "thermoenergetic_alloy_ingot": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "mekanismheated:thermoenergetic_alloy_ingot"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.mekanismheated.thermoenergetic_alloy.description"
+    },
+    "frame": "task",
+    "icon": {
+      "count": 1,
+      "id": "mekanismheated:thermoenergetic_alloy_ingot"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.mekanismheated.thermoenergetic_alloy.title"
+    }
+  },
+  "requirements": [
+    [
+      "thermoenergetic_alloy_ingot"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

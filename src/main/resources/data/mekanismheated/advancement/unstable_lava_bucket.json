@@ -1,0 +1,38 @@
+{
+  "parent": "mekanismheated:molten_iron_bucket",
+  "criteria": {
+    "unstable_lava_bucket": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "mekanismheated:unstable_lava_bucket"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "description": {
+      "translate": "advancements.mekanismheated.unstable_lava_bucket.description"
+    },
+    "frame": "task",
+    "icon": {
+      "count": 1,
+      "id": "mekanismheated:unstable_lava_bucket"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.mekanismheated.unstable_lava_bucket.title"
+    }
+  },
+  "requirements": [
+    [
+      "unstable_lava_bucket"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
