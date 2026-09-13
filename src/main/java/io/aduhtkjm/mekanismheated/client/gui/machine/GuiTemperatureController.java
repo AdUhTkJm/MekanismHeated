@@ -84,19 +84,19 @@ public class GuiTemperatureController extends GuiMekanismTile<TileEntityTemperat
         addRenderableWidget(new GuiInnerScreen(this, 48, 19, 130, 40, this::screenLines)).clearFormat();
 
         OutputMode mode = tile.getOutputMode();
-        modeButton = addRenderableWidget(new MekanismButton(this, 8, 61, 36, 14, modeLabel(mode), (element, mouseX, mouseY) -> {
+        modeButton = addRenderableWidget(new MekanismButton(this, 8, 59, 36, 14, modeLabel(mode), (element, mouseX, mouseY) -> {
             toggleOutputMode();
             return true;
         }));
         modeButton.setTooltip(Tooltip.create(modeTooltip(mode)));
         shownMode = mode;
 
-        expressionField = addRenderableWidget(new GuiTextField(this, 48, 61, 130, 12));
+        expressionField = addRenderableWidget(new GuiTextField(this, 48, 59, 130, 12));
         expressionField.setMaxLength(Config.TemperatureController.MAX_EXPRESSION_LENGTH.get());
         expressionField.setInputValidator(EXPRESSION_CHARS)
               .setEnterHandler(this::submitExpression)
               .addCheckmarkButton(ButtonType.NORMAL, this::submitExpression)
-              .setBackground(BackgroundType.DEFAULT);
+              .setBackground(BackgroundType.DIGITAL);
         //Deliberately not focused on open: the controller has nothing else to type into, so grabbing the keyboard would
         //swallow the player's shortcuts for no benefit. Clicking the field focuses it.
         expressionField.setTooltip(ModLang.GUI_TEMPERATURE_CONTROLLER_INPUT_HINT);
@@ -131,7 +131,7 @@ public class GuiTemperatureController extends GuiMekanismTile<TileEntityTemperat
         return List.of(
               ModLang.GUI_TEMPERATURE_CONTROLLER_AMBIENT.translate(
                     MekanismUtils.getTemperatureDisplay(tile.getLastAmbientTemperature(), TemperatureUnit.KELVIN, true)),
-              TemperatureControllerText.output(tile.getOutputMode(), tile.getLastOutput()),
+              TemperatureControllerText.output(tile.getOutputMode(), tile.getOutput()),
               statusLine()
         );
     }
@@ -150,10 +150,9 @@ public class GuiTemperatureController extends GuiMekanismTile<TileEntityTemperat
             return status(TemperatureControllerText.parseError(error));
         }
         return switch (tile.getRuntimeError()) {
-            case NO_HEAT_CAPACITOR, RESULT_NOT_FINITE -> status(TemperatureControllerText.runtimeError(tile.getRuntimeError(), tile.getErrorSide()));
-            case NONE -> tile.isRedstoneActivated()
-                  ? status(TemperatureControllerText.colored(ModLang.GUI_TEMPERATURE_CONTROLLER_STATUS_OK.translate(), ChatFormatting.GREEN))
-                  : status(TemperatureControllerText.colored(ModLang.GUI_TEMPERATURE_CONTROLLER_STATUS_GATED.translate(), ChatFormatting.YELLOW));
+            case NO_HEAT_CAPACITOR, RESULT_INFINITE, RESULT_NAN ->
+                status(TemperatureControllerText.runtimeError(tile.getRuntimeError(), tile.getErrorSide()));
+            case NONE -> status(TemperatureControllerText.colored(ModLang.GUI_TEMPERATURE_CONTROLLER_STATUS_OK.translate(), ChatFormatting.GREEN));
         };
     }
 

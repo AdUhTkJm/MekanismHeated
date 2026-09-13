@@ -17,10 +17,13 @@ public enum ExpressionRuntimeError {
      */
     NO_HEAT_CAPACITOR,
     /**
-     * The expression's result was {@code NaN} or infinite. This covers every division by zero, since {@code x / 0} is
-     * {@code ±Infinity} in IEEE-754.
+     * The expression's result was infinite.
      */
-    RESULT_NOT_FINITE;
+    RESULT_INFINITE,
+    /**
+     * The expression's result was NaN.
+     */
+    RESULT_NAN;
 
     /**
      * Ordinal-indexed lookup that tolerates out-of-range input, for decoding synced values that may be stale or

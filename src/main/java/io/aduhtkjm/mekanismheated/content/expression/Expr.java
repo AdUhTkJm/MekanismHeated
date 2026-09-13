@@ -44,8 +44,11 @@ public sealed interface Expr {
      */
     static double evaluate(Expr expression, VariableResolver resolver) throws ExpressionRuntimeException {
         double value = expression.eval(resolver);
-        if (!Double.isFinite(value)) {
-            throw new ExpressionRuntimeException(ExpressionRuntimeError.RESULT_NOT_FINITE);
+        if (Double.isInfinite(value)) {
+            throw new ExpressionRuntimeException(ExpressionRuntimeError.RESULT_INFINITE);
+        }
+        if (Double.isNaN(value)) {
+            throw new ExpressionRuntimeException(ExpressionRuntimeError.RESULT_NAN);
         }
         return value;
     }

@@ -1,6 +1,7 @@
 package io.aduhtkjm.mekanismheated.tile;
 
 import io.aduhtkjm.mekanismheated.Config;
+import io.aduhtkjm.mekanismheated.client.renderer.TileEntityTemperatureControllerRenderer;
 import io.aduhtkjm.mekanismheated.content.expression.Expr;
 import io.aduhtkjm.mekanismheated.content.expression.ExpressionParseException;
 import io.aduhtkjm.mekanismheated.content.expression.ExpressionParser;
@@ -10,6 +11,7 @@ import io.aduhtkjm.mekanismheated.content.expression.OutputMode;
 import io.aduhtkjm.mekanismheated.content.expression.Side;
 import io.aduhtkjm.mekanismheated.registries.ModBlocks;
 import java.nio.charset.StandardCharsets;
+
 import mekanism.api.heat.HeatAPI;
 import mekanism.api.heat.IHeatHandler;
 import mekanism.common.capabilities.Capabilities;
@@ -32,8 +34,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.system.NonnullDefault;
 
 /**
  * Reads the ambient temperature and the temperature of the heat capacitors of the six blocks around it, evaluates a
@@ -48,6 +50,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>The machine has no energy buffer, no inventory and no heat capacitors: everything it does is gated by Mekanism's
  * normal redstone control (default {@code HIGH}), which is why it overrides only a handful of hooks.
  */
+@NonnullDefault
 public class TileEntityTemperatureController extends TileEntityMekanism {
 
     private static final String TAG_EXPRESSION = "Expression";
@@ -55,12 +58,17 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
     private static final String TAG_DISPLAY_LEVEL = "DisplayLevel";
 
     /**
-     * The number of rows in the front window, and therefore the exclusive upper bound (and full range) of
-     * {@link #getDisplayLevel()}.
+     * Instead of comparing at most 1024 chars from {@link #compiledFrom} and {@link #expression} per
+     * tick, we first do a quick hash check.
      */
-    public static final int DISPLAY_ROWS = 16;
+    private record HashedString(String expr, long hash) {
+        HashedString(String expr) {
+            this(expr, expr.hashCode());
+        }
+    }
 
-    private String expression = "";
+    private HashedString expression = new HashedString("");
+    private int ticks = 0;
     /**
      * The compiled form of {@link #expression}. {@code null} whenever the expression is empty or does not parse, which
      * is exactly the "produces no output" state.
@@ -68,10 +76,11 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
     @Nullable
     private Expr compiled;
     /**
-     * The text {@link #compiled} was built from, so the (comparatively expensive) parse runs only when the text
-     * actually changes rather than every tick.
+     * The text {@link #compiled} was built from, while {@link #expression} is the current expression. <p>
+     *
+     * When they're different then we rebuild.
      */
-    private String compiledFrom = "";
+    private HashedString compiledFrom = new HashedString("");
 
     private OutputMode outputMode = OutputMode.REDSTONE;
     private ExpressionRuntimeError runtimeError = ExpressionRuntimeError.NONE;
@@ -81,7 +90,7 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
      * The last value the expression evaluated to, in the player's configured energy unit (or as a raw number in
      * redstone mode). Synced for the GUI's "Output" line.
      */
-    private double lastOutput;
+    private double output;
     /**
      * Current redstone signal strength, 0-15. Only ever non-zero in {@link OutputMode#REDSTONE}, and read by the
      * block's {@code AttributeRedstoneEmitter}.
@@ -104,33 +113,36 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
 
     @Override
     protected void presetVariables() {
-        //Gated by redstone by default. The redstone control tab can set DISABLED to make the controller always run;
-        //presetVariables is where this has to happen, because it runs after setSupportedTypes (so supportsRedstone
-        //is known) but before applyImplicitComponents, which already reads the control type back out.
-        setControlType(RedstoneControl.HIGH);
+        // We disable the redstone signal controlling, or otherwise then the machine outputs redstone signal,
+        // it might block itself from updating.
+        setControlType(RedstoneControl.DISABLED);
     }
 
     @Override
     protected boolean onUpdateServer() {
         boolean needsPacket = super.onUpdateServer();
-
-        //1. (Re)compile if the source text changed. A parse error is deliberately not sent anywhere: the client
-        //   re-parses the same string with the same parser to report it in its own language.
-        if (!expression.equals(compiledFrom)) {
+        // Compare hash first for optimization. Always re-evaluate when expression changes.
+        if (expression.hash() != compiledFrom.hash() || !expression.expr().equals(compiledFrom.expr())) {
             recompile();
+            ticks = Config.TemperatureController.INTERVAL.get();
         }
 
-        //2. Evaluate. Anything that makes the controller "not working" collapses the value to 0 here; whether that 0
-        //   is then acted on depends on the mode (see #emit).
-        //The ambient temperature is read out of the world once per tick and reused by every T in the expression, and
-        //it is also what the front window displays, so it is needed whether or not the expression is evaluated.
+        // Make sure the controller detects only once per interval.
+        if (ticks-- > 0) {
+            return needsPacket;
+        }
+        ticks = Config.TemperatureController.INTERVAL.get();
+
+        // Evaluate and emit.
+        // The ambient temperature is read out of the world once per tick and reused by every T in the expression, and
+        // it is also what the front window displays, so it is needed whether or not the expression is evaluated.
         Level world = getLevel();
         lastAmbientTemperature = world == null ? HeatAPI.AMBIENT_TEMP : HeatAPI.getAmbientTemp(world, getBlockPos());
         double value = 0;
         runtimeError = ExpressionRuntimeError.NONE;
         errorSide = null;
         if (canFunction() && compiled != null) {
-            //An empty or unparsable expression leaves the value at 0.
+            // An empty or unparsable expression leaves the value at 0.
             try {
                 value = Expr.evaluate(compiled, this::resolveVariable);
             } catch (ExpressionRuntimeException e) {
@@ -138,18 +150,11 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
                 errorSide = e.side();
             }
         }
-        lastOutput = value;
-
-        //3. Emit.
+        output = value;
         emit(value);
-
-        //The block's active state (which is what drives its light level) follows whether the controller is actually
-        //doing its job, rather than merely being powered.
         setActive(isWorking());
 
-        //4. Front window level. This is independent of the working/error state: a broken expression does not blank the
-        //   display, it keeps showing how hot it is where the controller stands. Because the level is an integer, the
-        //   update packet is sent at most 16 times as the temperature sweeps its whole range.
+        // Front window level.
         byte level = computeDisplayLevel(lastAmbientTemperature);
         if (level != displayLevel) {
             displayLevel = level;
@@ -175,11 +180,11 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
         runtimeError = ExpressionRuntimeError.NONE;
         errorSide = null;
         compiled = null;
-        if (!expression.isEmpty()) {
+        if (!expression.expr().isEmpty()) {
             try {
-                compiled = ExpressionParser.parse(expression);
+                compiled = ExpressionParser.parse(expression.expr());
             } catch (ExpressionParseException ignored) {
-                //Reported by the GUI, which re-parses the same text with the client's own language.
+                // Deliberately ignored
             }
         }
     }
@@ -189,8 +194,8 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
      */
     private void emit(double value) {
         if (outputMode == OutputMode.REDSTONE) {
-            //Runs unconditionally, so that closing the redstone gate (or hitting an error) actively drops the signal
-            //with a neighbour update rather than leaving it latched.
+            // Runs unconditionally, so that closing the redstone gate (or hitting an error) actively drops the signal
+            // with a neighbour update rather than leaving it latched.
             int signal = clampToSignal(value);
             if (signal != redstoneOutput) {
                 redstoneOutput = signal;
@@ -200,8 +205,8 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
                 }
             }
         } else if (canFunction() && runtimeError == ExpressionRuntimeError.NONE && compiled != null) {
-            //Energy mode only writes while the gate is open and the expression is clean; on a gated, empty, malformed
-            //or erroring expression the neighbours are left alone rather than being forced to 0.
+            // Energy mode only writes while the gate is open and the expression is clean; on a gated, empty, malformed
+            // or erroring expression the neighbours are left alone rather than being forced to 0.
             Level world = getLevel();
             if (world == null) {
                 return;
@@ -210,9 +215,10 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
             for (Direction side : EnumUtils.DIRECTIONS) {
                 BlockPos neighbourPos = getBlockPos().relative(side);
                 BlockEntity neighbour = world.getBlockEntity(neighbourPos);
+                // TODO: Shall we somewhat abstract this ability of setting the packet, e.g. with reflection?
                 if (neighbour instanceof TileEntityCooler cooler) {
-                    //setEnergyUsageFromPacket marks the neighbour for save unconditionally, so compare first: an
-                    //unguarded per-tick write would keep the chunk dirty forever for no reason.
+                    // setEnergyUsageFromPacket marks the neighbour for save unconditionally, so compare first: an
+                    // unguarded per-tick write would keep the chunk dirty forever for no reason.
                     if (cooler.getEnergyContainer().getEnergyPerTick() != joules) {
                         cooler.setEnergyUsageFromPacket(joules);
                     }
@@ -275,15 +281,16 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
      * exactly at the maximum.
      */
     public static byte computeDisplayLevel(double temperature) {
+        byte rows = TileEntityTemperatureControllerRenderer.DISPLAY_ROWS;
         double min = Config.TemperatureController.DISPLAY_MIN_TEMPERATURE.get();
         double max = Config.TemperatureController.DISPLAY_MAX_TEMPERATURE.get();
         if (temperature <= min || max <= min) {
             return 0;
         }
         if (temperature >= max) {
-            return DISPLAY_ROWS;
+            return rows;
         }
-        return (byte) (int) Math.floor((temperature - min) / (max - min) * DISPLAY_ROWS);
+        return (byte) Math.floor((temperature - min) / (max - min) * rows);
     }
 
     /**
@@ -302,7 +309,7 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
     }
 
     public String getExpression() {
-        return expression;
+        return expression.expr();
     }
 
     /**
@@ -310,8 +317,8 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
      * the next tick rather than after it.
      */
     public void setExpression(String expression) {
-        if (!this.expression.equals(expression)) {
-            this.expression = expression;
+        if (!this.expression.expr().equals(expression)) {
+            this.expression = new HashedString(expression);
             recompile();
             markForSave();
         }
@@ -330,10 +337,12 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
     public void setOutputMode(OutputMode mode) {
         if (outputMode != mode) {
             outputMode = mode;
-            if (mode == OutputMode.ENERGY) {
-                //The energy branch is not the writer of redstoneOutput, so a signal latched from before the switch
-                //has to be dropped here or it would stay on forever.
-                clearRedstoneOutput();
+            if (mode == OutputMode.ENERGY && redstoneOutput != 0) {
+                redstoneOutput = 0;
+                Level world = getLevel();
+                if (world != null) {
+                    world.updateNeighborsAt(getBlockPos(), getBlockState().getBlock());
+                }
             }
             markForSave();
         }
@@ -347,16 +356,6 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
         }
     }
 
-    private void clearRedstoneOutput() {
-        if (redstoneOutput != 0) {
-            redstoneOutput = 0;
-            Level world = getLevel();
-            if (world != null) {
-                world.updateNeighborsAt(getBlockPos(), getBlockState().getBlock());
-            }
-        }
-    }
-
     public ExpressionRuntimeError getRuntimeError() {
         return runtimeError;
     }
@@ -366,8 +365,8 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
         return errorSide;
     }
 
-    public double getLastOutput() {
-        return lastOutput;
+    public double getOutput() {
+        return output;
     }
 
     public double getLastAmbientTemperature() {
@@ -385,14 +384,14 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
     @Override
     public void addContainerTrackers(MekanismContainer container) {
         super.addContainerTrackers(container);
-        //SyncableString does not exist; a UTF-8 byte array is how Mekanism syncs strings (compare SyncableFrequency).
+        // Mekanism syncs strings with a UTF-8 byte array.
         container.track(SyncableByteArray.create(
-              () -> expression.getBytes(StandardCharsets.UTF_8),
-              bytes -> expression = new String(bytes, StandardCharsets.UTF_8)));
+              () -> expression.expr().getBytes(StandardCharsets.UTF_8),
+              bytes -> expression = new HashedString(new String(bytes, StandardCharsets.UTF_8))));
         container.track(SyncableEnum.create(OutputMode::byIndex, OutputMode.REDSTONE, this::getOutputMode, mode -> outputMode = mode));
         container.track(SyncableEnum.create(ExpressionRuntimeError::byIndex, ExpressionRuntimeError.NONE, this::getRuntimeError, error -> runtimeError = error));
         container.track(SyncableByte.create(this::getErrorSideOrdinal, this::setErrorSideOrdinal));
-        container.track(SyncableDouble.create(this::getLastOutput, value -> lastOutput = value));
+        container.track(SyncableDouble.create(this::getOutput, value -> output = value));
         container.track(SyncableDouble.create(this::getLastAmbientTemperature, value -> lastAmbientTemperature = value));
     }
 
@@ -405,18 +404,17 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
     }
 
     @Override
-    public void saveAdditional(@NotNull CompoundTag nbt, @NotNull HolderLookup.Provider provider) {
+    public void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
         super.saveAdditional(nbt, provider);
-        nbt.putString(TAG_EXPRESSION, expression);
+        nbt.putString(TAG_EXPRESSION, expression.expr());
         nbt.putString(TAG_OUTPUT_MODE, outputMode.name());
     }
 
     @Override
-    public void loadAdditional(@NotNull CompoundTag nbt, @NotNull HolderLookup.Provider provider) {
+    public void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
         super.loadAdditional(nbt, provider);
-        NBTUtils.setStringIfPresent(nbt, TAG_EXPRESSION, value -> expression = value);
+        NBTUtils.setStringIfPresent(nbt, TAG_EXPRESSION, value -> expression = new HashedString(value));
         NBTUtils.setStringIfPresent(nbt, TAG_OUTPUT_MODE, value -> outputMode = outputModeByName(value));
-        //The compiled tree is rebuilt on the next tick; see the compiledFrom comparison in onUpdateServer.
     }
 
     /**
@@ -433,14 +431,14 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
     }
 
     @Override
-    public CompoundTag getReducedUpdateTag(@NotNull HolderLookup.Provider provider) {
+    public CompoundTag getReducedUpdateTag(HolderLookup.Provider provider) {
         CompoundTag updateTag = super.getReducedUpdateTag(provider);
         updateTag.putByte(TAG_DISPLAY_LEVEL, displayLevel);
         return updateTag;
     }
 
     @Override
-    public void handleUpdateTag(@NotNull CompoundTag tag, @NotNull HolderLookup.Provider provider) {
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider provider) {
         super.handleUpdateTag(tag, provider);
         displayLevel = tag.getByte(TAG_DISPLAY_LEVEL);
     }
@@ -448,7 +446,7 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
     @Override
     public CompoundTag getConfigurationData(HolderLookup.Provider provider, Player player) {
         CompoundTag data = super.getConfigurationData(provider, player);
-        data.putString(TAG_EXPRESSION, expression);
+        data.putString(TAG_EXPRESSION, expression.expr());
         data.putString(TAG_OUTPUT_MODE, outputMode.name());
         return data;
     }

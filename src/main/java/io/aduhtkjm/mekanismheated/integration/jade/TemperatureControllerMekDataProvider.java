@@ -40,7 +40,7 @@ public enum TemperatureControllerMekDataProvider implements IServerDataProvider<
         }
         CompoundTag mhData = new CompoundTag();
         mhData.putByte(MODE, (byte) controller.getOutputMode().ordinal());
-        mhData.putDouble(OUTPUT, controller.getLastOutput());
+        mhData.putDouble(OUTPUT, controller.getOutput());
         mhData.putByte(ERROR, (byte) controller.getRuntimeError().ordinal());
         //Negative for "not a side-specific failure", matching how the tile's own trackers encode it.
         Side errorSide = controller.getErrorSide();

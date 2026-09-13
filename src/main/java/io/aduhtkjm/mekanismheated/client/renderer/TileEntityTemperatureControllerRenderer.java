@@ -42,11 +42,19 @@ public class TileEntityTemperatureControllerRenderer implements BlockEntityRende
     public static final ResourceLocation FRONT_TEXTURE = Mod.rl("block/temperature_controller/front");
 
     /**
-     * The window's bounds within the front texture, in texture pixels: {@code x = 5..10} inclusive for all of
-     * {@code y = 0..15}. In block coordinates that is {@code 5/16} to {@code 11/16} across and the full height.
+     * The number of rows in the front window, and therefore the exclusive upper bound (and full range) of
+     * {@link TileEntityTemperatureController#getDisplayLevel()}.
      */
-    private static final float WINDOW_MIN_X = 5.0F / 16.0F;
-    private static final float WINDOW_MAX_X = 11.0F / 16.0F;
+    public static final int DISPLAY_ROWS = 16;
+
+    /**
+     * The window's bounds within the front texture, in texture pixels: {@code x = 5..10} inclusive for all of
+     * {@code y = 0..15}. In block coordinates that is {@code 5/16} to {@code 11/16} across and the full height. <p>
+     *
+     * We make it slightly larger, or otherwise a white line would appear.
+     */
+    private static final float WINDOW_MIN_X = 4.99F / 16.0F;
+    private static final float WINDOW_MAX_X = 11.01F / 16.0F;
     /**
      * A point inside the white window, as a fraction of the texture, used for every vertex: the window is uniform, so
      * one sample is all a flat quad needs. It stays clear of the window's edge whatever the atlas resolution is.
@@ -62,11 +70,9 @@ public class TileEntityTemperatureControllerRenderer implements BlockEntityRende
      * Rows that are not lit: the shade of the panel around the window in the front texture, so an empty window reads
      * as a window that is off rather than as a hole.
      */
-    private static final int UNLIT_COLOR = 0xFF565656;
+    private static final int UNLIT_COLOR = 0xFF676767;
     /**
-     * The colour of a lit row, indexed by row from the bottom. Hue sweeps from 120 degrees (green, cold) to 0 degrees
-     * (red, hot) in 8 degree steps at full saturation and value — a plain green-to-red RGB interpolation would muddy
-     * through olive instead of passing through yellow and orange.
+     * The colour of a lit row, indexed by row from the bottom. From green to red in HSV color space.
      */
     private static final int[] ROW_COLORS = {
           0xFF00FF00, //  0: 120
@@ -105,10 +111,10 @@ public class TileEntityTemperatureControllerRenderer implements BlockEntityRende
         applyFacingTransform(poseStack, blockState);
         VertexConsumer vertexConsumer = bufferSource.getBuffer(Sheets.cutoutBlockSheet());
         PoseStack.Pose pose = poseStack.last();
-        for (int row = 0; row < TileEntityTemperatureController.DISPLAY_ROWS; row++) {
+        for (int row = 0; row < DISPLAY_ROWS; row++) {
             int color = row < level ? ROW_COLORS[row] : UNLIT_COLOR;
-            float minY = (float) row / TileEntityTemperatureController.DISPLAY_ROWS;
-            float maxY = (float) (row + 1) / TileEntityTemperatureController.DISPLAY_ROWS;
+            float minY = (float) row / DISPLAY_ROWS;
+            float maxY = (float) (row + 1) / DISPLAY_ROWS;
             //Counter-clockwise seen from outside the front face, which is the winding the block baker gives a north
             //face — the sheet culls back faces, so the wrong order would make the strip invisible from the front.
             addVertex(vertexConsumer, pose, WINDOW_MIN_X, minY, color, u, v, packedLight, packedOverlay);

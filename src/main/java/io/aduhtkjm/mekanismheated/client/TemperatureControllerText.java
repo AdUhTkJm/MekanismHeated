@@ -80,7 +80,8 @@ public final class TemperatureControllerText {
         return switch (error) {
             case NO_HEAT_CAPACITOR -> colored(ModLang.GUI_TEMPERATURE_CONTROLLER_ERROR_NO_HEAT.translate(
                   side == null ? "?" : side.displayName()), ChatFormatting.RED);
-            case RESULT_NOT_FINITE -> colored(ModLang.GUI_TEMPERATURE_CONTROLLER_ERROR_NOT_FINITE.translate(), ChatFormatting.RED);
+            case RESULT_INFINITE -> colored(ModLang.GUI_TEMPERATURE_CONTROLLER_ERROR_INFINITE.translate(), ChatFormatting.RED);
+            case RESULT_NAN -> colored(ModLang.GUI_TEMPERATURE_CONTROLLER_ERROR_NAN.translate(), ChatFormatting.RED);
             case NONE -> Component.empty();
         };
     }
