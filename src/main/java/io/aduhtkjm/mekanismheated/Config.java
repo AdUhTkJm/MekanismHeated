@@ -126,6 +126,22 @@ public class Config {
         public static ModConfigSpec.DoubleValue INVERSE_INSULATION_COEFFICIENT;
     }
 
+    private static String heatCapacity(String name) {
+        return String.format("Heat capacity of the %s in J/K, controlling how quickly its temperature changes.", name);
+    }
+
+    private static String invCdt(String name) {
+        return String.format("Inverse conduction coefficient of the %s, controlling how readily it exchanges heat with adjacent blocks.", name);
+    }
+
+    private static String invIns(String name) {
+        return String.format("Inverse insulation coefficient of the %s, controlling how readily it loses heat to the environment.", name);
+    }
+
+    private static String maxEnergy(String name) {
+        return String.format("Max energy in Joules that the %s can hold,", name);
+    }
+
     public static ModConfigSpec SPEC;
     static {
         BUILDER.push("heatSmelter");
@@ -142,13 +158,13 @@ public class Config {
             .comment("Temperature in Kelvin below which the Heat Smelter cannot process recipes.")
             .defineInRange("baseTemperature", 300, 0, Double.MAX_VALUE);
         HeatSmelter.HEAT_CAPACITY = BUILDER
-            .comment("Heat capacity of the Heat Smelter in J/K, controlling how quickly its temperature changes.")
+            .comment(heatCapacity("Heat Smelter"))
             .defineInRange("heatCapacity", 50, 1, Double.MAX_VALUE);
         HeatSmelter.INVERSE_CONDUCTION_COEFFICIENT = BUILDER
-            .comment("Inverse conduction coefficient of the Heat Smelter, controlling how readily it exchanges heat with adjacent blocks.")
+            .comment(invCdt("Heat Smelter"))
             .defineInRange("inverseConductionCoefficient", 5, 1, Double.MAX_VALUE);
         HeatSmelter.INVERSE_INSULATION_COEFFICIENT = BUILDER
-            .comment("Inverse insulation coefficient of the Heat Smelter, controlling how readily it loses heat to the environment.")
+            .comment(invIns("Heat Smelter"))
             .defineInRange("inverseInsulationCoefficient", 3, 1, Double.MAX_VALUE);
         HeatSmelter.MAX_FUEL_TEMPERATURE = BUILDER
             .comment("Temperature in Kelvin at which the Heat Smelter stops burning fuel. Note the temperature can be raised by, e.g., resistive heaters beyond this point.")
@@ -169,7 +185,7 @@ public class Config {
             .comment("Energy consumed per tick.")
             .defineInRange("energyPerTick", 40, 0, Long.MAX_VALUE);
         Shaker.MAX_ENERGY = BUILDER
-            .comment("Maximum amount of energy the shaker can hold.")
+            .comment(maxEnergy("Shaker"))
             .defineInRange("maxEnergy", 80000, 0, Long.MAX_VALUE);
         BUILDER.pop();
 
@@ -187,13 +203,13 @@ public class Config {
             .comment("Temperature in Kelvin at which the Condenser processes recipes at 100% base speed.")
             .defineInRange("fullSpeedTemperature", 100, 0, Double.MAX_VALUE);
         Condenser.HEAT_CAPACITY = BUILDER
-            .comment("Heat capacity of the Condenser in J/K, controlling how quickly its temperature changes.")
+            .comment(heatCapacity("Condenser"))
             .defineInRange("heatCapacity", 50, 1, Double.MAX_VALUE);
         Condenser.INVERSE_CONDUCTION_COEFFICIENT = BUILDER
-            .comment("Inverse conduction coefficient of the Condenser, controlling how readily it exchanges heat with adjacent blocks.")
+            .comment(invCdt("Condenser"))
             .defineInRange("inverseConductionCoefficient", 5, 1, Double.MAX_VALUE);
         Condenser.INVERSE_INSULATION_COEFFICIENT = BUILDER
-            .comment("Inverse insulation coefficient of the Condenser, controlling how readily it exchanges heat with the environment.")
+            .comment(invIns("Condenser"))
             .defineInRange("inverseInsulationCoefficient", 5, 1, Double.MAX_VALUE);
         BUILDER.pop();
 
@@ -205,7 +221,7 @@ public class Config {
             .comment("Energy in Joules the Quenching Enrichment Chamber consumes per tick while processing a recipe. Each operation therefore costs energyPerTick * processingTime Joules.")
             .defineInRange("energyPerTick", 375, 0, Long.MAX_VALUE);
         QuenchingEnrichmentChamber.MAX_ENERGY = BUILDER
-            .comment("Maximum amount of energy in Joules the Quenching Enrichment Chamber can hold.")
+            .comment(maxEnergy("Quenching Enrichment Chamber"))
             .defineInRange("maxEnergy", 150_000, 0, Long.MAX_VALUE);
         QuenchingEnrichmentChamber.INPUT_FLUID_CAPACITY = BUILDER
             .comment("The capacity of the Quenching Enrichment Chamber's input fluid buffer, in buckets.")
@@ -256,13 +272,13 @@ public class Config {
             .comment("Heat pump coefficient of performance (COP). Heat moved per joule of energy consumed.")
             .defineInRange("efficiency", 2.0, 0, Double.MAX_VALUE);
         Cooler.HEAT_CAPACITY = BUILDER
-            .comment("Heat capacity of the Cooler in J/K, controlling how quickly its temperature changes.")
+            .comment(heatCapacity("Cooler"))
             .defineInRange("heatCapacity", 100, 1, Double.MAX_VALUE);
         Cooler.INVERSE_CONDUCTION_COEFFICIENT = BUILDER
-            .comment("Inverse conduction coefficient of the Cooler, controlling how readily it exchanges heat with adjacent blocks.")
+            .comment(invCdt("the Cooler"))
             .defineInRange("inverseConductionCoefficient", 5, 1, Double.MAX_VALUE);
         Cooler.INVERSE_INSULATION_COEFFICIENT = BUILDER
-            .comment("Inverse insulation coefficient of the Cooler, controlling how readily it loses heat to the environment.")
+            .comment(invIns("the Cooler"))
             .defineInRange("inverseInsulationCoefficient", 10, 1, Double.MAX_VALUE);
         BUILDER.pop();
 
@@ -274,13 +290,13 @@ public class Config {
             .comment("The total capacity of the reaction chamber's mixed fluid/chemical buffer, in buckets. Fluids and chemicals share this pool.")
             .defineInRange("capacity", 16, 1, Integer.MAX_VALUE);
         ReactionChamber.HEAT_CAPACITY = BUILDER
-            .comment("Heat capacity of the reaction chamber in J/K, controlling how quickly its temperature changes.")
+            .comment(heatCapacity("Reaction Chamber"))
             .defineInRange("heatCapacity", 100, 1, Double.MAX_VALUE);
         ReactionChamber.INVERSE_CONDUCTION_COEFFICIENT = BUILDER
-            .comment("Inverse conduction coefficient of the reaction chamber, controlling how readily it exchanges heat with adjacent blocks.")
+            .comment(invCdt("Reaction Chamber"))
             .defineInRange("inverseConductionCoefficient", 5, 1, Double.MAX_VALUE);
         ReactionChamber.INVERSE_INSULATION_COEFFICIENT = BUILDER
-            .comment("Inverse insulation coefficient of the reaction chamber, controlling how readily it loses heat to the environment.")
+            .comment(invIns("Reaction Chamber"))
             .defineInRange("inverseInsulationCoefficient", 5, 1, Double.MAX_VALUE);
         BUILDER.pop();
 
@@ -379,13 +395,13 @@ public class Config {
 
         BUILDER.push("retroentropicArray");
         RetroentropicArray.HEAT_CAPACITY = BUILDER
-            .comment("Heat capacity of the retroentropic array in J/K, controlling how quickly its temperature changes.")
+            .comment(heatCapacity("Retroentropic Array"))
             .defineInRange("heatCapacity", 100, 1, Double.MAX_VALUE);
         RetroentropicArray.INVERSE_CONDUCTION_COEFFICIENT = BUILDER
-            .comment("Inverse conduction coefficient of the retroentropic array, controlling how readily it exchanges heat with adjacent blocks.")
+            .comment(invCdt("Retroentropic Array"))
             .defineInRange("inverseConductionCoefficient", 5, 1, Double.MAX_VALUE);
         RetroentropicArray.INVERSE_INSULATION_COEFFICIENT = BUILDER
-            .comment("Inverse insulation coefficient of the retroentropic array, controlling how readily it loses heat to the environment.")
+            .comment(invIns("Retroentropic Array"))
             .defineInRange("inverseInsulationCoefficient", 5, 1, Double.MAX_VALUE);
         BUILDER.pop();
 
