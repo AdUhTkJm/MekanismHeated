@@ -1,3 +1,6 @@
 {
-  "parent": "mekanismheated:block/temperature_controller"
+  "parent": "mekanismheated:block/temperature_controller",
+  "textures": {
+    "front": "mekanismheated:block/temperature_controller/front_lit"
+  }
 }

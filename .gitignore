@@ -122,7 +122,7 @@ gradle-app.setting
 run/
 runs/
 mek
-mek/*
+AGENTS.md
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
