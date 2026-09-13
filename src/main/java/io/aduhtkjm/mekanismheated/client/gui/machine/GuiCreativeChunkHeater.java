@@ -23,6 +23,7 @@ public class GuiCreativeChunkHeater extends GuiMekanismTile<TileEntityCreativeCh
 
     public GuiCreativeChunkHeater(EmptyTileContainer<TileEntityCreativeChunkHeater> container, Inventory inv, Component title) {
         super(container, inv, title);
+        imageHeight = 91;
     }
 
     @Override
@@ -34,7 +35,7 @@ public class GuiCreativeChunkHeater extends GuiMekanismTile<TileEntityCreativeCh
               ModLang.GUI_CHUNK_DELTA.translate(MekanismUtils.getTemperatureDisplay(tile.getLastAppliedDelta(), TemperatureUnit.KELVIN, false))
         )).clearFormat());
 
-        targetTempField = addRenderableWidget(new GuiTextField(this, 50, 51, 76, 12));
+        targetTempField = addRenderableWidget(new GuiTextField(this, 50, 63, 76, 12));
         targetTempField.setMaxLength(10);
         targetTempField.setInputValidator(InputValidator.DIGIT)
               .configureDigitalInput(this::setTargetTemperature);

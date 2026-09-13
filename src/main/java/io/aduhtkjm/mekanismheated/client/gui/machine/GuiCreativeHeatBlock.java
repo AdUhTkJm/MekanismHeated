@@ -25,6 +25,7 @@ public class GuiCreativeHeatBlock extends GuiMekanismTile<TileEntityCreativeHeat
 
     public GuiCreativeHeatBlock(EmptyTileContainer<TileEntityCreativeHeatBlock> container, Inventory inv, Component title) {
         super(container, inv, title);
+        imageHeight = 91;
     }
 
     @Override

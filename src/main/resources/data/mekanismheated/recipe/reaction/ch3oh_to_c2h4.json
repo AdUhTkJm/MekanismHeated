@@ -1,0 +1,30 @@
+{
+  "type": "mekanismheated:reaction",
+  "comment": "2 CH3OH (90) == (cat. H2SO4 [1]) C2H4 (45) + 2 H2O (90)",
+  "inputs": {
+    "fluids": [{
+      "fluid": "mekanismheated:methanol",
+      "amount": 90
+    }, {
+      "fluid": "mekanism:sulfuric_acid",
+      "amount": 1
+    }],
+    "chemicals": []
+  },
+  "outputs": {
+    "fluids": [{
+      "fluid": "mekanism:sulfuric_acid",
+      "amount": 1
+    }, {
+      "fluid": "minecraft:water",
+      "amount": 90
+    }],
+    "chemicals": [{
+      "chemical": "mekanism:ethene",
+      "amount": 90
+    }]
+  },
+  "min_temperature": 300,
+  "max_temperature": 4000,
+  "duration": 20
+}
