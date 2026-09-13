@@ -1,7 +1,6 @@
 package io.aduhtkjm.mekanismheated.tile;
 
 import io.aduhtkjm.mekanismheated.Config;
-import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.recipe.*;
 import io.aduhtkjm.mekanismheated.recipe.cache.HeatSensitiveOneInputCachedRecipe;
 import io.aduhtkjm.mekanismheated.recipe.lookup.monitor.HeatSmelterRecipeCacheLookupMonitor;
@@ -462,7 +461,7 @@ public class TileEntityHeatSmelter
     }
 
     @Override
-    public void addContainerTrackers(MekanismContainer container) {
+    public void addContainerTrackers(@NotNull MekanismContainer container) {
         super.addContainerTrackers(container);
         container.track(SyncableDouble.create(this::getLastTransferLoss, value -> lastTransferLoss = value));
         container.track(SyncableDouble.create(this::getLastEnvironmentLoss, value -> lastEnvironmentLoss = value));

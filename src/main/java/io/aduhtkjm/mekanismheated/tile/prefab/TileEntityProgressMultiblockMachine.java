@@ -49,6 +49,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.system.NonnullDefault;
 
 /**
  * Shared base for a tile that works both as a standalone {@link TileEntityProgressMachine} and, once enough of its
@@ -70,6 +71,7 @@ import org.jetbrains.annotations.Nullable;
  * {@link #multiblockInventorySlotHolder()}, {@link #multiblockFluidTankHolder()}, {@link #multiblockHeatCapacitorHolder()})
  * from its three-argument {@code getInitial*} overrides.</p>
  */
+@NonnullDefault
 public abstract class TileEntityProgressMultiblockMachine<T extends MultiblockData, RECIPE extends MekanismRecipe<?>> extends TileEntityProgressMachine<RECIPE> implements IMultiblock<T>, IConfigurable {
 
     private Structure structure = Structure.INVALID;
@@ -303,9 +305,8 @@ public abstract class TileEntityProgressMultiblockMachine<T extends MultiblockDa
         return isMaster;
     }
 
-    @NotNull
     @Override
-    public CompoundTag getReducedUpdateTag(@NotNull HolderLookup.Provider provider) {
+    public CompoundTag getReducedUpdateTag(HolderLookup.Provider provider) {
         CompoundTag updateTag = super.getReducedUpdateTag(provider);
         updateTag.putBoolean(SerializationConstants.RENDERING, isMaster());
         T multiblock = getMultiblock();
@@ -317,7 +318,7 @@ public abstract class TileEntityProgressMultiblockMachine<T extends MultiblockDa
     }
 
     @Override
-    public void handleUpdateTag(@NotNull CompoundTag tag, @NotNull HolderLookup.Provider provider) {
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider provider) {
         super.handleUpdateTag(tag, provider);
         NBTUtils.setBooleanIfPresent(tag, SerializationConstants.RENDERING, value -> isMaster = value);
         T multiblock = getMultiblock();
@@ -354,7 +355,7 @@ public abstract class TileEntityProgressMultiblockMachine<T extends MultiblockDa
     }
 
     @Override
-    public void loadAdditional(@NotNull CompoundTag nbt, @NotNull HolderLookup.Provider provider) {
+    public void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
         super.loadAdditional(nbt, provider);
         if (!getMultiblock().isFormed()) {
             NBTUtils.setUUIDIfPresent(nbt, SerializationConstants.INVENTORY_ID, id -> cachedID = id);
@@ -362,7 +363,7 @@ public abstract class TileEntityProgressMultiblockMachine<T extends MultiblockDa
     }
 
     @Override
-    public void saveAdditional(@NotNull CompoundTag nbtTags, @NotNull HolderLookup.Provider provider) {
+    public void saveAdditional(CompoundTag nbtTags, HolderLookup.Provider provider) {
         super.saveAdditional(nbtTags, provider);
         if (cachedID != null) {
             //Note: We don't bother validating here the cache still exists as it is irrelevant and unused until attempting to form the multiblock
@@ -390,7 +391,6 @@ public abstract class TileEntityProgressMultiblockMachine<T extends MultiblockDa
      * Holder exposing the formed multiblock's inventory slots. A concrete tile should return this from its
      * three-argument {@code getInitialInventory} override while formed.
      */
-    @NotNull
     protected IInventorySlotHolder multiblockInventorySlotHolder() {
         return side -> getMultiblock().getInventorySlots(side);
     }
@@ -399,7 +399,6 @@ public abstract class TileEntityProgressMultiblockMachine<T extends MultiblockDa
      * Holder exposing the formed multiblock's fluid tanks. A concrete tile should return this from its
      * three-argument {@code getInitialFluidTanks} override while formed.
      */
-    @NotNull
     protected IFluidTankHolder multiblockFluidTankHolder() {
         return side -> getMultiblock().getFluidTanks(side);
     }
@@ -408,26 +407,26 @@ public abstract class TileEntityProgressMultiblockMachine<T extends MultiblockDa
      * Holder exposing the formed multiblock's heat capacitors. A concrete tile should return this from its
      * three-argument {@code getInitialHeatCapacitors} override while formed.
      */
-    @NotNull
     protected IHeatCapacitorHolder multiblockHeatCapacitorHolder() {
         return side -> getMultiblock().getHeatCapacitors(side);
     }
 
     @Override
+    @SuppressWarnings("all") // npe: level cannot be null
     public void onNeighborChange(Block block, BlockPos neighborPos) {
         super.onNeighborChange(block, neighborPos);
-        //TODO - V11: Make this properly support changing blocks inside the structure when they aren't touching any part of the multiblocks
-        if (!isRemote()) {
-            T multiblock = getMultiblock();
-            if (multiblock.isPositionInsideBounds(getStructure(), neighborPos)) {
-                //If the neighbor change happened from inside the bounds of the multiblock,
-                if (level.isEmptyBlock(neighborPos) || !multiblock.internalLocations.contains(neighborPos)) {
-                    //And we are not already an internal part of the structure, or we are changing an internal part to air
-                    // then we mark the structure as needing to be re-validated
-                    //Note: This isn't a super accurate check as if a node gets replaced by command or mod with say dirt
-                    // it won't know to invalidate it but oh well. (See java docs on internalLocations for more caveats)
-                    getStructure().markForUpdate(level, true);
-                }
+        if (isRemote())
+            return;
+
+        T multiblock = getMultiblock();
+        if (multiblock.isPositionInsideBounds(getStructure(), neighborPos)) {
+            //If the neighbor change happened from inside the bounds of the multiblock,
+            if (level.isEmptyBlock(neighborPos) || !multiblock.internalLocations.contains(neighborPos)) {
+                //And we are not already an internal part of the structure, or we are changing an internal part to air
+                // then we mark the structure as needing to be re-validated
+                //Note: This isn't a super accurate check as if a node gets replaced by command or mod with say dirt
+                // it won't know to invalidate it but oh well. (See java docs on internalLocations for more caveats)
+                getStructure().markForUpdate(level, true);
             }
         }
     }

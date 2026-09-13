@@ -46,9 +46,6 @@ import org.lwjgl.system.NonnullDefault;
  * client can re-parse the same text locally to build a localised syntax error without any of it crossing the wire. Only
  * runtime failures — which depend on the world the client cannot see — are synced, as a
  * {@link ExpressionRuntimeError} plus the {@link Side} it applies to.
- *
- * <p>The machine has no energy buffer, no inventory and no heat capacitors: everything it does is gated by Mekanism's
- * normal redstone control (default {@code HIGH}), which is why it overrides only a handful of hooks.
  */
 @NonnullDefault
 public class TileEntityTemperatureController extends TileEntityMekanism {
@@ -78,9 +75,11 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
     /**
      * The text {@link #compiled} was built from, while {@link #expression} is the current expression. <p>
      *
-     * When they're different then we rebuild.
+     * When they're different then we rebuild. <p>
+     *
+     * We must rebuild when the block is placed, to ensure the `lastAmbientTemperature` gets updated properly.
      */
-    private HashedString compiledFrom = new HashedString("");
+    private HashedString compiledFrom = new HashedString("_");
 
     private OutputMode outputMode = OutputMode.REDSTONE;
     private ExpressionRuntimeError runtimeError = ExpressionRuntimeError.NONE;
@@ -109,13 +108,6 @@ public class TileEntityTemperatureController extends TileEntityMekanism {
 
     public TileEntityTemperatureController(BlockPos pos, BlockState state) {
         super(ModBlocks.TEMPERATURE_CONTROLLER, pos, state);
-    }
-
-    @Override
-    protected void presetVariables() {
-        // We disable the redstone signal controlling, or otherwise then the machine outputs redstone signal,
-        // it might block itself from updating.
-        setControlType(RedstoneControl.DISABLED);
     }
 
     @Override

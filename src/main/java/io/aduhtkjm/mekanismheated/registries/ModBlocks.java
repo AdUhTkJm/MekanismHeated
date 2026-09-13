@@ -214,10 +214,6 @@ public class ModBlocks {
     public static final BlockRegistryObject<AtmosphereHeaterBlock, BlockItem> ATMOSPHERE_HEATER =
           BLOCKS.register("atmosphere_heater", () -> new AtmosphereHeaterBlock(ATMOSPHERE_HEATER_TYPE, BlockBehaviour.Properties.of().mapColor(MapColor.METAL)));
 
-    //Only the five attributes this block actually uses, plus the redstone emitter that lets a plain BlockTile expose
-    //the controller's output as a signal source (which is what makes BlockTile#isSignalSource true). The inventory,
-    //upgrade, particle and comparator attributes a Machine comes with by default are all removed: the controller has no
-    //slots to configure, nothing to upgrade, and its comparator output would always read 0 because it has no inventory.
     public static final Machine<TileEntityTemperatureController> TEMPERATURE_CONTROLLER_TYPE = MachineBuilder
           .createMachine(() -> ModTileEntityTypes.TEMPERATURE_CONTROLLER, ModLang.DESCRIPTION_TEMPERATURE_CONTROLLER)
           .withGui(() -> ModContainerTypes.TEMPERATURE_CONTROLLER)

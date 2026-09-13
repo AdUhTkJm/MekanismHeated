@@ -2,7 +2,7 @@
   "type": "mekanismheated:heated_melting",
   "input": {
     "count": 1,
-    "tag": "mekanismheated:impure_sn_ingot"
+    "item": "mekanismheated:impure_sn_ingot"
   },
   "output": {
     "amount": 30,

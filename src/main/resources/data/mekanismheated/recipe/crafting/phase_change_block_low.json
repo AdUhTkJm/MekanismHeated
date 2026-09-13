@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " I ",
+    "PTP",
+    " P "
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:ice"
+    },
+    "T": {
+      "tag": "mekanismheated:thermal_casing"
+    },
+    "P": {
+      "item": "mekanismheated:thermoenergetic_alloy_ingot"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "mekanismheated:phase_change_block_low"
+  }
+}

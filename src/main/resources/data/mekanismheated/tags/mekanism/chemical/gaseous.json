@@ -1,5 +1,7 @@
 {
   "values": [
-    "mekanismheated:carbon_monoxide"
+    "mekanismheated:carbon_monoxide",
+    "mekanismheated:nitrogen",
+    "mekanismheated:gas_methanol"
   ]
 }

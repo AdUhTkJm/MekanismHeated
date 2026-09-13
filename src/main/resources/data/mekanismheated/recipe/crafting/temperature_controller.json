@@ -1,19 +1,19 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "TAT",
-    "SES",
-    "TAT"
+    "RAR",
+    "OTO",
+    "RAR"
   ],
   "key": {
     "A": {
       "tag": "c:circuits/advanced"
     },
-    "E": {
-      "item": "mekanism:enrichment_chamber"
+    "O": {
+      "tag": "c:ingots/osmium"
     },
-    "S": {
-      "item": "mekanism:steel_casing"
+    "R": {
+      "tag": "c:dusts/redstone"
     },
     "T": {
       "tag": "mekanismheated:thermal_casing"

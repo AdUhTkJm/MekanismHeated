@@ -84,7 +84,7 @@ public class GuiTemperatureController extends GuiMekanismTile<TileEntityTemperat
         addRenderableWidget(new GuiInnerScreen(this, 48, 19, 130, 40, this::screenLines)).clearFormat();
 
         OutputMode mode = tile.getOutputMode();
-        modeButton = addRenderableWidget(new MekanismButton(this, 8, 59, 36, 14, modeLabel(mode), (element, mouseX, mouseY) -> {
+        modeButton = addRenderableWidget(new MekanismButton(this, 8, 58, 36, 14, modeLabel(mode), (element, mouseX, mouseY) -> {
             toggleOutputMode();
             return true;
         }));
