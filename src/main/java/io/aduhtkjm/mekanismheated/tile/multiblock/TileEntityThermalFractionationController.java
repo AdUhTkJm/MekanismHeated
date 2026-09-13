@@ -1,6 +1,5 @@
 package io.aduhtkjm.mekanismheated.tile.multiblock;
 
-import io.aduhtkjm.mekanismheated.content.fractionation.FractionationMultiblockData;
 import io.aduhtkjm.mekanismheated.registries.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;

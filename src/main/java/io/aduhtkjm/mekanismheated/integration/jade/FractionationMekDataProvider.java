@@ -1,6 +1,6 @@
 package io.aduhtkjm.mekanismheated.integration.jade;
 
-import io.aduhtkjm.mekanismheated.content.fractionation.FractionationMultiblockData;
+import io.aduhtkjm.mekanismheated.tile.multiblock.FractionationMultiblockData;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityFractionationBlock;
 import mekanism.api.SerializationConstants;
 import mekanism.api.fluid.IExtendedFluidTank;

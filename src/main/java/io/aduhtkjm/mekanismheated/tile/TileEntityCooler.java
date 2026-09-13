@@ -74,13 +74,14 @@ public class TileEntityCooler extends TileEntityMekanism {
             toUse = energyContainer.extract(energyContainer.getEnergyPerTick(), Action.SIMULATE, AutomationType.INTERNAL);
             if (toUse > 0) {
                 double heat = toUse * getCop();
+                // We intentionally don't check whether coldCapacitor has enough heat, so it can go below 0K.
+                // This is required to power the end-game multiblock, Retroentropic Array.
                 coldCapacitor.handleHeat(-heat);
                 hotCapacitor.handleHeat(heat);
                 energyContainer.extract(toUse, Action.EXECUTE, AutomationType.INTERNAL);
             }
         }
-        setActive(toUse > 0);
-        energyUsed = toUse;
+        setActive((energyUsed = toUse) > 0);
         simulate();
         return sendUpdatePacket;
     }

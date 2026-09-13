@@ -27,8 +27,7 @@ public class LargeHeatSmelterValidator extends CuboidStructureValidator<LargeHea
 
     @Override
     protected StructureRequirement getStructureRequirement(BlockPos pos) {
-        //Solid cuboid: every position (frame, wall, and interior) must be a heat_smelter block, so treat them all
-        // as frame/casing rather than leaving the interior as hollow air
+        // Must be frame everywhere.
         return StructureRequirement.FRAME;
     }
 
@@ -41,7 +40,7 @@ public class LargeHeatSmelterValidator extends CuboidStructureValidator<LargeHea
     public FormationResult postcheck(LargeHeatSmelterData structure, Long2ObjectMap<ChunkAccess> chunkMap) {
         FormationResult result = super.postcheck(structure, chunkMap);
         if (result.isFormed()) {
-            //Scale the shared fluid tank and heat capacitor to the formed structure's volume
+            // Scale the shared fluid tank and heat capacitor to the formed structure's volume
             structure.configure(structure.getVolume());
         }
         return result;

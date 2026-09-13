@@ -5,9 +5,9 @@ import io.aduhtkjm.mekanismheated.recipe.*;
 import io.aduhtkjm.mekanismheated.recipe.cache.HeatSensitiveOneInputCachedRecipe;
 import io.aduhtkjm.mekanismheated.recipe.lookup.monitor.HeatSmelterRecipeCacheLookupMonitor;
 import io.aduhtkjm.mekanismheated.registries.ModBlocks;
+import io.aduhtkjm.mekanismheated.registries.ModMultiblockManagers;
 import io.aduhtkjm.mekanismheated.tank.MultiFluidTank;
 import io.aduhtkjm.mekanismheated.tile.multiblock.LargeHeatSmelterData;
-import io.aduhtkjm.mekanismheated.tile.multiblock.ModLargeHeatSmelter;
 import io.aduhtkjm.mekanismheated.tile.prefab.TileEntityProgressMultiblockMachine;
 import java.util.ArrayList;
 import java.util.List;
@@ -202,7 +202,7 @@ public class TileEntityHeatSmelter
     @NotNull
     @Override
     public MultiblockManager<LargeHeatSmelterData> getManager() {
-        return ModLargeHeatSmelter.LARGE_HEAT_SMELTER_MANAGER;
+        return ModMultiblockManagers.LARGE_HEAT_SMELTER_MANAGER;
     }
 
     @NotNull

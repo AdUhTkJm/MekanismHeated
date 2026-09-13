@@ -1,19 +1,9 @@
 package io.aduhtkjm.mekanismheated.registries;
 
 import io.aduhtkjm.mekanismheated.Mod;
-import io.aduhtkjm.mekanismheated.tile.TileEntityAtmosphereHeater;
-import io.aduhtkjm.mekanismheated.tile.TileEntityCondenser;
-import io.aduhtkjm.mekanismheated.tile.TileEntityCooler;
-import io.aduhtkjm.mekanismheated.tile.TileEntityCreativeChunkHeater;
-import io.aduhtkjm.mekanismheated.tile.TileEntityCreativeHeatBlock;
-import io.aduhtkjm.mekanismheated.tile.TileEntityShaker;
-import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
-import io.aduhtkjm.mekanismheated.tile.TileEntityFusedPipe;
-import io.aduhtkjm.mekanismheated.tile.TileEntityPhaseChangeBlock;
-import io.aduhtkjm.mekanismheated.tile.TileEntityQuenchingEnrichmentChamber;
-import io.aduhtkjm.mekanismheated.tile.TileEntityReactionChamber;
-import io.aduhtkjm.mekanismheated.tile.TileEntityTemperatureController;
+import io.aduhtkjm.mekanismheated.tile.*;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityFractionationBlock;
+import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityRetroentropicArrayCasing;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationController;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationValve;
 import mekanism.common.capabilities.Capabilities;
@@ -139,4 +129,11 @@ public class ModTileEntityTypes {
           .mekBuilder(ModBlocks.PHASE_CHANGE_HIGH, TileEntityPhaseChangeBlock::new)
           .serverTicker(TileEntityMekanism::tickServer)
           .build();
+
+    public static final TileEntityTypeRegistryObject<TileEntityRetroentropicArrayCasing> RETROENTROPIC_ARRAY_CASING = TILE_ENTITY_TYPES
+        .mekBuilder(ModBlocks.RETROENTROPIC_ARRAY_CASING, TileEntityRetroentropicArrayCasing::new)
+        .clientTicker(TileEntityMekanism::tickClient)
+        .serverTicker(TileEntityMekanism::tickServer)
+        .withSimple(Capabilities.CONFIGURABLE)
+        .build();
 }

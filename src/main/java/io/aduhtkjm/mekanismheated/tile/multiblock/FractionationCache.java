@@ -1,4 +1,4 @@
-package io.aduhtkjm.mekanismheated.content.fractionation;
+package io.aduhtkjm.mekanismheated.tile.multiblock;
 
 import java.util.List;
 import mekanism.api.fluid.IExtendedFluidTank;
@@ -18,7 +18,7 @@ public class FractionationCache extends MultiblockCache<FractionationMultiblockD
         List<IExtendedFluidTank> cacheTanks = getFluidTanks(null);
         int required = data.getFluidTanks(null).size();
         while (cacheTanks.size() < required) {
-            //Same shape of tank CacheSubstance.FLUID prefabs with; contents are copied by the super call below.
+            // Same shape of tank CacheSubstance.FLUID prefabs with; contents are copied by the super call below.
             // Extra cache tanks left over after shrinking a tower are kept so removing and re-adding a tray layer
             // preserves its contents.
             cacheTanks.add(BasicFluidTank.create(Integer.MAX_VALUE, this));

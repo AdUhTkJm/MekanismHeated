@@ -23,6 +23,7 @@ public enum ModLang implements ILangEntry {
     DESCRIPTION_CREATIVE_CHUNK_HEATER("description", "creative_chunk_heater"),
     DESCRIPTION_COOLER("description", "cooler"),
     DESCRIPTION_TEMPERATURE_CONTROLLER("description", "temperature_controller"),
+    DESCRIPTION_RETROENTROPIC_ARRAY_CASING("description", "retroentropic_array_casing"),
 
     // Strings used in GUI.
     GUI_ALLOYING("gui", "alloying"),

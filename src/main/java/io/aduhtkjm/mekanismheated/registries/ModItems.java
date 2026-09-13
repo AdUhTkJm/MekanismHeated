@@ -64,6 +64,7 @@ public class ModItems {
         output.accept(ModBlocks.PHASE_CHANGE_LOW);
         output.accept(ModBlocks.PHASE_CHANGE_MEDIUM);
         output.accept(ModBlocks.PHASE_CHANGE_HIGH);
+        output.accept(ModBlocks.RETROENTROPIC_ARRAY_CASING);
 
         output.accept(ModItems.SPONGE_IRON_INGOT.get());
         output.accept(ModItems.IMPURE_SN_INGOT.get());

@@ -6,7 +6,6 @@ import io.aduhtkjm.mekanismheated.block.heatsmelter.HeatSmelterBlock;
 import io.aduhtkjm.mekanismheated.block.phasechange.PhaseChangeBlock;
 import io.aduhtkjm.mekanismheated.block.reactionchamber.ReactionChamberBlock;
 import io.aduhtkjm.mekanismheated.block.temperaturecontroller.TemperatureControllerBlock;
-import io.aduhtkjm.mekanismheated.content.fractionation.FractionationMultiblockData;
 import io.aduhtkjm.mekanismheated.tile.TileEntityAtmosphereHeater;
 import io.aduhtkjm.mekanismheated.tile.TileEntityFusedPipe;
 import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;

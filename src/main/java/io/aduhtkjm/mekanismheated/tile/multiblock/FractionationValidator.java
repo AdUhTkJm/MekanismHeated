@@ -1,10 +1,9 @@
-package io.aduhtkjm.mekanismheated.content.fractionation;
+package io.aduhtkjm.mekanismheated.tile.multiblock;
 
 import io.aduhtkjm.mekanismheated.Config;
 import io.aduhtkjm.mekanismheated.ModLang;
 import io.aduhtkjm.mekanismheated.block.fractionation.DistillationTrayBlock;
 import io.aduhtkjm.mekanismheated.registries.ModBlocks;
-import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationController;
 import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;

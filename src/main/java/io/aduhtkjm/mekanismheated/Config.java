@@ -120,6 +120,12 @@ public class Config {
         public static ModConfigSpec.IntValue INTERVAL;
     }
 
+    public static class RetroentropicArray {
+        public static ModConfigSpec.DoubleValue HEAT_CAPACITY;
+        public static ModConfigSpec.DoubleValue INVERSE_CONDUCTION_COEFFICIENT;
+        public static ModConfigSpec.DoubleValue INVERSE_INSULATION_COEFFICIENT;
+    }
+
     public static ModConfigSpec SPEC;
     static {
         BUILDER.push("heatSmelter");
@@ -370,6 +376,19 @@ public class Config {
             .comment("The ticks between two output updates of the temperature controller.")
             .defineInRange("interval", 20, 1, Integer.MAX_VALUE);
         BUILDER.pop();
+
+        BUILDER.push("retroentropicArray");
+        RetroentropicArray.HEAT_CAPACITY = BUILDER
+            .comment("Heat capacity of the retroentropic array in J/K, controlling how quickly its temperature changes.")
+            .defineInRange("heatCapacity", 100, 1, Double.MAX_VALUE);
+        RetroentropicArray.INVERSE_CONDUCTION_COEFFICIENT = BUILDER
+            .comment("Inverse conduction coefficient of the retroentropic array, controlling how readily it exchanges heat with adjacent blocks.")
+            .defineInRange("inverseConductionCoefficient", 5, 1, Double.MAX_VALUE);
+        RetroentropicArray.INVERSE_INSULATION_COEFFICIENT = BUILDER
+            .comment("Inverse insulation coefficient of the retroentropic array, controlling how readily it loses heat to the environment.")
+            .defineInRange("inverseInsulationCoefficient", 5, 1, Double.MAX_VALUE);
+        BUILDER.pop();
+
         SPEC = BUILDER.build();
     }
 

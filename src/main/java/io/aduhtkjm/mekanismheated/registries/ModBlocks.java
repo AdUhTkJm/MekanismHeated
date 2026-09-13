@@ -31,6 +31,7 @@ import io.aduhtkjm.mekanismheated.tile.TileEntityQuenchingEnrichmentChamber;
 import io.aduhtkjm.mekanismheated.tile.TileEntityReactionChamber;
 import io.aduhtkjm.mekanismheated.tile.TileEntityTemperatureController;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityFractionationBlock;
+import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityRetroentropicArrayCasing;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationController;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationValve;
 import mekanism.common.block.attribute.AttributeParticleFX;
@@ -67,10 +68,6 @@ public class ModBlocks {
 
     public static final BlockDeferredRegister BLOCKS = new BlockDeferredRegister(Mod.MODID);
 
-    /**
-     * An orange counterpart to Mekanism's steel casing: a plain decorative building block with no behaviour. The
-     * texture is baked from the steel casing's by {@code scripts/thermal_casing_texture.py}.
-     */
     public static final BlockRegistryObject<Block, BlockItem> THERMAL_CASING =
           BLOCKS.register("thermal_casing", BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(3.5F, 9F).sound(SoundType.METAL));
 
@@ -262,4 +259,15 @@ public class ModBlocks {
     private static BlockBehaviour.Properties phaseChangeProperties(MapColor mapColor) {
         return BlockBehaviour.Properties.of().mapColor(mapColor).strength(3.5F, 9F).sound(SoundType.METAL);
     }
+
+    public static final BlockTypeTile<TileEntityRetroentropicArrayCasing> RETROENTROPIC_ARRAY_TYPE = BlockTileBuilder
+        .createBlock(() -> ModTileEntityTypes.RETROENTROPIC_ARRAY_CASING, ModLang.DESCRIPTION_RETROENTROPIC_ARRAY_CASING)
+        .with(new AttributeCustomResistance(9))
+        .externalMultiblock()
+        .build();
+
+    public static final BlockRegistryObject<BlockBasicMultiblock<TileEntityRetroentropicArrayCasing>, ItemBlockTooltip<BlockBasicMultiblock<TileEntityRetroentropicArrayCasing>>> RETROENTROPIC_ARRAY_CASING =
+        BLOCKS.register("retroentropic_array_casing",
+            () -> new BlockBasicMultiblock<>(RETROENTROPIC_ARRAY_TYPE, BlockBehaviour.Properties.of().mapColor(MapColor.METAL)),
+            (block, properties) -> new ItemBlockTooltip<>(block, true, properties));;
 }

@@ -1,4 +1,4 @@
-package io.aduhtkjm.mekanismheated.content.fractionation;
+package io.aduhtkjm.mekanismheated.tile.multiblock;
 
 import io.aduhtkjm.mekanismheated.Config;
 import io.aduhtkjm.mekanismheated.recipe.BasicFractionationRecipe;

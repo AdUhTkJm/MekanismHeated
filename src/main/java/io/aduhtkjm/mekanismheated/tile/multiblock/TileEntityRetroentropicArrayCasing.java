@@ -9,24 +9,24 @@ import net.minecraft.core.Holder;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class TileEntityFractionationBlock extends TileEntityMultiblock<FractionationMultiblockData> {
+public class TileEntityRetroentropicArrayCasing extends TileEntityMultiblock<RetroentropicArrayData> {
 
-    public TileEntityFractionationBlock(BlockPos pos, BlockState state) {
-        this(ModBlocks.THERMAL_FRACTIONATION_CASING, pos, state);
+    public TileEntityRetroentropicArrayCasing(BlockPos pos, BlockState state) {
+        this(ModBlocks.RETROENTROPIC_ARRAY_CASING, pos, state);
     }
 
-    public TileEntityFractionationBlock(Holder<Block> provider, BlockPos pos, BlockState state) {
+    public TileEntityRetroentropicArrayCasing(Holder<Block> provider, BlockPos pos, BlockState state) {
         super(provider, pos, state);
     }
 
     @Override
-    public FractionationMultiblockData createMultiblock() {
-        return new FractionationMultiblockData(this);
+    public RetroentropicArrayData createMultiblock() {
+        return new RetroentropicArrayData(this);
     }
 
     @Override
-    public MultiblockManager<FractionationMultiblockData> getManager() {
-        return ModMultiblockManagers.FRACTIONATION_MANAGER;
+    public MultiblockManager<RetroentropicArrayData> getManager() {
+        return ModMultiblockManagers.RETROENTROPIC_MANAGER;
     }
 
     @Override

@@ -2,14 +2,13 @@ package io.aduhtkjm.mekanismheated.client.gui.machine;
 
 import io.aduhtkjm.mekanismheated.ModLang;
 import io.aduhtkjm.mekanismheated.client.gui.element.GuiMixedFluidGauge;
-import io.aduhtkjm.mekanismheated.content.fractionation.FractionationMultiblockData;
+import io.aduhtkjm.mekanismheated.tile.multiblock.FractionationMultiblockData;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationController;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.client.gui.GuiMekanismTile;
-import mekanism.client.gui.element.GuiDownArrow;
 import mekanism.client.gui.element.GuiElement;
 import mekanism.client.gui.element.GuiInnerScreen;
 import mekanism.client.gui.element.bar.GuiBar.IBarInfoHandler;

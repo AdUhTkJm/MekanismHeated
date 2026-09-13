@@ -101,7 +101,6 @@ public class TileEntityFusedPipe extends CapabilityTileEntity implements ProxyCo
           };
 
     private static final String TAG_CONNECTION_TYPES = "connection_types";
-    private static final String TAG_ITEMS = "items";
 
     private FusedPipeConfig config = FusedPipeConfig.defaults();
     private final FusedPipeNode node = new FusedPipeNode(this);
