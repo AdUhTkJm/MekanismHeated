@@ -1,0 +1,11 @@
+{
+  "type": "mekanismheated:condensing",
+  "input": {
+    "tag": "c:fluids/molten_lead",
+    "amount": 90
+  },
+  "output": {
+    "tag": "c:ingots/lead",
+    "count": 1
+  }
+}

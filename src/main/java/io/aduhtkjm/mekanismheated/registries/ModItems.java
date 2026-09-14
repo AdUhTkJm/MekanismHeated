@@ -96,6 +96,7 @@ public class ModItems {
         output.accept(ModFluids.MOLTEN_CASING_ALLOY.getBucket());
         output.accept(ModFluids.MOLTEN_INFUSED_ALLOY.getBucket());
         output.accept(ModFluids.MOLTEN_REINFORCED_ALLOY.getBucket());
+        output.accept(ModFluids.MOLTEN_ANCIENT_DEBRIS.getBucket());
         for (UnstableLavaVariant variant : ModFluids.UNSTABLE_LAVA_VARIANTS) {
             output.accept(variant.bucket().get());
         }

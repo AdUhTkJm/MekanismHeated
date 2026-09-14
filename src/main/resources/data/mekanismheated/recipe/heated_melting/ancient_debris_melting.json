@@ -1,0 +1,12 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "input": {
+    "count": 1,
+    "item": "minecraft:ancient_debris"
+  },
+  "output": {
+    "amount": 180,
+    "tag": "c:fluids/molten_ancient_debris"
+  },
+  "temperature": 2885
+}

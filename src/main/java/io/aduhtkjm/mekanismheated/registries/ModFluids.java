@@ -65,6 +65,9 @@ public class ModFluids {
     public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ItemChemicalFormulaBucket> MOLTEN_OSMIUM =
         FLUIDS.register("molten_osmium", (fluid, properties) -> new ItemChemicalFormulaBucket(fluid, properties, "Os"),
             UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFFC8CCF3));
+    public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ItemChemicalFormulaBucket> MOLTEN_LEAD =
+        FLUIDS.register("molten_lead", (fluid, properties) -> new ItemChemicalFormulaBucket(fluid, properties, "Pb"),
+            UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFF807F7D));
     public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ItemChemicalFormulaBucket> MOLTEN_THERMOENERGETIC_ALLOY =
         FLUIDS.register("molten_thermoenergetic_alloy", (fluid, properties) -> new ItemChemicalFormulaBucket(fluid, properties, "Fe-Cu"),
             UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFFFC7E11));
@@ -75,6 +78,13 @@ public class ModFluids {
         FLUIDS.register("molten_infused_alloy", renderProperties -> renderProperties.tint(0xFFE64141));
     public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, BucketItem> MOLTEN_REINFORCED_ALLOY =
         FLUIDS.register("molten_reinforced_alloy", renderProperties -> renderProperties.tint(0xFF58D7F0));
+    public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, BucketItem> MOLTEN_ANCIENT_DEBRIS =
+        FLUIDS.register("molten_ancient_debris", renderProperties -> renderProperties.tint(0xFF704F0C));
+
+    public static final List<FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ? extends BucketItem>> MOLTEN_FLUID_VARIANTS =
+        List.of(MOLTEN_IRON, MOLTEN_COPPER, MOLTEN_TIN, MOLTEN_BRONZE, MOLTEN_OSMIUM, MOLTEN_LEAD,
+            MOLTEN_THERMOENERGETIC_ALLOY, MOLTEN_CASING_ALLOY, MOLTEN_INFUSED_ALLOY, MOLTEN_REINFORCED_ALLOY,
+            MOLTEN_ANCIENT_DEBRIS);
 
     // Slurry
     public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ItemChemicalFormulaBucket> SLURRY_FE2O3 =
@@ -99,9 +109,9 @@ public class ModFluids {
           UnstableLavaVariant.register(UNSTABLE_LAVA_REGISTERS, "unstable_lava", 0xFFFF8C00);
     /** Unstable lava with different resources melted into it. */
     public static final UnstableLavaVariant UNSTABLE_LAVA_IRON =
-          UnstableLavaVariant.register(UNSTABLE_LAVA_REGISTERS, "unstable_lava_iron", 0xFFE0A46B);
+        UnstableLavaVariant.register(UNSTABLE_LAVA_REGISTERS, "unstable_lava_iron", 0xFFE0A46B);
     public static final UnstableLavaVariant UNSTABLE_LAVA_COPPER =
-          UnstableLavaVariant.register(UNSTABLE_LAVA_REGISTERS, "unstable_lava_copper", 0xFFFFA13B);
+        UnstableLavaVariant.register(UNSTABLE_LAVA_REGISTERS, "unstable_lava_copper", 0xFFFFA13B);
     public static final UnstableLavaVariant UNSTABLE_LAVA_TIN =
         UnstableLavaVariant.register(UNSTABLE_LAVA_REGISTERS, "unstable_lava_tin", 0xFFE0A46B);
     public static final UnstableLavaVariant UNSTABLE_LAVA_OSMIUM =

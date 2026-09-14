@@ -1,0 +1,12 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "input": {
+    "count": 1,
+    "tag": "c:ingots/lead"
+  },
+  "output": {
+    "amount": 90,
+    "tag": "c:fluids/molten_lead"
+  },
+  "temperature": 600
+}

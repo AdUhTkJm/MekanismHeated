@@ -4,7 +4,7 @@ import io.aduhtkjm.mekanismheated.content.unstablelava.UnstableLavaVariant;
 import io.aduhtkjm.mekanismheated.registries.ModFluids;
 import java.util.HashSet;
 import java.util.Set;
-import mekanism.common.registration.impl.FluidRegistryObject;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
@@ -34,7 +34,7 @@ import net.neoforged.neoforge.event.tick.EntityTickEvent;
  */
 public final class MoltenFluidHandler {
 
-    private static Set<Fluid> moltenFluids;
+    private static Set<Fluid> harmfulFluids;
 
     private MoltenFluidHandler() {
     }
@@ -45,26 +45,15 @@ public final class MoltenFluidHandler {
      */
     public static void init() {
         Set<Fluid> set = new HashSet<>();
-        add(set, ModFluids.MOLTEN_IRON);
-        add(set, ModFluids.MOLTEN_COPPER);
-        add(set, ModFluids.MOLTEN_TIN);
-        add(set, ModFluids.MOLTEN_BRONZE);
-        add(set, ModFluids.MOLTEN_OSMIUM);
-        add(set, ModFluids.MOLTEN_THERMOENERGETIC_ALLOY);
-        add(set, ModFluids.MOLTEN_CASING_ALLOY);
-        add(set, ModFluids.MOLTEN_INFUSED_ALLOY);
-        add(set, ModFluids.MOLTEN_REINFORCED_ALLOY);
-        //Unstable lava is not registered through FluidDeferredRegister, so its variants are added directly.
+        for (var molten : ModFluids.MOLTEN_FLUID_VARIANTS) {
+            set.add(molten.get());
+            set.add(molten.getFlowingFluid().get());
+        }
         for (UnstableLavaVariant variant : ModFluids.UNSTABLE_LAVA_VARIANTS) {
             set.add(variant.source().get());
             set.add(variant.flowing().get());
         }
-        moltenFluids = Set.copyOf(set);
-    }
-
-    private static void add(Set<Fluid> set, FluidRegistryObject<?, ?, ?, ?, ?> object) {
-        set.add(object.get());
-        set.add(object.getFlowingFluid().get());
+        harmfulFluids = Set.copyOf(set);
     }
 
     public static void onEntityTickPost(EntityTickEvent.Post event) {
@@ -87,7 +76,7 @@ public final class MoltenFluidHandler {
     }
 
     private static boolean isTouchingMoltenFluid(Level level, AABB aabb) {
-        if (moltenFluids == null) {
+        if (harmfulFluids == null) {
             return false;
         }
         int minX = Mth.floor(aabb.minX);
@@ -101,7 +90,7 @@ public final class MoltenFluidHandler {
             for (int y = minY; y <= maxY; y++) {
                 for (int z = minZ; z <= maxZ; z++) {
                     FluidState state = level.getFluidState(pos.set(x, y, z));
-                    if (!state.isEmpty() && moltenFluids.contains(state.getType())) {
+                    if (!state.isEmpty() && harmfulFluids.contains(state.getType())) {
                         return true;
                     }
                 }

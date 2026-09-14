@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " C ",
+    "CTC",
+    " C "
+  ],
+  "key": {
+    "C": {
+      "tag": "mekanismheated:thermal_casing"
+    },
+    "T": {
+      "item": "mekanism:teleportation_core"
+    }
+  },
+  "result": {
+    "count": 1,
+    "id": "mekanismheated:retroentropic_array_casing"
+  }
+}

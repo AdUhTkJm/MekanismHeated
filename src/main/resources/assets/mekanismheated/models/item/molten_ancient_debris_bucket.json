@@ -1,0 +1,5 @@
+{
+  "parent": "neoforge:item/bucket",
+  "fluid": "mekanismheated:molten_ancient_debris",
+  "loader": "neoforge:fluid_container"
+}

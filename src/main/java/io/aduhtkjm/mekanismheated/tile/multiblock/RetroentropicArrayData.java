@@ -1,7 +1,6 @@
 package io.aduhtkjm.mekanismheated.tile.multiblock;
 
 import io.aduhtkjm.mekanismheated.Config;
-import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.recipe.ModRecipeTypes;
 import io.aduhtkjm.mekanismheated.recipe.RetroentropicArrayRecipe;
 import mekanism.api.Action;
@@ -19,7 +18,6 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -107,7 +105,6 @@ public class RetroentropicArrayData extends MultiblockData {
         HeatAPI.HeatTransfer transfer = simulate();
         lastEnvironmentLoss = transfer.environmentTransfer();
         lastTransferLoss = transfer.adjacentTransfer();
-        Mod.LOGGER.info("env = {}, transfer = {}", lastEnvironmentLoss, lastTransferLoss);
         updateHeatCapacitors(null);
         needsPacket |= processRecipes(world);
         return needsPacket;

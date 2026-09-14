@@ -23,9 +23,9 @@ public class RetroentropicArrayRecipeCategory extends HolderRecipeCategory<Retro
 
     public RetroentropicArrayRecipeCategory(IGuiHelper helper, IRecipeViewerRecipeType<RetroentropicArrayRecipe> recipeType) {
         super(helper, recipeType);
-        input = addSlot(SlotType.INPUT, 58, 35);
-        output = addSlot(SlotType.OUTPUT, 110, 35);
-        addSimpleProgress(ProgressType.BAR, 80, 38);
+        input = addSlot(SlotType.INPUT, 64, 35);
+        output = addSlot(SlotType.OUTPUT, 116, 35);
+        addSimpleProgress(ProgressType.BAR, 86, 38);
     }
 
     private void addTooltip(IRecipeSlotBuilder slotBuilder, int duration) {
