@@ -3,15 +3,19 @@
   "inputs": [
     {
       "amount": 27,
-      "tag": "c:molten_cobalt"
+      "tag": "c:molten_copper"
     },
     {
       "amount": 9,
-      "tag": "tconstruct:molten_debris"
+      "tag": "c:molten_silver"
+    },
+    {
+      "amount": 40,
+      "tag": "c:redstone"
     }
   ],
   "output": {
     "amount": 36,
-    "tag": "c:molten_manyullyn"
+    "tag": "c:molten_signalum"
   }
 }

@@ -1,0 +1,17 @@
+{
+  "type": "mekanismheated:alloying",
+  "inputs": [
+    {
+      "amount": 1,
+      "fluid": "minecraft:water"
+    },
+    {
+      "amount": 10,
+      "fluid": "minecraft:lava"
+    }
+  ],
+  "output": {
+    "amount": 10,
+    "fluid": "tconstruct:molten_obsidian"
+  }
+}

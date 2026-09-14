@@ -14,7 +14,7 @@
       "tag": "c:molten_cadmium"
     }
   ],
-  "result": {
+  "output": {
     "amount": 36,
     "tag": "c:molten_bendalloy"
   }

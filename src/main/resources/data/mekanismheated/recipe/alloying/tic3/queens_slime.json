@@ -1,0 +1,21 @@
+{
+  "type": "mekanismheated:alloying",
+  "inputs": [
+    {
+      "amount": 9,
+      "tag": "c:molten_cobalt"
+    },
+    {
+      "amount": 9,
+      "tag": "c:molten_gold"
+    },
+    {
+      "amount": 25,
+      "tag": "c:magma"
+    }
+  ],
+  "output": {
+    "amount": 18,
+    "fluid": "tconstruct:molten_queens_slime"
+  }
+}

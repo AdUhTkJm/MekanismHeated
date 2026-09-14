@@ -161,45 +161,53 @@ public final class HeatSmelterLogic {
         // Snapshot once; safe because we stop after the first operation applied this tick
         List<FluidStack> fluids = tank.getFluids();
         // Fast path: if the last-applied recipe still matches, reuse it instead of re-scanning every alloy recipe
-        if (lastApplied != null && applyAlloy(tank, lastApplied.input1(), lastApplied.input2(), lastApplied.output(), fluids)) {
+        if (lastApplied != null && applyAlloy(tank, lastApplied.inputs(), lastApplied.output(), fluids)) {
             return lastApplied;
         }
         // Full scan: find any applicable recipe and remember it for the next tick
         for (RecipeHolder<AlloyRecipe> holder : level.getRecipeManager().getAllRecipesFor(ModRecipeTypes.TYPE_ALLOYING.value())) {
             AlloyRecipe recipe = holder.value();
-            if (applyAlloy(tank, recipe.getInput1(), recipe.getInput2(), recipe.getOutput(), fluids)) {
-                return new AlloyConfig(recipe.getInput1(), recipe.getInput2(), recipe.getOutput());
+            if (applyAlloy(tank, recipe.getInputs(), recipe.getOutput(), fluids)) {
+                return new AlloyConfig(recipe.getInputs(), recipe.getOutput());
             }
         }
         return lastApplied;
     }
 
     /**
-     * If the output tank can currently satisfy the given alloy ingredients (both inputs present in sufficient amount and room
-     * for the output), performs one alloy operation: drains the two inputs and adds the alloy.
+     * If the output tank can currently satisfy the given alloy ingredients (every input present in sufficient amount and
+     * room for the output), performs one alloy operation: drains the inputs and adds the alloy.
+     *
+     * @param inputs the recipe's fluid input ingredients, treated as an unordered group. A single tank fluid may satisfy
+     *               several of them, in which case it is drained once for each matching ingredient.
      *
      * @return {@code true} if the operation was applied.
      */
-    public static boolean applyAlloy(@NotNull MultiFluidTank tank, @NotNull FluidStackIngredient in1, @NotNull FluidStackIngredient in2,
+    public static boolean applyAlloy(@NotNull MultiFluidTank tank, @NotNull List<FluidStackIngredient> inputs,
           @NotNull FluidStackIngredient output, @NotNull List<FluidStack> fluids) {
         Fluid outFluid = AlloyRecipe.outputFluid(output);
-        if (outFluid == null) {
+        if (outFluid == null || inputs.isEmpty()) {
             return false;
         }
-        FluidStack match1 = findMatchingFluid(in1, fluids);
-        FluidStack match2 = findMatchingFluid(in2, fluids);
-        if (match1 == null || match2 == null) {
-            return false;
-        }
-        int need1 = (int) in1.getNeededAmount(match1);
-        int need2 = (int) in2.getNeededAmount(match2);
-        boolean sameFluid = FluidStack.isSameFluidSameComponents(match1, match2);
-        if (sameFluid) {
-            if (match1.getAmount() < need1 + need2) {
+        //Amounts are accumulated per tank fluid, so that two ingredients matching the same fluid sum their needs
+        long[] needByFluid = new long[fluids.size()];
+        long totalNeed = 0;
+        for (FluidStackIngredient input : inputs) {
+            int match = indexOfMatchingFluid(input, fluids);
+            if (match < 0) {
                 return false;
             }
-        } else if (match1.getAmount() < need1 || match2.getAmount() < need2) {
-            return false;
+            needByFluid[match] += input.getNeededAmount(fluids.get(match));
+        }
+        for (int i = 0; i < fluids.size(); i++) {
+            long need = needByFluid[i];
+            if (need < 1) {
+                continue;
+            }
+            if (fluids.get(i).getAmount() < need) {
+                return false;
+            }
+            totalNeed += need;
         }
         FluidStack outProbe = new FluidStack(outFluid, 1);
         int outAmount = (int) output.getNeededAmount(outProbe);
@@ -207,22 +215,14 @@ public final class HeatSmelterLogic {
             return false;
         }
         // Room available once the inputs have been drained (the alloy is typically volume-neutral, but need not be)
-        int projectedFree = tank.getTotalNeeded() + need1 + need2;
-        if (projectedFree < outAmount) {
+        if (tank.getTotalNeeded() + totalNeed < outAmount) {
             return false;
         }
         if (!tank.containsFluid(outProbe)) {
             // A new fluid type can only occupy an empty slot; verify draining frees one up (or one already exists)
             int projectedEmpty = tank.getSlots().size() - tank.getFluidCount();
-            if (sameFluid) {
-                if (match1.getAmount() == need1 + need2) {
-                    projectedEmpty++;
-                }
-            } else {
-                if (match1.getAmount() == need1) {
-                    projectedEmpty++;
-                }
-                if (match2.getAmount() == need2) {
+            for (int i = 0; i < fluids.size(); i++) {
+                if (needByFluid[i] > 0 && fluids.get(i).getAmount() == needByFluid[i]) {
                     projectedEmpty++;
                 }
             }
@@ -230,29 +230,33 @@ public final class HeatSmelterLogic {
                 return false;
             }
         }
-        tank.extract(match1, need1, Action.EXECUTE, AutomationType.INTERNAL);
-        tank.extract(match2, need2, Action.EXECUTE, AutomationType.INTERNAL);
+        for (int i = 0; i < fluids.size(); i++) {
+            if (needByFluid[i] > 0) {
+                tank.extract(fluids.get(i), (int) needByFluid[i], Action.EXECUTE, AutomationType.INTERNAL);
+            }
+        }
         tank.insert(outProbe.copyWithAmount(outAmount), Action.EXECUTE, AutomationType.INTERNAL);
         return true;
     }
 
     /**
-     * Finds the first fluid in the given list that matches the provided ingredient (type match only; amounts are checked by the caller).
+     * Finds the index of the first fluid in the given list that matches the provided ingredient, or {@code -1} if none do.
+     * Matching is done by {@link FluidStackIngredient#test(FluidStack)}, which also requires the fluid to hold the amount
+     * the ingredient asks for; the caller re-checks the amounts per fluid because several ingredients may share one fluid.
      */
-    @Nullable
-    public static FluidStack findMatchingFluid(@NotNull FluidStackIngredient ingredient, @NotNull List<FluidStack> fluids) {
-        for (FluidStack fluid : fluids) {
-            if (ingredient.test(fluid)) {
-                return fluid;
+    public static int indexOfMatchingFluid(@NotNull FluidStackIngredient ingredient, @NotNull List<FluidStack> fluids) {
+        for (int i = 0; i < fluids.size(); i++) {
+            if (ingredient.test(fluids.get(i))) {
+                return i;
             }
         }
-        return null;
+        return -1;
     }
 
     /**
      * A successfully applied alloy configuration, cached so the same recipe can be reapplied without re-scanning every alloy
      * recipe each tick.
      */
-    public record AlloyConfig(FluidStackIngredient input1, FluidStackIngredient input2, FluidStackIngredient output) {
+    public record AlloyConfig(List<FluidStackIngredient> inputs, FluidStackIngredient output) {
     }
 }

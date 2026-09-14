@@ -1,0 +1,17 @@
+{
+  "type": "mekanismheated:alloying",
+  "inputs": [
+    {
+      "amount": 9,
+      "tag": "c:molten_copper"
+    },
+    {
+      "amount": 9,
+      "tag": "c:molten_gold"
+    }
+  ],
+  "output": {
+    "amount": 18,
+    "tag": "c:molten_rose_gold"
+  }
+}

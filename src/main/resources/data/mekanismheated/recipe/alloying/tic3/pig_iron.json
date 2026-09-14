@@ -1,0 +1,21 @@
+{
+  "type": "mekanismheated:alloying",
+  "inputs": [
+    {
+      "amount": 9,
+      "tag": "c:molten_iron"
+    },
+    {
+      "amount": 50,
+      "tag": "tconstruct:meat_soup"
+    },
+    {
+      "amount": 25,
+      "tag": "c:honey"
+    }
+  ],
+  "output": {
+    "amount": 18,
+    "fluid": "tconstruct:molten_pig_iron"
+  }
+}

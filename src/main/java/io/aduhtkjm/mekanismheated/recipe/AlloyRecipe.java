@@ -1,6 +1,7 @@
 package io.aduhtkjm.mekanismheated.recipe;
 
 import io.aduhtkjm.mekanismheated.registries.ModBlocks;
+import java.util.List;
 import mekanism.api.recipes.MekanismRecipe;
 import mekanism.api.recipes.ingredients.FluidStackIngredient;
 import net.minecraft.core.HolderLookup;
@@ -15,10 +16,11 @@ import org.lwjgl.system.NonnullDefault;
 import javax.annotation.Nullable;
 
 /**
- * A recipe that melts two fluids together into a single alloy fluid.
+ * A recipe that melts two or more fluids together into a single alloy fluid.
  * <br>
- * Input: two fluids (fed into the heat smelter's fluid inlets). The two inputs are treated as an <em>unordered</em>
- * pair, so the order they are fed in does not matter.
+ * Input: two or more fluids (fed into the heat smelter's fluid inlets). The inputs are treated as an <em>unordered</em>
+ * group, so the order they are fed in does not matter, and a single fluid may satisfy more than one input (in which
+ * case it is consumed once per matching input).
  * <br>
  * Output: a single fluid, defined by a fluid ingredient (typically a tag) so that other mods' molten fluid alloys can be
  * defined without this mod hard-coding specific fluids.
@@ -26,36 +28,57 @@ import javax.annotation.Nullable;
  * No temperature threshold applies; the heat smelter is assumed to always be hot enough to melt.
  */
 @NonnullDefault
-public abstract class AlloyRecipe extends MekanismRecipe<TwoFluidRecipeInput> {
+public abstract class AlloyRecipe extends MekanismRecipe<AlloyRecipeInput> {
 
     /**
-     * Checks whether the given pair of fluids matches this recipe, treating the two inputs as an unordered pair.
-     *
-     * @param input The two fluids to test.
-     *
-     * @return {@code true} if one fluid matches the first input ingredient and the other matches the second, in either order.
+     * The fewest fluid inputs an alloy recipe may declare.
      */
-    public boolean test(TwoFluidRecipeInput input) {
-        FluidStack first = input.getFluid(0);
-        FluidStack second = input.getFluid(1);
-        return getInput1().test(first) && getInput2().test(second)
-              || getInput1().test(second) && getInput2().test(first);
+    public static final int MIN_INPUTS = 2;
+
+    /**
+     * The most fluid inputs an alloy recipe may declare. Bounded because the recipe viewer only lays out this many input
+     * gauges; the matching logic itself is agnostic to how many inputs a recipe has.
+     */
+    public static final int MAX_INPUTS = 3;
+
+    /**
+     * Checks whether the given fluids match this recipe, treating the inputs as an unordered group.
+     *
+     * @param input The fluids present in the tank.
+     *
+     * @return {@code true} if every input ingredient is satisfied by at least one of the given fluids.
+     */
+    public boolean test(AlloyRecipeInput input) {
+        for (FluidStackIngredient ingredient : getInputs()) {
+            if (!matchesAny(ingredient, input)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Checks whether any of the fluids held by the given input satisfies the ingredient.
+     */
+    private static boolean matchesAny(FluidStackIngredient ingredient, AlloyRecipeInput input) {
+        for (int i = 0; i < input.size(); i++) {
+            if (ingredient.test(input.getFluid(i))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
-    public boolean matches(TwoFluidRecipeInput input, Level level) {
+    public boolean matches(AlloyRecipeInput input, Level level) {
         return !isIncomplete() && test(input);
     }
 
     /**
-     * Gets the first of the two fluid input ingredients.
+     * Gets the fluid input ingredients, in the order they were declared. The order carries no meaning: the inputs are
+     * matched as an unordered group.
      */
-    public abstract FluidStackIngredient getInput1();
-
-    /**
-     * Gets the second of the two fluid input ingredients.
-     */
-    public abstract FluidStackIngredient getInput2();
+    public abstract List<FluidStackIngredient> getInputs();
 
     /**
      * Gets the output fluid ingredient.
@@ -64,16 +87,23 @@ public abstract class AlloyRecipe extends MekanismRecipe<TwoFluidRecipeInput> {
 
     @Override
     public boolean isIncomplete() {
-        return getInput1().hasNoMatchingInstances() || getInput2().hasNoMatchingInstances() || getOutput().hasNoMatchingInstances();
+        if (getOutput().hasNoMatchingInstances()) {
+            return true;
+        }
+        for (FluidStackIngredient input : getInputs()) {
+            if (input.hasNoMatchingInstances()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
     public void logMissingTags() {
-        if (getInput1().hasNoMatchingInstances()) {
-            getInput1().logMissingTags();
-        }
-        if (getInput2().hasNoMatchingInstances()) {
-            getInput2().logMissingTags();
+        for (FluidStackIngredient input : getInputs()) {
+            if (input.hasNoMatchingInstances()) {
+                input.logMissingTags();
+            }
         }
         if (getOutput().hasNoMatchingInstances()) {
             getOutput().logMissingTags();

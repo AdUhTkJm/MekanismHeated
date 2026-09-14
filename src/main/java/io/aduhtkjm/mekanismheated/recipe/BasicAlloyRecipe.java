@@ -9,29 +9,28 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 @NothingNullByDefault
 public class BasicAlloyRecipe extends AlloyRecipe {
 
-    private final FluidStackIngredient input1;
-    private final FluidStackIngredient input2;
+    private final List<FluidStackIngredient> inputs;
     private final FluidStackIngredient output;
 
     /**
-     * @param input1 The first of the two fluid input ingredients.
-     * @param input2 The second of the two fluid input ingredients.
+     * @param inputs The fluid input ingredients, treated as an unordered group. Must hold between
+     *               {@link AlloyRecipe#MIN_INPUTS} and {@link AlloyRecipe#MAX_INPUTS} ingredients.
      * @param output The single output fluid ingredient.
      */
-    public BasicAlloyRecipe(FluidStackIngredient input1, FluidStackIngredient input2, FluidStackIngredient output) {
-        this.input1 = Objects.requireNonNull(input1, "First fluid input cannot be null.");
-        this.input2 = Objects.requireNonNull(input2, "Second fluid input cannot be null.");
+    public BasicAlloyRecipe(List<FluidStackIngredient> inputs, FluidStackIngredient output) {
+        Objects.requireNonNull(inputs, "Fluid inputs cannot be null.");
+        if (inputs.size() < MIN_INPUTS) {
+            throw new IllegalArgumentException("An alloy recipe needs at least " + MIN_INPUTS + " fluid inputs, got " + inputs.size() + ".");
+        } else if (inputs.size() > MAX_INPUTS) {
+            throw new IllegalArgumentException("An alloy recipe supports at most " + MAX_INPUTS + " fluid inputs, got " + inputs.size() + ".");
+        }
+        this.inputs = List.copyOf(inputs);
         this.output = Objects.requireNonNull(output, "Output cannot be null.");
     }
 
     @Override
-    public FluidStackIngredient getInput1() {
-        return input1;
-    }
-
-    @Override
-    public FluidStackIngredient getInput2() {
-        return input2;
+    public List<FluidStackIngredient> getInputs() {
+        return inputs;
     }
 
     @Override
@@ -40,12 +39,10 @@ public class BasicAlloyRecipe extends AlloyRecipe {
     }
 
     /**
-     * For serializer use.
-     *
-     * @return the two input ingredients, in the order they were declared. DO NOT MODIFY RETURN VALUE.
+     * For serializer use. DO NOT MODIFY RETURN VALUE.
      */
     public List<FluidStackIngredient> getInputsRaw() {
-        return List.of(input1, input2);
+        return inputs;
     }
 
     /**
@@ -68,13 +65,12 @@ public class BasicAlloyRecipe extends AlloyRecipe {
             return false;
         }
         BasicAlloyRecipe other = (BasicAlloyRecipe) o;
-        return input1.equals(other.input1) && input2.equals(other.input2) && output.equals(other.output);
+        return inputs.equals(other.inputs) && output.equals(other.output);
     }
 
     @Override
     public int hashCode() {
-        int result = input1.hashCode();
-        result = 31 * result + input2.hashCode();
+        int result = inputs.hashCode();
         result = 31 * result + output.hashCode();
         return result;
     }

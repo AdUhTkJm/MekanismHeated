@@ -166,17 +166,16 @@ public class ModRecipeSerializers {
                       PassiveFractionationRecipe::new
                   )));
 
-    @SuppressWarnings("all") // get(0) -> getFirst()
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BasicAlloyRecipe>> ALLOYING =
           RECIPE_SERIALIZERS.register("alloying", () -> new MekanismRecipeSerializer<>(
                 RecordCodecBuilder.mapCodec(instance -> instance.group(
-                      FluidStackIngredient.CODEC.listOf().fieldOf("inputs").forGetter(BasicAlloyRecipe::getInputsRaw),
+                      FluidStackIngredient.CODEC.listOf(AlloyRecipe.MIN_INPUTS, AlloyRecipe.MAX_INPUTS)
+                            .fieldOf("inputs").forGetter(BasicAlloyRecipe::getInputsRaw),
                       FluidStackIngredient.CODEC.fieldOf(SerializationConstants.OUTPUT).forGetter(BasicAlloyRecipe::getOutputRaw)
-                ).apply(instance, (inputs, output) -> new BasicAlloyRecipe(inputs.get(0), inputs.get(1), output))),
+                ).apply(instance, BasicAlloyRecipe::new)),
                 StreamCodec.composite(
-                      FluidStackIngredient.STREAM_CODEC, BasicAlloyRecipe::getInput1,
-                      FluidStackIngredient.STREAM_CODEC, BasicAlloyRecipe::getInput2,
-                      FluidStackIngredient.STREAM_CODEC, BasicAlloyRecipe::getOutput,
+                      FluidStackIngredient.STREAM_CODEC.apply(ByteBufCodecs.list()), BasicAlloyRecipe::getInputsRaw,
+                      FluidStackIngredient.STREAM_CODEC, BasicAlloyRecipe::getOutputRaw,
                       BasicAlloyRecipe::new
                 )));
 

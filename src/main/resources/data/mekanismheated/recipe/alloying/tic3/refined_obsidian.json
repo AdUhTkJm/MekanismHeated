@@ -1,0 +1,21 @@
+{
+  "type": "mekanismheated:alloying",
+  "inputs": [
+    {
+      "amount": 25,
+      "tag": "tconstruct:molten_obsidian"
+    },
+    {
+      "amount": 10,
+      "tag": "tconstruct:molten_diamond"
+    },
+    {
+      "amount": 9,
+      "tag": "c:molten_osmium"
+    }
+  ],
+  "output": {
+    "amount": 9,
+    "tag": "c:molten_refined_obsidian"
+  }
+}

@@ -157,12 +157,13 @@ earlier sketch):
 - `@Nullable AlloyConfig tryAlloyOnce(Level, MultiFluidTank tank, @Nullable AlloyConfig lastApplied)` — the
   `tryAlloying` orchestration (empty/client gate, last-applied fast path, full alloy-recipe scan). Returns the
   applied/updated config.
-- `boolean applyAlloy(MultiFluidTank, FluidStackIngredient in1, in2, FluidStackIngredient output, List<FluidStack>)`
-  and `@Nullable FluidStack findMatchingFluid(FluidStackIngredient, List<FluidStack>)` — the alloy math.
-- `record AlloyConfig(FluidStackIngredient input1, input2, output)` — the old `AlloyCache`.
+- `boolean applyAlloy(MultiFluidTank, List<FluidStackIngredient> inputs, FluidStackIngredient output, List<FluidStack>)`
+  and `int indexOfMatchingFluid(FluidStackIngredient, List<FluidStack>)` — the alloy math. Inputs are an unordered
+  group of two or three ingredients; needs are accumulated per tank fluid so one fluid may satisfy several ingredients.
+- `record AlloyConfig(List<FluidStackIngredient> inputs, FluidStackIngredient output)` — the old `AlloyCache`.
 
 `TileEntityHeatSmelter` now: `findRecipe`/`getSpeedFactor`/`burnFuel`/`tryAlloying` delegate to these; the
-`lastAlloy` field is `HeatSmelterLogic.AlloyConfig`; `applyAlloy`/`findMatchingFluid`/`AlloyCache` removed;
+`lastAlloy` field is `HeatSmelterLogic.AlloyConfig`; `applyAlloy`/`indexOfMatchingFluid`/`AlloyCache` removed;
 unused imports pruned. `canBurnFuel()` is left as the tile's public display predicate (unchanged). The multiblock
 `LargeHeatSmelterData.tick()` (Phase 3) will call the same statics. Standalone behavior is unchanged.
 
