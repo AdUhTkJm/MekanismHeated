@@ -117,6 +117,7 @@
   "gui.mekanismheated.phase_change.capacity": "潜热容：%1$s",
   "gui.mekanismheated.phase_change.melting_point": "熔点：%1$s",
   "gui.mekanismheated.reaction_duration": "反应耗时：%1$s 刻",
+  "gui.mekanismheated.retroentropic_array_duration": "追溯耗时：%1$d 刻",
   "gui.mekanismheated.target_temperature": "目标温度：%1$s",
   "gui.mekanismheated.temperature_controller.ambient": "环境：%1$s",
   "gui.mekanismheated.temperature_controller.error.no_heat": "%1$s侧没有热容",

@@ -66,13 +66,11 @@ public class LargeHeatSmelterData extends MultiblockData {
         biomeAmbientTemp = HeatAPI.getAmbientTemp(tile.getLevel(), tile.getBlockPos());
         IContentsListener listener = createSaveAndComparator();
         //Use the same GUI positions as the standalone smelter so the reused GUI lays out identically
-        inputSlot = BasicInventorySlot.at(ConstantPredicates.alwaysTrue(), listener, 64, 17);
-        outputSlot = BasicInventorySlot.at(ConstantPredicates.alwaysTrue(), listener, 116, 35);
-        fuelSlot = BasicInventorySlot.at(ConstantPredicates.alwaysTrue(), listener, 64, 55);
+        inputSlot = BasicInventorySlot.at(listener, 64, 17);
+        outputSlot = BasicInventorySlot.at(listener, 116, 35);
+        fuelSlot = BasicInventorySlot.at(listener, 64, 55);
         IContentsListener fluidListener = () -> {
-            if (!isRemote()) {
-                fluidChanged = true;
-            }
+            fluidChanged = !isRemote();
             listener.onContentsChanged();
         };
         //The initial capacities are for a single block; they are scaled up by {@link #configure(int)} once the
@@ -193,16 +191,15 @@ public class LargeHeatSmelterData extends MultiblockData {
             }
             return wasProcessing != (processing = false);
         }
-        //The large smelter performs one recipe operation per member block at once (so a volume-N structure processes
-        // N items per cycle, N times the output of a single smelter in the same time), limited by the input items
+        // The large smelter performs one recipe operation per member block at once, limited by the input items
         // actually available and by the output space. The batch's heat cost scales with the square root of the
-        // operation count (capped), making it more heat-efficient than the equivalent number of separate smelters
+        // operation count (capped), making it more heat-efficient than the equivalent number of separate smelters.
         int operations = Math.min(HeatSmelterLogic.parallelOperations(getVolume(), input.getCount()),
               maxOutputOperations(recipe, input));
         if (operations <= 0) {
             return wasProcessing != (processing = false);
         }
-        //Pay this tick's share of the recipe's total heat cost (scaled by the parallel heat multiplier); if the
+        // Pay this tick's share of the recipe's total heat cost (scaled by the parallel heat multiplier); if the
         // capacitor cannot cover it, the smelter stalls and the recipe idles (without advancing) until enough heat
         // is available again
         double heatForTick = HeatSmelterLogic.heatForTick(

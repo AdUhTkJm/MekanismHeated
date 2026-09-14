@@ -253,6 +253,21 @@ public class ModRecipeSerializers {
                       BasicAtmosphereFuelRecipe::new
                 )));
 
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<BasicRetroentropicArrayRecipe>> RETROENTROPIC_ARRAY =
+          RECIPE_SERIALIZERS.register("retroentropic_array", () -> new MekanismRecipeSerializer<>(
+               RecordCodecBuilder.mapCodec(instance -> instance.group(
+                    ItemStackIngredient.CODEC.fieldOf(SerializationConstants.INPUT).forGetter(BasicRetroentropicArrayRecipe::getInput),
+                    ItemStackIngredient.CODEC.fieldOf(SerializationConstants.OUTPUT).forGetter(BasicRetroentropicArrayRecipe::getOutputIngredient),
+                    DURATION_CODEC.fieldOf("duration").forGetter(BasicRetroentropicArrayRecipe::getDuration)
+               ).apply(instance, BasicRetroentropicArrayRecipe::new)),
+               StreamCodec.composite(
+                    ItemStackIngredient.STREAM_CODEC, BasicRetroentropicArrayRecipe::getInput,
+                    ItemStackIngredient.STREAM_CODEC, BasicRetroentropicArrayRecipe::getOutputIngredient,
+                    ByteBufCodecs.VAR_INT, BasicRetroentropicArrayRecipe::getDuration,
+                    BasicRetroentropicArrayRecipe::new
+               )
+          ));
+
     /**
      * The shape of the {@code "inputs"} / {@code "outputs"} objects in a reaction recipe: an optional single item plus lists of
      * fluids and chemicals. The item is "at most one" while the fluid and chemical lists may hold any number (including none).

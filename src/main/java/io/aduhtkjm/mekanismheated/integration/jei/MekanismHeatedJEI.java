@@ -1,15 +1,7 @@
 package io.aduhtkjm.mekanismheated.integration.jei;
 
 import io.aduhtkjm.mekanismheated.Mod;
-import io.aduhtkjm.mekanismheated.integration.jei.category.AlloyingRecipeCategory;
-import io.aduhtkjm.mekanismheated.integration.jei.category.AtmosphereFuelRecipeCategory;
-import io.aduhtkjm.mekanismheated.integration.jei.category.CondenserRecipeCategory;
-import io.aduhtkjm.mekanismheated.integration.jei.category.FractionationRecipeCategory;
-import io.aduhtkjm.mekanismheated.integration.jei.category.HeatedMeltingRecipeCategory;
-import io.aduhtkjm.mekanismheated.integration.jei.category.HeatedSmeltingRecipeCategory;
-import io.aduhtkjm.mekanismheated.integration.jei.category.QuenchingRecipeCategory;
-import io.aduhtkjm.mekanismheated.integration.jei.category.ReactionChamberRecipeCategory;
-import io.aduhtkjm.mekanismheated.integration.jei.category.ShakerRecipeCategory;
+import io.aduhtkjm.mekanismheated.integration.jei.category.*;
 import io.aduhtkjm.mekanismheated.recipe.FractionationRecipe;
 import io.aduhtkjm.mekanismheated.recipe.ModRecipeTypes;
 import java.util.ArrayList;
@@ -70,15 +62,16 @@ public class MekanismHeatedJEI implements IModPlugin {
     public void registerCategories(IRecipeCategoryRegistration registry) {
         IGuiHelper guiHelper = registry.getJeiHelpers().getGuiHelper();
         registry.addRecipeCategories(
-              new HeatedSmeltingRecipeCategory(guiHelper, ModRecipeViewerTypes.HEATED_SMELTING),
-              new HeatedMeltingRecipeCategory(guiHelper, ModRecipeViewerTypes.HEATED_MELTING),
-              new AlloyingRecipeCategory(guiHelper, ModRecipeViewerTypes.ALLOYING),
-              new ShakerRecipeCategory(guiHelper, ModRecipeViewerTypes.SHAKING),
-               new CondenserRecipeCategory(guiHelper, ModRecipeViewerTypes.CONDENSING),
-               new QuenchingRecipeCategory(guiHelper, ModRecipeViewerTypes.QUENCHING),
-               new ReactionChamberRecipeCategory(guiHelper, ModRecipeViewerTypes.REACTION),
-               new AtmosphereFuelRecipeCategory(guiHelper, ModRecipeViewerTypes.ATMOSPHERE_FUEL),
-               new FractionationRecipeCategory(guiHelper, ModRecipeViewerTypes.FRACTIONATING));
+            new HeatedSmeltingRecipeCategory(guiHelper, ModRecipeViewerTypes.HEATED_SMELTING),
+            new HeatedMeltingRecipeCategory(guiHelper, ModRecipeViewerTypes.HEATED_MELTING),
+            new AlloyingRecipeCategory(guiHelper, ModRecipeViewerTypes.ALLOYING),
+            new ShakerRecipeCategory(guiHelper, ModRecipeViewerTypes.SHAKING),
+            new CondenserRecipeCategory(guiHelper, ModRecipeViewerTypes.CONDENSING),
+            new QuenchingRecipeCategory(guiHelper, ModRecipeViewerTypes.QUENCHING),
+            new ReactionChamberRecipeCategory(guiHelper, ModRecipeViewerTypes.REACTION),
+            new AtmosphereFuelRecipeCategory(guiHelper, ModRecipeViewerTypes.ATMOSPHERE_FUEL),
+            new FractionationRecipeCategory(guiHelper, ModRecipeViewerTypes.FRACTIONATING),
+            new RetroentropicArrayRecipeCategory(guiHelper, ModRecipeViewerTypes.RETROENTROPIC_ARRAY_PROCESSING));
     }
 
     @Override
@@ -91,6 +84,7 @@ public class MekanismHeatedJEI implements IModPlugin {
         registerRecipes(registry, ModRecipeViewerTypes.QUENCHING, ModRecipeTypes.TYPE_QUENCHING);
         registerRecipes(registry, ModRecipeViewerTypes.REACTION, ModRecipeTypes.TYPE_REACTION);
         registerRecipes(registry, ModRecipeViewerTypes.ATMOSPHERE_FUEL, ModRecipeTypes.TYPE_ATMOSPHERE_FUEL);
+        registerRecipes(registry, ModRecipeViewerTypes.RETROENTROPIC_ARRAY_PROCESSING, ModRecipeTypes.TYPE_RETROENTROPIC_ARRAY);
         //Both fractionation recipe forms share one category, so their recipes are collected separately and merged.
         registerFractionationRecipes(registry, ModRecipeViewerTypes.FRACTIONATING);
     }

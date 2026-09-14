@@ -1,0 +1,11 @@
+{
+  "type": "mekanismheated:retroentropic_array",
+  "input": {
+    "tag": "c:ingots/gold",
+    "count": 1
+  },
+  "output": {
+    "tag": "c:raw_materials/gold",
+    "count": 1
+  }
+}

@@ -12,7 +12,7 @@ import io.aduhtkjm.mekanismheated.block.creative.CreativeHeatBlock;
 import io.aduhtkjm.mekanismheated.block.fractionation.DistillationTrayBlock;
 import io.aduhtkjm.mekanismheated.block.heatsmelter.HeatSmelterBlock;
 import io.aduhtkjm.mekanismheated.block.phasechange.PhaseChangeBlock;
-import io.aduhtkjm.mekanismheated.block.quenchingenrichmentchamber.QuenchingEnrichmentChamberBlock;
+import io.aduhtkjm.mekanismheated.block.qec.QuenchingEnrichmentChamberBlock;
 import io.aduhtkjm.mekanismheated.block.reactionchamber.ReactionChamberBlock;
 import io.aduhtkjm.mekanismheated.block.shaker.ShakerBlock;
 import io.aduhtkjm.mekanismheated.block.temperaturecontroller.TemperatureControllerBlock;

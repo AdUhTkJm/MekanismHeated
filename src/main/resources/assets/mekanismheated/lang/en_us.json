@@ -117,6 +117,7 @@
   "gui.mekanismheated.phase_change.capacity": "Capacity: %1$s",
   "gui.mekanismheated.phase_change.melting_point": "Melting Point: %1$s",
   "gui.mekanismheated.reaction_duration": "Duration: %1$s ticks",
+  "gui.mekanismheated.retroentropic_array_duration": "Duration: %1$d ticks",
   "gui.mekanismheated.target_temperature": "Target: %1$s",
   "gui.mekanismheated.temperature_controller.ambient": "Ambient: %1$s",
   "gui.mekanismheated.temperature_controller.error.no_heat": "No heat capacitor on the %1$s side",

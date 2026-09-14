@@ -2,15 +2,7 @@ package io.aduhtkjm.mekanismheated.integration.jei;
 
 import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.ModLang;
-import io.aduhtkjm.mekanismheated.recipe.AlloyRecipe;
-import io.aduhtkjm.mekanismheated.recipe.AtmosphereFuelRecipe;
-import io.aduhtkjm.mekanismheated.recipe.CondenserRecipe;
-import io.aduhtkjm.mekanismheated.recipe.FractionationRecipe;
-import io.aduhtkjm.mekanismheated.recipe.HeatedItemStackToFluidRecipe;
-import io.aduhtkjm.mekanismheated.recipe.HeatedItemStackToItemStackRecipe;
-import io.aduhtkjm.mekanismheated.recipe.QuenchingRecipe;
-import io.aduhtkjm.mekanismheated.recipe.ReactionChamberRecipe;
-import io.aduhtkjm.mekanismheated.recipe.ShakerRecipe;
+import io.aduhtkjm.mekanismheated.recipe.*;
 import io.aduhtkjm.mekanismheated.registries.ModBlocks;
 
 public final class ModRecipeViewerTypes {
@@ -39,4 +31,6 @@ public final class ModRecipeViewerTypes {
     //Taller than the single-row machines: the fractionation tower stacks its output banks vertically.
     public static final ModRecipeViewerType<FractionationRecipe> FRACTIONATING =
           new ModRecipeViewerType<>(Mod.rl("fractionating"), ModBlocks.THERMAL_FRACTIONATION_CONTROLLER, -2, -12, 164, 96);
+    public static final ModRecipeViewerType<RetroentropicArrayRecipe> RETROENTROPIC_ARRAY_PROCESSING =
+          new ModRecipeViewerType<>(Mod.rl("retroentropic_array_processing"), ModBlocks.RETROENTROPIC_ARRAY_CASING, -28, -16, 144, 54);
 }

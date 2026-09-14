@@ -1,4 +1,4 @@
-package io.aduhtkjm.mekanismheated.block.quenchingenrichmentchamber;
+package io.aduhtkjm.mekanismheated.block.qec;
 
 import io.aduhtkjm.mekanismheated.tile.TileEntityQuenchingEnrichmentChamber;
 import mekanism.common.block.prefab.BlockTile;

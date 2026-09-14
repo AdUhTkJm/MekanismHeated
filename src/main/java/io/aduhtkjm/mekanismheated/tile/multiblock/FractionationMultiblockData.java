@@ -311,14 +311,14 @@ public class FractionationMultiblockData extends MultiblockData {
      *
      * @return {@code true} if the processing state changed and an update packet should be sent.
      */
-    private boolean processRecipes(Level world) {
+    private boolean processRecipes(Level level) {
         boolean wasProcessing = processing;
         FluidStack current = inputTank.getFluid();
         FractionationRecipe recipe;
         if (current.isEmpty()) {
             //Passive generation only runs on an empty sump. Passive recipes take no input, but getRecipeFor short-circuits
             //empty inputs (returning nothing), so fetch the type's recipes directly and use the first complete one.
-            recipe = world.getRecipeManager()
+            recipe = level.getRecipeManager()
                   .getAllRecipesFor(ModRecipeTypes.TYPE_FRACTIONATING_PASSIVE.value())
                   .stream()
                   .filter(holder -> !holder.value().isIncomplete())
@@ -326,15 +326,15 @@ public class FractionationMultiblockData extends MultiblockData {
                   .findFirst()
                   .orElse(null);
         } else {
-            recipe = world.getRecipeManager()
-                  .getRecipeFor(ModRecipeTypes.TYPE_FRACTIONATING.value(), new SingleFluidRecipeInput(current), world)
+            recipe = level.getRecipeManager()
+                  .getRecipeFor(ModRecipeTypes.TYPE_FRACTIONATING.value(), new SingleFluidRecipeInput(current), level)
                   .map(RecipeHolder::value)
                   .orElse(null);
         }
         if (recipe == null || recipe.getMinTemperature() > getTemperature()) {
             return wasProcessing != (processing = false);
         }
-        //Speed scales linearly from zero ops at min temperature up to nominal speed at base temperature.
+        // Speed scales linearly from zero ops at min temperature up to nominal speed at base temperature.
         progress += processingRate(recipe);
         int operations = (int) progress;
         if (operations <= 0) {
@@ -367,12 +367,12 @@ public class FractionationMultiblockData extends MultiblockData {
      * @return {@code true} if the operation was performed.
      */
     private boolean operate(FractionationRecipe recipe) {
-        if (recipe instanceof PassiveFractionationRecipe passive) {
+        if (recipe instanceof PassiveFractionationRecipe passive)
             return performPassiveOperation(passive);
-        }
-        if (recipe instanceof BasicFractionationRecipe input) {
+
+        if (recipe instanceof BasicFractionationRecipe input)
             return performOperation(input);
-        }
+
         return false;
     }
 
@@ -384,12 +384,12 @@ public class FractionationMultiblockData extends MultiblockData {
     private boolean performOperation(BasicFractionationRecipe recipe) {
         FluidStack current = inputTank.getFluid();
         FluidStack required = recipe.getInput().getMatchingInstance(current);
-        if (required.isEmpty() || required.getAmount() > inputTank.getFluidAmount()) {
+        if (required.isEmpty() || required.getAmount() > inputTank.getFluidAmount())
             return false;
-        }
-        if (!canDeposit(recipe.getOutputs())) {
+
+        if (!canDeposit(recipe.getOutputs()))
             return false;
-        }
+
         inputTank.extract(required.getAmount(), Action.EXECUTE, AutomationType.INTERNAL);
         deposit(recipe.getOutputs());
         return true;
@@ -401,9 +401,9 @@ public class FractionationMultiblockData extends MultiblockData {
      * @return {@code true} if the operation was performed.
      */
     private boolean performPassiveOperation(PassiveFractionationRecipe recipe) {
-        if (!canDeposit(recipe.getOutputs())) {
+        if (!canDeposit(recipe.getOutputs()))
             return false;
-        }
+
         deposit(recipe.getOutputs());
         return true;
     }
@@ -416,12 +416,11 @@ public class FractionationMultiblockData extends MultiblockData {
      */
     private boolean canDeposit(List<BankOutput> outputs) {
         for (BankOutput output : outputs) {
-            if (output.bank() >= banks.size()) {
+            if (output.bank() >= banks.size())
                 return true;
-            }
-            if (!banks.get(output.bank()).insert(output.stack().copy(), Action.SIMULATE, AutomationType.INTERNAL).isEmpty()) {
+
+            if (!banks.get(output.bank()).insert(output.stack().copy(), Action.SIMULATE, AutomationType.INTERNAL).isEmpty())
                 return false;
-            }
         }
         return true;
     }

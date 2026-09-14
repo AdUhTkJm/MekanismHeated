@@ -1,0 +1,11 @@
+{
+  "type": "mekanismheated:retroentropic_array",
+  "input": {
+    "tag": "c:ingots/lead",
+    "count": 1
+  },
+  "output": {
+    "tag": "c:raw_materials/lead",
+    "count": 1
+  }
+}

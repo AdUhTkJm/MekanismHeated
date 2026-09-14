@@ -24,6 +24,7 @@ public class ModRecipeTypes {
     public static final ResourceLocation NAME_QUENCHING = Mod.rl("quenching");
     public static final ResourceLocation NAME_REACTION = Mod.rl("reaction");
     public static final ResourceLocation NAME_ATMOSPHERE_FUEL = Mod.rl("atmosphere_fuel");
+    public static final ResourceLocation NAME_RETROENTROPIC_ARRAY = Mod.rl("retroentropic_array");
 
     public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, Mod.MODID);
 
@@ -51,4 +52,6 @@ public class ModRecipeTypes {
         RECIPE_TYPES.register(NAME_REACTION.getPath(), () -> new RecipeType<>() {});
     public static final DeferredHolder<RecipeType<?>, RecipeType<AtmosphereFuelRecipe>> TYPE_ATMOSPHERE_FUEL =
         RECIPE_TYPES.register(NAME_ATMOSPHERE_FUEL.getPath(), () -> new RecipeType<>() {});
+    public static final DeferredHolder<RecipeType<?>, RecipeType<RetroentropicArrayRecipe>> TYPE_RETROENTROPIC_ARRAY =
+        RECIPE_TYPES.register(NAME_RETROENTROPIC_ARRAY.getPath(), () -> new RecipeType<>() {});
 }
