@@ -1,0 +1,47 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "type": "neoforge:compound",
+    "children": [
+      {
+        "tag": "tconstruct:seared_blocks"
+      },
+      {
+        "item": "tconstruct:seared_ladder"
+      },
+      {
+        "item": "tconstruct:seared_lamp"
+      },
+      {
+        "item": "tconstruct:seared_cobble_wall"
+      },
+      {
+        "item": "tconstruct:seared_bricks_wall"
+      },
+      {
+        "item": "tconstruct:seared_cobble_stairs"
+      },
+      {
+        "item": "tconstruct:seared_stone_stairs"
+      },
+      {
+        "item": "tconstruct:seared_bricks_stairs"
+      },
+      {
+        "item": "tconstruct:seared_paver_stairs"
+      }
+    ]
+  },
+  "output": {
+    "amount": 1000,
+    "fluid": "tconstruct:seared_stone"
+  },
+  "temperature": 873
+}

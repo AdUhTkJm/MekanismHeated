@@ -1,0 +1,29 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "type": "neoforge:compound",
+    "children": [
+      {
+        "item": "minecraft:glass_bottle"
+      },
+      {
+        "tag": "c:bottles/splash"
+      },
+      {
+        "tag": "c:bottles/lingering"
+      }
+    ]
+  },
+  "output": {
+    "amount": 1000,
+    "fluid": "tconstruct:molten_glass"
+  },
+  "temperature": 1023
+}

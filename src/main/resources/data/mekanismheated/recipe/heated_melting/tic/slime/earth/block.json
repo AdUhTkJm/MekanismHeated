@@ -1,0 +1,18 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "item": "minecraft:slime_block"
+  },
+  "output": {
+    "amount": 2250,
+    "tag": "c:slime"
+  },
+  "temperature": 323
+}

@@ -1,0 +1,32 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "type": "neoforge:compound",
+    "children": [
+      {
+        "item": "tconstruct:seared_cobble_slab"
+      },
+      {
+        "item": "tconstruct:seared_stone_slab"
+      },
+      {
+        "item": "tconstruct:seared_bricks_slab"
+      },
+      {
+        "item": "tconstruct:seared_paver_slab"
+      }
+    ]
+  },
+  "output": {
+    "amount": 500,
+    "fluid": "tconstruct:seared_stone"
+  },
+  "temperature": 873
+}

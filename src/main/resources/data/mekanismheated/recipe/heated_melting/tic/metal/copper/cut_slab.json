@@ -1,0 +1,44 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "type": "neoforge:compound",
+    "children": [
+      {
+        "item": "minecraft:cut_copper_slab"
+      },
+      {
+        "item": "minecraft:exposed_cut_copper_slab"
+      },
+      {
+        "item": "minecraft:weathered_cut_copper_slab"
+      },
+      {
+        "item": "minecraft:oxidized_cut_copper_slab"
+      },
+      {
+        "item": "minecraft:waxed_cut_copper_slab"
+      },
+      {
+        "item": "minecraft:waxed_exposed_cut_copper_slab"
+      },
+      {
+        "item": "minecraft:waxed_weathered_cut_copper_slab"
+      },
+      {
+        "item": "minecraft:waxed_oxidized_cut_copper_slab"
+      }
+    ]
+  },
+  "output": {
+    "amount": 100,
+    "tag": "c:molten_copper"
+  },
+  "temperature": 773
+}

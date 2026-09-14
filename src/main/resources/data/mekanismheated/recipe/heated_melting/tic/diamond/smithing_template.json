@@ -1,0 +1,26 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "type": "neoforge:compound",
+    "children": [
+      {
+        "item": "minecraft:netherite_upgrade_smithing_template"
+      },
+      {
+        "tag": "minecraft:trim_templates"
+      }
+    ]
+  },
+  "output": {
+    "amount": 500,
+    "fluid": "tconstruct:molten_diamond"
+  },
+  "temperature": 1723
+}

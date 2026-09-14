@@ -1,0 +1,18 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "tag": "c:storage_blocks/queens_slime"
+  },
+  "output": {
+    "amount": 810,
+    "fluid": "tconstruct:molten_queens_slime"
+  },
+  "temperature": 1423
+}

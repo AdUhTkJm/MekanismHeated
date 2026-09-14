@@ -1,0 +1,68 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "type": "neoforge:compound",
+    "children": [
+      {
+        "item": "minecraft:cut_copper"
+      },
+      {
+        "item": "minecraft:exposed_cut_copper"
+      },
+      {
+        "item": "minecraft:weathered_cut_copper"
+      },
+      {
+        "item": "minecraft:oxidized_cut_copper"
+      },
+      {
+        "item": "minecraft:cut_copper_stairs"
+      },
+      {
+        "item": "minecraft:exposed_cut_copper_stairs"
+      },
+      {
+        "item": "minecraft:weathered_cut_copper_stairs"
+      },
+      {
+        "item": "minecraft:oxidized_cut_copper_stairs"
+      },
+      {
+        "item": "minecraft:waxed_cut_copper"
+      },
+      {
+        "item": "minecraft:waxed_exposed_cut_copper"
+      },
+      {
+        "item": "minecraft:waxed_weathered_cut_copper"
+      },
+      {
+        "item": "minecraft:waxed_oxidized_cut_copper"
+      },
+      {
+        "item": "minecraft:waxed_cut_copper_stairs"
+      },
+      {
+        "item": "minecraft:waxed_exposed_cut_copper_stairs"
+      },
+      {
+        "item": "minecraft:waxed_weathered_cut_copper_stairs"
+      },
+      {
+        "item": "minecraft:waxed_oxidized_cut_copper_stairs"
+      }
+    ]
+  },
+  "output": {
+    "amount": 200,
+    "tag": "c:molten_copper"
+  },
+  "temperature": 773
+}

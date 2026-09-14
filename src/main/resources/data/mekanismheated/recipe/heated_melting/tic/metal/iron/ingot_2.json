@@ -1,0 +1,29 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "type": "neoforge:compound",
+    "children": [
+      {
+        "item": "minecraft:heavy_weighted_pressure_plate"
+      },
+      {
+        "item": "minecraft:iron_door"
+      },
+      {
+        "item": "minecraft:smithing_table"
+      }
+    ]
+  },
+  "output": {
+    "amount": 180,
+    "tag": "c:molten_iron"
+  },
+  "temperature": 1073
+}

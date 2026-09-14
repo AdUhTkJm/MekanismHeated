@@ -1,0 +1,26 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "type": "neoforge:compound",
+    "children": [
+      {
+        "item": "minecraft:lantern"
+      },
+      {
+        "item": "minecraft:soul_lantern"
+      }
+    ]
+  },
+  "output": {
+    "amount": 80,
+    "tag": "c:molten_iron"
+  },
+  "temperature": 1073
+}

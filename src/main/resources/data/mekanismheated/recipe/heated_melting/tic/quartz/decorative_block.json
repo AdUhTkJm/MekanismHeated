@@ -1,0 +1,38 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "type": "neoforge:compound",
+    "children": [
+      {
+        "item": "minecraft:smooth_quartz"
+      },
+      {
+        "item": "minecraft:quartz_pillar"
+      },
+      {
+        "item": "minecraft:quartz_bricks"
+      },
+      {
+        "item": "minecraft:chiseled_quartz_block"
+      },
+      {
+        "item": "minecraft:quartz_stairs"
+      },
+      {
+        "item": "minecraft:smooth_quartz_stairs"
+      }
+    ]
+  },
+  "output": {
+    "amount": 400,
+    "fluid": "tconstruct:molten_quartz"
+  },
+  "temperature": 910
+}

@@ -1,0 +1,29 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "type": "neoforge:compound",
+    "children": [
+      {
+        "item": "tconstruct:scorched_bricks_slab"
+      },
+      {
+        "item": "tconstruct:scorched_bricks_slab"
+      },
+      {
+        "item": "tconstruct:scorched_road_slab"
+      }
+    ]
+  },
+  "output": {
+    "amount": 500,
+    "fluid": "tconstruct:scorched_stone"
+  },
+  "temperature": 773
+}

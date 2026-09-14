@@ -1,0 +1,35 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "type": "neoforge:compound",
+    "children": [
+      {
+        "item": "minecraft:activator_rail"
+      },
+      {
+        "item": "minecraft:detector_rail"
+      },
+      {
+        "item": "minecraft:stonecutter"
+      },
+      {
+        "item": "minecraft:piston"
+      },
+      {
+        "item": "minecraft:sticky_piston"
+      }
+    ]
+  },
+  "output": {
+    "amount": 90,
+    "tag": "c:molten_iron"
+  },
+  "temperature": 1073
+}

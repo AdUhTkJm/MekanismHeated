@@ -1,0 +1,22 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    },
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "oreberriesreplanted"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "item": "oreberriesreplanted:gold_oreberry"
+  },
+  "output": {
+    "amount": 10,
+    "tag": "c:molten_gold"
+  },
+  "temperature": 973
+}

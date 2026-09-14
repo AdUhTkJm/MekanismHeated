@@ -1,0 +1,18 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "tag": "c:dusts/tungsten"
+  },
+  "output": {
+    "amount": 90,
+    "tag": "c:molten_tungsten"
+  },
+  "temperature": 1223
+}

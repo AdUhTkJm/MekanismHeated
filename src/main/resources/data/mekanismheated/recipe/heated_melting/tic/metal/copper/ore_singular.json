@@ -1,0 +1,24 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "type": "neoforge:difference",
+    "base": {
+      "tag": "c:ores/copper"
+    },
+    "subtracted": {
+      "tag": "tconstruct:non_singular_ore_rates"
+    }
+  },
+  "output": {
+    "amount": 180,
+    "tag": "c:molten_copper"
+  },
+  "temperature": 773
+}

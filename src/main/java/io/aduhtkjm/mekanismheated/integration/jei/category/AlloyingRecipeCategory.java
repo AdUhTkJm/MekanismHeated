@@ -56,17 +56,6 @@ public class AlloyingRecipeCategory extends HolderRecipeCategory<AlloyRecipe> {
     }
 
     @Override
-    public void draw(RecipeHolder<AlloyRecipe> recipeHolder, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
-        //Only draw the gauges the recipe actually uses, so a two-input recipe looks like a pair rather than a pair plus
-        // an empty gauge. Done here rather than in setRecipe because JEI lays out several recipes before drawing them.
-        int usedInputs = recipeHolder.value().getInputs().size();
-        for (int i = 0; i < inputGauges.size(); i++) {
-            inputGauges.get(i).setVisible(i < usedInputs);
-        }
-        super.draw(recipeHolder, recipeSlotsView, guiGraphics, mouseX, mouseY);
-    }
-
-    @Override
     public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<AlloyRecipe> recipeHolder, IFocusGroup focusGroup) {
         AlloyRecipe recipe = recipeHolder.value();
         //The inputs are matched as an unordered group, so let JEI show them without an order

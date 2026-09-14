@@ -1,0 +1,18 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "tag": "c:storage_blocks/amethyst"
+  },
+  "output": {
+    "amount": 400,
+    "fluid": "tconstruct:molten_amethyst"
+  },
+  "temperature": 1223
+}

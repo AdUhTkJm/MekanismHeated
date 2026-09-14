@@ -1,0 +1,26 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "type": "neoforge:compound",
+    "children": [
+      {
+        "item": "minecraft:iron_bars"
+      },
+      {
+        "item": "minecraft:rail"
+      }
+    ]
+  },
+  "output": {
+    "amount": 30,
+    "tag": "c:molten_iron"
+  },
+  "temperature": 1073
+}

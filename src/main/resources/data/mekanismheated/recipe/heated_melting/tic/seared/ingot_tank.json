@@ -1,0 +1,18 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "item": "tconstruct:seared_ingot_tank"
+  },
+  "output": {
+    "amount": 1500,
+    "fluid": "tconstruct:seared_stone"
+  },
+  "temperature": 873
+}

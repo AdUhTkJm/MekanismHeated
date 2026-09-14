@@ -1,0 +1,26 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "type": "neoforge:compound",
+    "children": [
+      {
+        "tag": "c:ender_pearls"
+      },
+      {
+        "item": "minecraft:ender_eye"
+      }
+    ]
+  },
+  "output": {
+    "amount": 250,
+    "tag": "c:ender"
+  },
+  "temperature": 750
+}

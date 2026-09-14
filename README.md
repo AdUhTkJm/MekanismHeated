@@ -22,6 +22,8 @@ This is a working heat smelter with liquids. The block beside it is a creative h
 
 They can form into a larger smelter, from 2x2x2 to 6x6x6, similar to jumbo furnaces:
 
+Melting and alloying is _compatible with Tinkerer's Construct_. Though it doesn't have an official 1.21.1 Neoforge version, if you install a community-maintained fork, the recipes will appear properly.
+
 ![A large smelter.](https://cdn.modrinth.com/data/cached_images/43170b17c966089edba54d9b7732184999a1589f.png)
 
 ## Condenser
@@ -77,4 +79,6 @@ In the previous image, the pipe between the water tank and the reaction chamber 
 # Credits
 
 Some assets are derived from Mekanism (Licensed under MIT). We sincerely thank everyone who contributed to Mekanism.
+
+The melting recipes under `data/mekanismheated/recipe/heated_melting/tic/` are converted from Tinkers' Construct's smeltery melting recipes (Licensed under MIT) by `scripts/tic_melting_to_heated.py`. We sincerely thank the Tinkers' Construct and Mantle authors and contributors.
 

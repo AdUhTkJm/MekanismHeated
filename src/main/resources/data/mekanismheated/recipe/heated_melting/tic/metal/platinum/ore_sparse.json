@@ -1,0 +1,26 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "type": "neoforge:intersection",
+    "children": [
+      {
+        "tag": "c:ores/platinum"
+      },
+      {
+        "tag": "c:ore_rates/sparse"
+      }
+    ]
+  },
+  "output": {
+    "amount": 90,
+    "tag": "c:molten_platinum"
+  },
+  "temperature": 1243
+}

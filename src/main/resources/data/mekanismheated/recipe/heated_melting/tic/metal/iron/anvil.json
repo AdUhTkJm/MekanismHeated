@@ -1,0 +1,29 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "type": "neoforge:compound",
+    "children": [
+      {
+        "item": "minecraft:anvil"
+      },
+      {
+        "item": "minecraft:chipped_anvil"
+      },
+      {
+        "item": "minecraft:damaged_anvil"
+      }
+    ]
+  },
+  "output": {
+    "amount": 2790,
+    "tag": "c:molten_iron"
+  },
+  "temperature": 1073
+}

@@ -1,0 +1,22 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    },
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "allomancy"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "item": "allomancy:brass_flakes"
+  },
+  "output": {
+    "amount": 30,
+    "tag": "c:molten_brass"
+  },
+  "temperature": 878
+}

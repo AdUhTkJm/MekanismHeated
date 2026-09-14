@@ -1,0 +1,26 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "tconstruct"
+    }
+  ],
+  "input": {
+    "count": 1,
+    "type": "neoforge:compound",
+    "children": [
+      {
+        "item": "tconstruct:seared_fuel_gauge"
+      },
+      {
+        "item": "tconstruct:seared_ingot_gauge"
+      }
+    ]
+  },
+  "output": {
+    "amount": 1000,
+    "fluid": "tconstruct:seared_stone"
+  },
+  "temperature": 873
+}
