@@ -1,7 +1,7 @@
 {
   "type": "mekanismheated:condensing",
   "input": {
-    "tag": "c:fluids/molten_ancient_debris",
+    "tag": "c:molten_ancient_debris",
     "amount": 90
   },
   "output": {

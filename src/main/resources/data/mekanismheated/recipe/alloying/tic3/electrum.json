@@ -3,15 +3,15 @@
   "inputs": [
     {
       "amount": 9,
-      "tag": "c:molten_iron"
+      "tag": "c:molten_gold"
     },
     {
       "amount": 9,
-      "tag": "c:molten_copper"
+      "tag": "c:molten_silver"
     }
   ],
   "output": {
     "amount": 18,
-    "tag": "c:molten_thermoenergetic_alloy"
+    "tag": "c:molten_electrum"
   }
 }

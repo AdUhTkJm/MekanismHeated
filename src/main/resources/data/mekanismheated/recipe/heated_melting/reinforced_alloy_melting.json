@@ -6,7 +6,7 @@
   },
   "output": {
     "amount": 90,
-    "tag": "c:fluids/molten_reinforced_alloy"
+    "tag": "c:molten_reinforced_alloy"
   },
   "temperature": 1672
 }

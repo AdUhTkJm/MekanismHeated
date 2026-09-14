@@ -6,7 +6,7 @@
   },
   "output": {
     "amount": 810,
-    "tag": "c:fluids/molten_copper"
+    "tag": "c:molten_copper"
   },
   "temperature": 1357
 }

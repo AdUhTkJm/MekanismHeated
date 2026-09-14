@@ -6,7 +6,7 @@
   },
   "output": {
     "amount": 90,
-    "tag": "c:fluids/molten_zinc"
+    "tag": "c:molten_zinc"
   },
   "temperature": 692
 }

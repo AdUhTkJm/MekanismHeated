@@ -1,0 +1,21 @@
+{
+  "type": "mekanismheated:alloying",
+  "inputs": [
+    {
+      "amount": 18,
+      "tag": "c:molten_tin"
+    },
+    {
+      "amount": 9,
+      "tag": "c:molten_lead"
+    },
+    {
+      "amount": 9,
+      "tag": "c:molten_cadmium"
+    }
+  ],
+  "result": {
+    "amount": 36,
+    "tag": "c:molten_bendalloy"
+  }
+}

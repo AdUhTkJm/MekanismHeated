@@ -6,12 +6,12 @@
       "tag": "c:molten_copper"
     },
     {
-      "amount": 9,
-      "tag": "c:molten_zinc"
+      "amount": 10,
+      "tag": "tconstruct:molten_amethyst"
     }
   ],
   "output": {
-    "amount": 18,
-    "tag": "c:molten_brass"
+    "amount": 9,
+    "tag": "c:molten_amethyst_bronze"
   }
 }

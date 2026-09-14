@@ -3,15 +3,19 @@
   "inputs": [
     {
       "amount": 27,
-      "tag": "c:molten_copper"
+      "tag": "c:molten_tin"
     },
     {
       "amount": 9,
-      "tag": "c:molten_tin"
+      "tag": "c:molten_silver"
+    },
+    {
+      "amount": 50,
+      "tag": "c:glowstone"
     }
   ],
   "output": {
     "amount": 36,
-    "tag": "c:molten_bronze"
+    "tag": "c:molten_lumium"
   }
 }

@@ -2,16 +2,16 @@
   "type": "mekanismheated:alloying",
   "inputs": [
     {
-      "amount": 27,
+      "amount": 9,
       "tag": "c:molten_copper"
     },
     {
       "amount": 9,
-      "tag": "c:molten_tin"
+      "tag": "c:molten_nickel"
     }
   ],
   "output": {
-    "amount": 36,
-    "tag": "c:molten_bronze"
+    "amount": 18,
+    "tag": "c:molten_constantan"
   }
 }

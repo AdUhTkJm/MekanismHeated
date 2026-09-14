@@ -1,7 +1,7 @@
 {
   "type": "mekanismheated:condensing",
   "input": {
-    "tag": "c:fluids/molten_thermoenergetic_alloy",
+    "tag": "c:molten_thermoenergetic_alloy",
     "amount": 90
   },
   "output": {

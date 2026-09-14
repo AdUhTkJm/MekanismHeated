@@ -1,0 +1,21 @@
+{
+  "type": "mekanismheated:alloying",
+  "inputs": [
+    {
+      "amount": 9,
+      "tag": "c:molten_gold"
+    },
+    {
+      "amount": 25,
+      "tag": "tconstruct:ichor"
+    },
+    {
+      "amount": 25,
+      "tag": "tconstruct:scorched_stone"
+    }
+  ],
+  "output": {
+    "amount": 18,
+    "fluid": "tconstruct:molten_cinderslime"
+  }
+}

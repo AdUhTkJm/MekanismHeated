@@ -1,7 +1,7 @@
 {
   "type": "mekanismheated:condensing",
   "input": {
-    "tag": "c:fluids/molten_iron",
+    "tag": "c:molten_iron",
     "amount": 90
   },
   "output": {

@@ -2,16 +2,16 @@
   "type": "mekanismheated:alloying",
   "inputs": [
     {
-      "amount": 360,
-      "tag": "c:fluids/molten_thermoenergetic_alloy"
+      "amount": 36,
+      "tag": "c:molten_thermoenergetic_alloy"
     },
     {
-      "amount": 90,
-      "tag": "c:fluids/molten_osmium"
+      "amount": 9,
+      "tag": "c:molten_osmium"
     }
   ],
   "output": {
-    "amount": 450,
-    "tag": "c:fluids/molten_casing_alloy"
+    "amount": 45,
+    "tag": "c:molten_casing_alloy"
   }
 }

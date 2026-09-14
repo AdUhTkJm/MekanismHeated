@@ -6,7 +6,7 @@
   },
   "output": {
     "amount": 90,
-    "tag": "c:fluids/molten_osmium"
+    "tag": "c:molten_osmium"
   },
   "temperature": 3318
 }

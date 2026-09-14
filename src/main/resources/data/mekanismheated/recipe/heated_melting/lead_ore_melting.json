@@ -6,7 +6,7 @@
   },
   "output": {
     "amount": 180,
-    "tag": "c:fluids/molten_lead"
+    "tag": "c:molten_lead"
   },
   "temperature": 600
 }

@@ -1,7 +1,7 @@
 {
   "type": "mekanismheated:condensing",
   "input": {
-    "tag": "c:fluids/molten_casing_alloy",
+    "tag": "c:molten_casing_alloy",
     "amount": 225
   },
   "item_input": {

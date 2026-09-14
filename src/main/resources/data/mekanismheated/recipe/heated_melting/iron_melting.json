@@ -6,7 +6,7 @@
   },
   "output": {
     "amount": 90,
-    "tag": "c:fluids/molten_iron"
+    "tag": "c:molten_iron"
   },
   "temperature": 1808
 }

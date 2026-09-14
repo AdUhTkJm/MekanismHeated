@@ -2,16 +2,16 @@
   "type": "mekanismheated:alloying",
   "inputs": [
     {
-      "amount": 9,
+      "amount": 18,
       "tag": "c:molten_iron"
     },
     {
       "amount": 9,
-      "tag": "c:molten_copper"
+      "tag": "c:molten_nickel"
     }
   ],
   "output": {
-    "amount": 18,
-    "tag": "c:molten_thermoenergetic_alloy"
+    "amount": 27,
+    "tag": "c:molten_invar"
   }
 }

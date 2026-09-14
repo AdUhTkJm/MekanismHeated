@@ -1,0 +1,21 @@
+{
+  "type": "mekanismheated:alloying",
+  "inputs": [
+    {
+      "amount": 27,
+      "tag": "c:molten_lead"
+    },
+    {
+      "amount": 10,
+      "tag": "tconstruct:molten_diamond"
+    },
+    {
+      "amount": 50,
+      "tag": "c:ender"
+    }
+  ],
+  "output": {
+    "amount": 18,
+    "tag": "c:molten_enderium"
+  }
+}

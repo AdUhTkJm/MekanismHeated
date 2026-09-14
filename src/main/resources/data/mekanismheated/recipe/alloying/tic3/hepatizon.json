@@ -2,16 +2,20 @@
   "type": "mekanismheated:alloying",
   "inputs": [
     {
-      "amount": 9,
+      "amount": 18,
       "tag": "c:molten_copper"
     },
     {
       "amount": 9,
-      "tag": "c:molten_zinc"
+      "tag": "c:molten_cobalt"
+    },
+    {
+      "amount": 10,
+      "tag": "tconstruct:molten_quartz"
     }
   ],
   "output": {
     "amount": 18,
-    "tag": "c:molten_brass"
+    "tag": "c:molten_hepatizon"
   }
 }
