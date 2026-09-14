@@ -4,6 +4,7 @@ import io.aduhtkjm.mekanismheated.registries.ModBlocks;
 import mekanism.common.lib.math.voxel.VoxelCuboid;
 import mekanism.common.lib.multiblock.CuboidStructureValidator;
 import mekanism.common.lib.multiblock.FormationProtocol;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
@@ -15,6 +16,12 @@ public class RetroentropicArrayValidator extends CuboidStructureValidator<Retroe
 
     public RetroentropicArrayValidator() {
         super(SHAPE, SHAPE);
+    }
+
+    @Override
+    protected FormationProtocol.StructureRequirement getStructureRequirement(BlockPos pos) {
+        VoxelCuboid.WallRelative relative = cuboid.getWallRelative(pos);
+        return relative.isWall() ? FormationProtocol.StructureRequirement.FRAME : FormationProtocol.StructureRequirement.INNER;
     }
 
     @Override

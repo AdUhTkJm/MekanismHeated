@@ -262,12 +262,15 @@ public class ModBlocks {
 
     public static final BlockTypeTile<TileEntityRetroentropicArrayCasing> RETROENTROPIC_ARRAY_TYPE = BlockTileBuilder
         .createBlock(() -> ModTileEntityTypes.RETROENTROPIC_ARRAY_CASING, ModLang.DESCRIPTION_RETROENTROPIC_ARRAY_CASING)
+        .withGui(() -> ModContainerTypes.RETROENTROPIC_ARRAY)
         .with(new AttributeCustomResistance(9))
         .externalMultiblock()
         .build();
 
     public static final BlockRegistryObject<BlockBasicMultiblock<TileEntityRetroentropicArrayCasing>, ItemBlockTooltip<BlockBasicMultiblock<TileEntityRetroentropicArrayCasing>>> RETROENTROPIC_ARRAY_CASING =
         BLOCKS.register("retroentropic_array_casing",
-            () -> new BlockBasicMultiblock<>(RETROENTROPIC_ARRAY_TYPE, BlockBehaviour.Properties.of().mapColor(MapColor.METAL)),
-            (block, properties) -> new ItemBlockTooltip<>(block, true, properties));;
+            //Use the properties-modifier overload so the standard strength/tool requirements are applied (the raw
+            //Properties overload would leave the casing with zero hardness and no tool requirement).
+            () -> new BlockBasicMultiblock<>(RETROENTROPIC_ARRAY_TYPE, properties -> properties.mapColor(MapColor.METAL)),
+            (block, properties) -> new ItemBlockTooltip<>(block, true, properties));
 }

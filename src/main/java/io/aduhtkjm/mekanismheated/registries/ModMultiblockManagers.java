@@ -13,7 +13,7 @@ public class ModMultiblockManagers {
           new MultiblockManager<>("fractionation", FractionationCache::new, FractionationValidator::new);
 
     public static final MultiblockManager<RetroentropicArrayData> RETROENTROPIC_MANAGER =
-        new MultiblockManager<>("fractionation", MultiblockCache::new, RetroentropicArrayValidator::new);
+        new MultiblockManager<>("retroentropic_array", MultiblockCache::new, RetroentropicArrayValidator::new);
 
     public static final MultiblockManager<LargeHeatSmelterData> LARGE_HEAT_SMELTER_MANAGER =
         new MultiblockManager<>("large_heat_smelter", MultiblockCache::new, LargeHeatSmelterValidator::new);

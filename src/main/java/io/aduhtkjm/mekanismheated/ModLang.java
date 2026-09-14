@@ -27,6 +27,7 @@ public enum ModLang implements ILangEntry {
 
     // Strings used in GUI.
     GUI_ALLOYING("gui", "alloying"),
+    GUI_RETROENTROPIC_ARRAY("gui", "retroentropic_array"),
     GUI_FRACTIONATION_HEIGHT("gui", "fractionation.height"),
     GUI_FRACTIONATION_LAYERS("gui", "fractionation.layers"),
     GUI_PHASE_CHANGE_MELTING_POINT("gui", "phase_change.melting_point"),
@@ -45,6 +46,11 @@ public enum ModLang implements ILangEntry {
     HEAT_CONSUMED("gui", "heat_consumed"),
     TEMPERATURE_RANGE("gui", "temperature_range"),
     REACTION_DURATION("gui", "reaction_duration"),
+    RETROENTROPIC_ARRAY_DURATION("gui", "retroentropic_array_duration"),
+    GUI_RETROENTROPIC_ARRAY_PROGRESS("gui", "retroentropic_array.progress"),
+    GUI_RETROENTROPIC_ARRAY_STATUS_ACTIVE("gui", "retroentropic_array.status.active"),
+    GUI_RETROENTROPIC_ARRAY_STATUS_IDLE("gui", "retroentropic_array.status.idle"),
+    GUI_RETROENTROPIC_ARRAY_STATUS_TOO_WARM("gui", "retroentropic_array.status.too_warm"),
     ATMOSPHERE_HEATER_REDUCTION("gui", "atmosphere_heater.reduction"),
     ATMOSPHERE_HEATER_CONSUMPTION("gui", "atmosphere_heater.consumption"),
 

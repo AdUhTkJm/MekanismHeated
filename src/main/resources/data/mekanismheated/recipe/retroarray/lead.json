@@ -7,5 +7,6 @@
   "output": {
     "tag": "c:raw_materials/lead",
     "count": 1
-  }
+  },
+  "duration": 100
 }

@@ -32,5 +32,6 @@ public final class ModRecipeViewerTypes {
     public static final ModRecipeViewerType<FractionationRecipe> FRACTIONATING =
           new ModRecipeViewerType<>(Mod.rl("fractionating"), ModBlocks.THERMAL_FRACTIONATION_CONTROLLER, -2, -12, 164, 96);
     public static final ModRecipeViewerType<RetroentropicArrayRecipe> RETROENTROPIC_ARRAY_PROCESSING =
-          new ModRecipeViewerType<>(Mod.rl("retroentropic_array_processing"), ModBlocks.RETROENTROPIC_ARRAY_CASING, -28, -16, 144, 54);
+          new ModRecipeViewerType<>(Mod.rl("retroentropic_array_processing"), ModBlocks.RETROENTROPIC_ARRAY_CASING,
+                ModLang.GUI_RETROENTROPIC_ARRAY.translate(), -28, -16, 144, 54);
 }

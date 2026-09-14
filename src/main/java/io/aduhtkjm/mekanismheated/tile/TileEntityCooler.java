@@ -148,12 +148,12 @@ public class TileEntityCooler extends TileEntityMekanism {
     @Override
     public void saveAdditional( CompoundTag nbt,  HolderLookup.Provider provider) {
         super.saveAdditional(nbt, provider);
-        nbt.putLong(TAG_ENERGY_USAGE, energyUsed);
+        nbt.putLong(TAG_ENERGY_USAGE, energyContainer.getEnergyPerTick());
     }
 
     @Override
     public void loadAdditional( CompoundTag nbt,  HolderLookup.Provider provider) {
         super.loadAdditional(nbt, provider);
-        energyUsed = nbt.getLong(TAG_ENERGY_USAGE);
+        setEnergyUsageFromPacket(nbt.getLong(TAG_ENERGY_USAGE));
     }
 }

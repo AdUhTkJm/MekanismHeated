@@ -93,7 +93,8 @@ public class MekanismHeatedJEI implements IModPlugin {
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registry) {
         CatalystRegistryHelper.register(registry, ModRecipeViewerTypes.HEATED_SMELTING, ModRecipeViewerTypes.HEATED_MELTING,
               ModRecipeViewerTypes.ALLOYING, ModRecipeViewerTypes.SHAKING, ModRecipeViewerTypes.CONDENSING, ModRecipeViewerTypes.QUENCHING,
-              ModRecipeViewerTypes.REACTION, ModRecipeViewerTypes.ATMOSPHERE_FUEL, ModRecipeViewerTypes.FRACTIONATING);
+              ModRecipeViewerTypes.REACTION, ModRecipeViewerTypes.ATMOSPHERE_FUEL, ModRecipeViewerTypes.FRACTIONATING,
+              ModRecipeViewerTypes.RETROENTROPIC_ARRAY_PROCESSING);
     }
 
     private static <I extends RecipeInput, RECIPE extends Recipe<I>>

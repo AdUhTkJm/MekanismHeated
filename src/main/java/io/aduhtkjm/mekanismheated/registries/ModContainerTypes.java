@@ -12,6 +12,7 @@ import io.aduhtkjm.mekanismheated.tile.TileEntityQuenchingEnrichmentChamber;
 import io.aduhtkjm.mekanismheated.tile.TileEntityShaker;
 import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
 import io.aduhtkjm.mekanismheated.tile.TileEntityPhaseChangeBlock;
+import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityRetroentropicArrayCasing;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationController;
 import mekanism.common.inventory.container.tile.EmptyTileContainer;
 import mekanism.common.inventory.container.tile.MekanismTileContainer;
@@ -33,6 +34,12 @@ public class ModContainerTypes {
 
     public static final ContainerTypeRegistryObject<MekanismTileContainer<TileEntityThermalFractionationController>> THERMAL_FRACTIONATION_CONTROLLER =
           CONTAINER_TYPES.custom("thermal_fractionation_controller", TileEntityThermalFractionationController.class).offset(10, 0).build();
+
+    //The Retroentropic Array has no controller block: every casing is a potential master, so the GUI is opened from the
+    //casing itself. Its item slots live in the shared RetroentropicArrayData and are exposed through the tile by
+    //TileEntityMultiblock#getInitialInventory, so the default container is enough here.
+    public static final ContainerTypeRegistryObject<MekanismTileContainer<TileEntityRetroentropicArrayCasing>> RETROENTROPIC_ARRAY =
+          CONTAINER_TYPES.register("retroentropic_array", TileEntityRetroentropicArrayCasing.class);
 
     public static final ContainerTypeRegistryObject<EmptyTileContainer<TileEntityCreativeHeatBlock>> CREATIVE_HEAT_BLOCK =
           CONTAINER_TYPES.registerEmpty(ModBlocks.CREATIVE_HEAT_BLOCK, TileEntityCreativeHeatBlock.class);

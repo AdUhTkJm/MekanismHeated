@@ -13,6 +13,7 @@ import io.aduhtkjm.mekanismheated.tile.TileEntityPhaseChangeBlock;
 import io.aduhtkjm.mekanismheated.tile.TileEntityReactionChamber;
 import io.aduhtkjm.mekanismheated.tile.TileEntityTemperatureController;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityFractionationBlock;
+import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityRetroentropicArrayCasing;
 import mekanism.common.block.prefab.BlockBasicMultiblock;
 import net.minecraft.resources.ResourceLocation;
 import snownee.jade.api.IWailaClientRegistration;
@@ -36,6 +37,7 @@ public class MekanismHeatedJadePlugin implements IWailaPlugin {
         //The whole tower (controller, valve and casing) resolves the same multiblock via getMultiblock(), and all three
         // tiles share the base type TileEntityFractionationBlock, so a single registration covers every part of the tower.
         registration.registerBlockDataProvider(FractionationMekDataProvider.INSTANCE, TileEntityFractionationBlock.class);
+        registration.registerBlockDataProvider(RetroentropicArrayMekDataProvider.INSTANCE, TileEntityRetroentropicArrayCasing.class);
     }
 
     @Override
@@ -56,5 +58,9 @@ public class MekanismHeatedJadePlugin implements IWailaPlugin {
         // and guard by the common fractionation tile base type inside each component; the whole tower gets the tooltip.
         registration.registerBlockComponent(FractionationMekRenderer.INSTANCE, BlockBasicMultiblock.class);
         registration.registerBlockComponent(FractionationBuiltinRemover.INSTANCE, BlockBasicMultiblock.class);
+        //Like the fractionation tower, every Retroentropic Array casing is a BlockBasicMultiblock, so register on that and
+        // guard by the retro casing tile type inside the component.
+        registration.registerBlockComponent(RetroentropicArrayMekRenderer.INSTANCE, BlockBasicMultiblock.class);
+        registration.registerBlockComponent(RetroentropicArrayBuiltinRemover.INSTANCE, BlockBasicMultiblock.class);
     }
 }
