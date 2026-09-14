@@ -13,6 +13,7 @@ import mekanism.common.inventory.container.sync.dynamic.ContainerSync;
 import mekanism.common.inventory.slot.InputInventorySlot;
 import mekanism.common.inventory.slot.OutputInventorySlot;
 import mekanism.common.lib.multiblock.MultiblockData;
+import mekanism.common.lib.multiblock.Structure;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
@@ -54,6 +55,12 @@ public class RetroentropicArrayData extends MultiblockData {
 
     private double biomeAmbientTemp;
 
+    /**
+     * Adjacent heat exchange with the blocks touching the casing. The array inherits the no-op
+     * {@code ITileHeatHandler#simulateAdjacent}, so without this a Cooler next to the casing could never cool it down.
+     */
+    private final MultiblockHeatTransfer heatTransfer = new MultiblockHeatTransfer(this);
+
     public RetroentropicArrayData(BlockEntity tile) {
         super(tile);
         biomeAmbientTemp = HeatAPI.getAmbientTemp(tile.getLevel(), tile.getBlockPos());
@@ -66,13 +73,32 @@ public class RetroentropicArrayData extends MultiblockData {
         // Containers have to be registered in the inherited lists, otherwise they are invisible to
         // capabilities, the multiblock cache and the GUI (a field alone exposes nothing).
         heatCapacitors.add(heatCapacitor);
-        inventorySlots.add(inputSlot = InputInventorySlot.at(listener, 64, 35));
-        inventorySlots.add(outputSlot = OutputInventorySlot.at(listener, 116, 35));
+        inventorySlots.add(inputSlot = InputInventorySlot.at(listener, 58, 35));
+        inventorySlots.add(outputSlot = OutputInventorySlot.at(listener, 110, 35));
     }
 
     @Override
     public void onCreated(Level world) {
+        super.onCreated(world);
         biomeAmbientTemp = calculateAverageAmbientTemperature(world);
+        heatTransfer.invalidate();
+    }
+
+    @Override
+    public void remove(Level world, Structure oldStructure) {
+        super.remove(world, oldStructure);
+        //Drop the cached neighbour capabilities so a torn down structure does not keep them alive
+        heatTransfer.invalidate();
+    }
+
+    /**
+     * Transfers heat to adjacent colder blocks. This is what actually cools the array down: the fresh structure has to
+     * start the exchange itself, because our heat-transfer mixin only lets the hotter side of a pair push heat. A hotter
+     * neighbour will therefore handle its own transfer when it simulates.
+     */
+    @Override
+    public double simulateAdjacent() {
+        return heatTransfer.simulateAdjacent();
     }
 
     @Override

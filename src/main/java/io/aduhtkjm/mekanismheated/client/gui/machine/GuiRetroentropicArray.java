@@ -38,7 +38,7 @@ public class GuiRetroentropicArray
     protected void addGuiElements() {
         super.addGuiElements();
         addRenderableWidget(new GuiProgress(() ->
-            tile.getMultiblock().getScaledProgress(), ProgressType.BAR, this, 86, 38)
+            tile.getMultiblock().getScaledProgress(), ProgressType.BAR, this, 80, 38)
                 .recipeViewerCategories(ModRecipeViewerTypes.RETROENTROPIC_ARRAY_PROCESSING));
         addRenderableWidget(new GuiHeatTab(this, () -> {
             var multiblock = tile.getMultiblock();

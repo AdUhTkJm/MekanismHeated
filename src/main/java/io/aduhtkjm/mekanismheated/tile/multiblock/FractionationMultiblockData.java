@@ -10,41 +10,30 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.function.BooleanSupplier;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.SerializationConstants;
 import mekanism.api.fluid.IExtendedFluidTank;
 import mekanism.api.functions.ConstantPredicates;
 import mekanism.api.heat.HeatAPI;
-import mekanism.api.heat.IHeatHandler;
 import mekanism.api.recipes.vanilla_input.SingleFluidRecipeInput;
-import mekanism.common.capabilities.Capabilities;
 import mekanism.common.capabilities.fluid.BasicFluidTank;
 import mekanism.common.capabilities.fluid.VariableCapacityFluidTank;
 import mekanism.common.capabilities.heat.VariableHeatCapacitor;
 import mekanism.common.inventory.container.sync.dynamic.ContainerSync;
 import mekanism.common.lib.multiblock.MultiblockData;
 import mekanism.common.lib.multiblock.Structure;
-import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.util.MekanismUtils;
 import mekanism.common.util.NBTUtils;
-import mekanism.common.util.WorldUtils;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -87,9 +76,11 @@ public class FractionationMultiblockData extends MultiblockData {
     public float prevInputScale;
     public float[] prevBankScales = new float[0];
 
-    private static final BooleanSupplier ALWAYS_VALID = () -> true;
-    private final List<BlockCapabilityCache<IHeatHandler, @Nullable Direction>> heatAcceptors = new ArrayList<>();
-    private boolean heatAcceptorsDirty = true;
+    /**
+     * Adjacent heat exchange with the blocks touching the tower's shell. The neighbour list is rebuilt lazily whenever
+     * the structure changes.
+     */
+    private final MultiblockHeatTransfer heatTransfer = new MultiblockHeatTransfer(this);
 
     public FractionationMultiblockData(BlockEntity tile) {
         super(tile);
@@ -178,13 +169,14 @@ public class FractionationMultiblockData extends MultiblockData {
         super.onCreated(world);
         biomeAmbientTemp = calculateAverageAmbientTemperature(world);
         heatCapacitor.setHeatCapacity(Config.Fractionation.HEAT_CAPACITY_PER_HEIGHT.get() * height(), true);
-        heatAcceptorsDirty = true;
+        heatTransfer.invalidate();
     }
 
     @Override
     public void remove(Level world, Structure oldStructure) {
         super.remove(world, oldStructure);
-        heatAcceptors.clear();
+        //Drop the cached neighbour capabilities so a torn down tower does not keep them alive
+        heatTransfer.invalidate();
     }
 
     @Override
@@ -221,77 +213,13 @@ public class FractionationMultiblockData extends MultiblockData {
     }
 
     /**
-     * Simulates heat transfer to all adjacent blocks that expose an {@link IHeatHandler}. Only blocks adjacent to
-     * heat-exposing tiles (valves) are considered. One-way: heat only flows from the tower to cooler neighbors;
-     * hotter neighbors will initiate their own transfer when they simulate.
+     * Transfers heat to all adjacent blocks that expose an {@code IHeatHandler}. Only blocks adjacent to heat-exposing
+     * tiles (valves) are considered, and only cooler ones: hotter neighbours initiate their own transfer when they
+     * simulate.
      */
+    @Override
     public double simulateAdjacent() {
-        rebuildHeatAcceptorsIfNeeded();
-        if (heatAcceptors.isEmpty()) {
-            return 0;
-        }
-        double adjacentTransfer = 0;
-        double myTemp = heatCapacitor.getTemperature();
-        double totalCapacity = heatCapacitor.getHeatCapacity();
-        for (BlockCapabilityCache<IHeatHandler, @Nullable Direction> cache : heatAcceptors) {
-            IHeatHandler sink = cache.getCapability();
-            if (sink == null) {
-                continue;
-            }
-            double sinkTemp = sink.getTotalTemperature();
-            if (myTemp <= sinkTemp) {
-                continue;
-            }
-            double sinkHeatCapacity = sink.getTotalHeatCapacity();
-            double invConduction = sink.getTotalInverseConduction() + heatCapacitor.getInverseConduction();
-            double finalTemp = (myTemp * totalCapacity + sinkTemp * sinkHeatCapacity) / (totalCapacity + sinkHeatCapacity);
-            double tempToTransfer = (myTemp - finalTemp) / invConduction;
-            double heatToTransfer = tempToTransfer * totalCapacity;
-            heatCapacitor.handleHeat(-heatToTransfer);
-            sink.handleHeat(heatToTransfer);
-            adjacentTransfer += tempToTransfer;
-        }
-        return adjacentTransfer;
-    }
-
-    /**
-     * Lazily rebuilds the list of external heat-acceptor capabilities. Only external blocks adjacent to tiles that
-     * expose heat (valves) are included. Internal multiblock blocks and duplicates are excluded.
-     */
-    private void rebuildHeatAcceptorsIfNeeded() {
-        if (!heatAcceptorsDirty) {
-            return;
-        }
-        Level world = getLevel();
-        if (!(world instanceof ServerLevel level)) {
-            return;
-        }
-        heatAcceptorsDirty = false;
-        heatAcceptors.clear();
-        Set<BlockPos> seen = new HashSet<>();
-        for (BlockPos pos : locations) {
-            BlockEntity tile = WorldUtils.getTileEntity(level, pos);
-            if (!(tile instanceof TileEntityMekanism mekTile) || !mekTile.canHandleHeat()) {
-                continue;
-            }
-            for (Direction side : Direction.values()) {
-                BlockPos neighborPos = pos.relative(side);
-                if (isKnownLocation(neighborPos)) {
-                    continue;
-                }
-                if (!seen.add(neighborPos)) {
-                    continue;
-                }
-                if (level.getCapability(Capabilities.HEAT, neighborPos, side.getOpposite()) != null) {
-                    heatAcceptors.add(BlockCapabilityCache.create(Capabilities.HEAT, level, neighborPos, side.getOpposite(), ALWAYS_VALID, this::invalidateHeatAcceptors));
-                }
-            }
-        }
-    }
-
-    private void invalidateHeatAcceptors() {
-        heatAcceptorsDirty = true;
-        heatAcceptors.clear();
+        return heatTransfer.simulateAdjacent();
     }
 
     public double getTemperature() {

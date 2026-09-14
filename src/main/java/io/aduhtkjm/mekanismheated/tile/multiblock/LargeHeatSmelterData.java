@@ -50,6 +50,13 @@ public class LargeHeatSmelterData extends MultiblockData {
     private final MultiFluidTank fluidTank;
     private final VariableHeatCapacitor heatCapacitor;
 
+    /**
+     * Adjacent heat exchange with the blocks touching the structure. Without this the shared capacitor would only ever
+     * lose heat to the environment, never to a colder neighbour, because {@link MultiblockData} has no
+     * {@code getAdjacent} implementation and our heat-transfer mixin only lets the hotter side push heat.
+     */
+    private final MultiblockHeatTransfer heatTransfer = new MultiblockHeatTransfer(this);
+
     private double biomeAmbientTemp;
     private double progress;
     private boolean processing;
@@ -61,8 +68,8 @@ public class LargeHeatSmelterData extends MultiblockData {
 
     public LargeHeatSmelterData(BlockEntity tile) {
         super(tile);
-        //Fall back to the ambient temperature at the controller position; recalculated for the whole structure
-        //in {@link #onCreated} (including any per-chunk ambient temperature delta).
+        // Fall back to the ambient temperature at the controller position; recalculated for the whole structure
+        // in {@link #onCreated} (including any per-chunk ambient temperature delta).
         biomeAmbientTemp = HeatAPI.getAmbientTemp(tile.getLevel(), tile.getBlockPos());
         IContentsListener listener = createSaveAndComparator();
         //Use the same GUI positions as the standalone smelter so the reused GUI lays out identically
@@ -73,10 +80,10 @@ public class LargeHeatSmelterData extends MultiblockData {
             fluidChanged = !isRemote();
             listener.onContentsChanged();
         };
-        //The initial capacities are for a single block; they are scaled up by {@link #configure(int)} once the
+        // The initial capacities are for a single block; they are scaled up by {@link #configure(int)} once the
         // structure forms (called from the validator's postcheck on the server and from readUpdateTag on the client).
         fluidTank = MultiFluidTank.output(TileEntityHeatSmelter.MAX_FLUID, fluidListener);
-        //The heat capacitor must be registered in the heat capacitors list, otherwise the multiblock exposes no
+        // The heat capacitor must be registered in the heat capacitors list, otherwise the multiblock exposes no
         // heat handler at all and nothing can add or receive heat
         heatCapacitor = VariableHeatCapacitor.create(Config.HeatSmelter.HEAT_CAPACITY.get(), () -> biomeAmbientTemp, listener);
         inventorySlots.add(inputSlot);
@@ -143,6 +150,11 @@ public class LargeHeatSmelterData extends MultiblockData {
 
     public void setLastEnvironmentLoss(double lastEnvironmentLoss) {
         this.lastEnvironmentLoss = lastEnvironmentLoss;
+    }
+
+    @Override
+    public double simulateAdjacent() {
+        return heatTransfer.simulateAdjacent();
     }
 
     @Override
@@ -292,7 +304,7 @@ public class LargeHeatSmelterData extends MultiblockData {
     public void onCreated(Level world) {
         super.onCreated(world);
         biomeAmbientTemp = calculateAverageAmbientTemperature(world);
-        //Absorb each member block's standalone containers into the shared brain, then empty them so the per-block
+        // Absorb each member block's standalone containers into the shared brain, then empty them so the per-block
         // containers become dormant. Each member's heat already includes its own ambient baseline, so summing the
         // member heat directly yields the correct combined temperature for the (now volume-scaled) shared capacitor.
         double totalHeat = 0;
@@ -313,6 +325,7 @@ public class LargeHeatSmelterData extends MultiblockData {
             }
         }
         heatCapacitor.setHeat(totalHeat);
+        heatTransfer.invalidate();
     }
 
     @Override
@@ -348,6 +361,8 @@ public class LargeHeatSmelterData extends MultiblockData {
     @Override
     public void remove(Level world, Structure oldStructure) {
         super.remove(world, oldStructure);
+        // Drop the cached neighbour capabilities so a torn down structure does not keep them alive
+        heatTransfer.invalidate();
         lastAlloy = null;
         progress = 0;
         processing = false;

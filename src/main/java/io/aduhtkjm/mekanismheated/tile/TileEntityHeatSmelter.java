@@ -265,24 +265,24 @@ public class TileEntityHeatSmelter
     @Override
     protected boolean onUpdateServer() {
         boolean sendUpdatePacket = super.onUpdateServer();
-        //Tick the multiblock structure every tick (formed or not) so formation is detected and the shared brain runs
+        // Tick the multiblock structure every tick (formed or not) so formation is detected and the shared brain runs
         boolean multiblockPacket = tickMultiblock(getMultiblock());
-        //The per-block machine logic only runs while unformed; once formed the shared brain handles all processing
+        // The per-block machine logic only runs while unformed; once formed the shared brain handles all processing
         if (!getMultiblock().isFormed()) {
             boolean burning = burnFuel();
             HeatTransfer transfer = simulate();
             lastEnvironmentLoss = transfer.environmentTransfer();
             lastTransferLoss = transfer.adjacentTransfer();
             recipeCacheLookupMonitor.updateAndProcess();
-            //Keep the synced progress in step with the temperature-scaled fractional progress: the base implementation counts
+            // Keep the synced progress in step with the temperature-scaled fractional progress: the base implementation counts
             // raw ticks, which would overflow the progress bar whenever the smelter runs slower than full speed
             if (recipeCacheLookupMonitor.getCachedRecipe(0) instanceof HeatSensitiveOneInputCachedRecipe<?> cachedRecipe) {
                 setOperatingTicks(cachedRecipe.getProgressTicks());
             }
-            //Passively alloy the molten output in place; temperature-independent and energy-free since the metals are already molten
+            // Passively alloy the molten output in place; temperature-independent and energy-free since the metals are already molten
             tryAlloying();
             if (burning) {
-                //Only set active for burning if smelting didn't already set us active
+                // Only set active for burning if smelting didn't already set us active
                 setActive(true);
                 sendUpdatePacket = true;
             }
@@ -465,7 +465,7 @@ public class TileEntityHeatSmelter
         super.addContainerTrackers(container);
         container.track(SyncableDouble.create(this::getLastTransferLoss, value -> lastTransferLoss = value));
         container.track(SyncableDouble.create(this::getLastEnvironmentLoss, value -> lastEnvironmentLoss = value));
-        //While formed, sync the shared brain's live values to the client so the GUI shows real multiblock state
+        // While formed, sync the shared brain's live values to the client so the GUI shows real multiblock state
         // (the per-block values above are dormant once formed). The setters write into the client-side brain instance.
         container.track(SyncableDouble.create(() -> getMultiblock().getProgress(), value -> getMultiblock().setProgress(value)));
         container.track(SyncableDouble.create(() -> getMultiblock().getLastTransferLoss(), value -> getMultiblock().setLastTransferLoss(value)));

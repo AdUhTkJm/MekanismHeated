@@ -17,6 +17,7 @@ import io.aduhtkjm.mekanismheated.registries.ModChemicals;
 import io.aduhtkjm.mekanismheated.registries.ModContainerTypes;
 import io.aduhtkjm.mekanismheated.registries.ModFluids;
 import io.aduhtkjm.mekanismheated.registries.ModItems;
+import io.aduhtkjm.mekanismheated.registries.ModMultiblockManagers;
 import io.aduhtkjm.mekanismheated.registries.ModTileEntityTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -65,6 +66,11 @@ public class Mod {
         ModRecipeTypes.RECIPE_TYPES.register(modEventBus);
         ModRecipeSerializers.RECIPE_SERIALIZERS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
+
+        //Build the multiblock managers during mod loading, not lazily when the first multiblock tile asks for one.
+        //Mekanism only creates/loads a manager's saved data once per world load (LevelEvent.Load), so a manager that
+        //first appears later never gets its cache persisted to disk (contents such as heat or items would reset).
+        ModMultiblockManagers.init();
 
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::registerBucketCapabilities);
