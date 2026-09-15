@@ -1,6 +1,7 @@
 package io.aduhtkjm.mekanismheated.content.fusedpipe;
 
 import io.aduhtkjm.mekanismheated.tile.TileEntityFusedPipe;
+import io.aduhtkjm.mekanismheated.util.CapabilityWatch;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,7 +32,11 @@ import org.jetbrains.annotations.Nullable;
  * Entries are only created when the neighbor actually exposes the corresponding capability from
  * the relevant side; same-network pipes are excluded. The underlying {@link BlockCapabilityCache}s
  * are registered with invalidation callbacks so that a machine placed or removed later triggers a
- * rebuild, at which point the capability check is re-evaluated.
+ * rebuild, at which point the capability check is re-evaluated. Block updates handle the neighbors
+ * that have no block entity (a plain block gains a capability only by changing its block state),
+ * but a block entity can change what it exposes on a side without any block update — the player
+ * reconfiguring a machine's side in its GUI, for example. Sides where no cache was created are
+ * therefore covered by a {@link CapabilityWatch}, so those changes rebuild the lists as well.
  */
 public final class FusedAcceptorCache {
 
@@ -153,6 +158,13 @@ public final class FusedAcceptorCache {
     private final List<TankTarget<IItemHandler>> itemTargets = new ArrayList<>();
     private final List<TankSource<IItemHandler>> itemSources = new ArrayList<>();
     private final List<HeatAcceptor> heatAcceptors = new ArrayList<>();
+    /**
+     * Watches the node sides at which no capability cache was created. Block entities are the only
+     * neighbors that can change what they expose without a block update, so only those need a raw
+     * watcher; everything else is already covered by the neighbor block update that invalidates the
+     * lists outright.
+     */
+    private final CapabilityWatch watchers = new CapabilityWatch(this::invalidate);
     private boolean dirty = true;
 
     /**
@@ -211,6 +223,7 @@ public final class FusedAcceptorCache {
         }
         dirty = false;
         clearLists();
+        watchers.clear();
         for (FusedPipeNode node : nodes) {
             if (!(node.getLevel() instanceof ServerLevel level)) {
                 continue;
@@ -218,14 +231,23 @@ public final class FusedAcceptorCache {
             BlockPos pos = node.getBlockPos();
             for (Direction side : Direction.values()) {
                 BlockPos neighborPos = pos.relative(side);
+                // Don't forcefully load neighbouring chunks.
+                if (level.isLoaded(neighborPos)) {
+                    continue;
+                }
+
                 Direction context = side.getOpposite();
-                //Skip same-network pipes — they share buffers with us and would be circular
+                // Skip same-network pipes — they share buffers with us and would be circular
                 if (isSameNetworkPipe(level, neighborPos, node)) {
                     continue;
                 }
+                // Whether any cache was created for this position. If none was, the position is watched instead
+                // so that a neighbor which starts exposing a capability there later (a machine reconfigured on
+                // this side, without any block update) still triggers a rebuild.
+                boolean watched = false;
                 boolean sends = node.canSendTo(side);
                 boolean pullsEnergy = node.pullsEnergyFrom(side);
-                //Only add entries when the neighbor actually exposes the capability from this side
+                // Only add entries when the neighbor actually exposes the capability from this side.
                 if (sends || pullsEnergy) {
                     boolean hasEnergy = false;
                     for (BlockCapability<?, @Nullable Direction> energyCap : EnergyCompatUtils.getLoadedEnergyCapabilities()) {
@@ -235,39 +257,53 @@ public final class FusedAcceptorCache {
                         }
                     }
                     if (hasEnergy) {
-                        //One adaptor per side so NORMAL sides (both send and pull) share it
+                        // One adaptor per side so NORMAL sides (both send and pull) share it.
                         EnergyAdaptor adaptor = new EnergyAdaptor(level, neighborPos, context, this::invalidate);
                         if (sends) {
                             energyTargets.add(new EnergyTarget(adaptor));
+                            watched = true;
                         }
                         if (pullsEnergy) {
                             energySources.add(new EnergySource(node, adaptor));
+                            watched = true;
                         }
                     }
                 }
                 if (sends) {
                     if (level.getCapability(Capabilities.FLUID.block(), neighborPos, context) != null) {
                         addTarget(fluidTargets, Capabilities.FLUID.block(), level, neighborPos, context);
+                        watched = true;
                     }
                     if (level.getCapability(Capabilities.CHEMICAL.block(), neighborPos, context) != null) {
                         addTarget(chemicalTargets, Capabilities.CHEMICAL.block(), level, neighborPos, context);
+                        watched = true;
                     }
                     if (level.getCapability(Capabilities.ITEM.block(), neighborPos, context) != null) {
                         addTarget(itemTargets, Capabilities.ITEM.block(), level, neighborPos, context);
+                        watched = true;
                     }
                 }
                 if (node.pullsFluidFrom(side) && level.getCapability(Capabilities.FLUID.block(), neighborPos, context) != null) {
                     addSource(fluidSources, node, Capabilities.FLUID.block(), level, neighborPos, context);
+                    watched = true;
                 }
                 if (node.pullsChemicalFrom(side) && level.getCapability(Capabilities.CHEMICAL.block(), neighborPos, context) != null) {
                     addSource(chemicalSources, node, Capabilities.CHEMICAL.block(), level, neighborPos, context);
+                    watched = true;
                 }
                 if (node.pullsItemsFrom(side) && level.getCapability(Capabilities.ITEM.block(), neighborPos, context) != null) {
                     addSource(itemSources, node, Capabilities.ITEM.block(), level, neighborPos, context);
+                    watched = true;
                 }
                 //Heat: always add if heat is enabled on this node — heat flows regardless of connection type
                 if (node.isEnabled(FusedFunction.HEAT) && level.getCapability(Capabilities.HEAT, neighborPos, context) != null) {
                     addHeatAcceptor(level, neighborPos, context);
+                    watched = true;
+                }
+                //Only a block entity can change its capabilities without a block update, and the block
+                //update already invalidates the lists on its own, so nothing else needs watching.
+                if (!watched && level.getBlockEntity(neighborPos) != null) {
+                    watchers.watch(level, neighborPos);
                 }
             }
         }
