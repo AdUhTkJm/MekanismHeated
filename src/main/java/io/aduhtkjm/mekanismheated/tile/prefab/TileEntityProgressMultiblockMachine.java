@@ -47,7 +47,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.system.NonnullDefault;
 
@@ -131,7 +130,7 @@ public abstract class TileEntityProgressMultiblockMachine<T extends MultiblockDa
         boolean formed = getMultiblock().isFormed();
         if (!formed) {
             unformedTicks++;
-            //Only close the GUI when a previously formed structure just broke. A standalone machine is legitimately
+            // Only close the GUI when a previously formed structure just broke. A standalone machine is legitimately
             // unformed, and closing on every unformed tick would instantly close its GUI right after opening it.
             if (clientPrevFormed && !playersUsing.isEmpty()) {
                 for (Player player : new HashSet<>(playersUsing)) {
@@ -214,7 +213,7 @@ public abstract class TileEntityProgressMultiblockMachine<T extends MultiblockDa
 
     @Override
     public void resetForFormed() {
-        //Clear this multiblock being master, and also mark it as we don't have a structure
+        // Clear this multiblock being master, and also mark it as we don't have a structure
         // as this method is only called when we have a formed multiblock so we want to just
         // treat it as us unforming if formed and then reforming
         isMaster = false;
@@ -285,7 +284,6 @@ public abstract class TileEntityProgressMultiblockMachine<T extends MultiblockDa
 
     @Override
     public boolean shouldDumpRadiation() {
-        //We handle dumping radiation separately for multiblocks
         return false;
     }
 
@@ -380,11 +378,22 @@ public abstract class TileEntityProgressMultiblockMachine<T extends MultiblockDa
 
     @Override
     public boolean persists(ContainerType<?, ?, ?> type) {
-        if (type == ContainerType.ITEM) {
-            //Only persist the per-block item inventory while unformed; when formed the items live in the shared brain
+        if (type == ContainerType.ITEM || type == ContainerType.FLUID || type == ContainerType.HEAT) {
+            // Only persist these while unformed. While formed they live in the shared brain, which is saved through the
+            // manager's multiblock cache.
             return !getMultiblock().isFormed();
         }
         return super.persists(type);
+    }
+
+    @Override
+    public boolean syncs(ContainerType<?, ?, ?> type) {
+        if (type == ContainerType.FLUID || type == ContainerType.HEAT) {
+            // While formed the shared containers are what the open GUI has to mirror, so keep tracking them even though
+            // the per-block containers are no longer persisted.
+            return type.canHandle(this);
+        }
+        return super.syncs(type);
     }
 
     /**

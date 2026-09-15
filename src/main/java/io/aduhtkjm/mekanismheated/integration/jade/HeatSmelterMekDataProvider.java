@@ -1,5 +1,6 @@
 package io.aduhtkjm.mekanismheated.integration.jade;
 
+import io.aduhtkjm.mekanismheated.tank.MultiFluidTank;
 import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
 import mekanism.api.SerializationConstants;
 import net.minecraft.nbt.CompoundTag;
@@ -25,12 +26,15 @@ public enum HeatSmelterMekDataProvider implements IServerDataProvider<BlockAcces
         if (!(accessor.getBlockEntity() instanceof TileEntityHeatSmelter smelter)) {
             return;
         }
-        var fluids = smelter.fluidTank.getFluids();
+        // While formed, the fluids live in the shared brain.
+        // So show the same tank for the GUI and the in-world renderer.
+        MultiFluidTank tank = smelter.getDisplayFluidTank();
+        var fluids = tank.getFluids();
         if (fluids.isEmpty()) {
             return;
         }
         CompoundTag mhData = new CompoundTag();
-        mhData.putInt(SerializationConstants.MAX, smelter.fluidTank.getTotalCapacity());
+        mhData.putInt(SerializationConstants.MAX, tank.getTotalCapacity());
         ListTag fluidList = new ListTag();
         for (FluidStack fluid : fluids) {
             fluidList.add(fluid.save(accessor.getLevel().registryAccess()));

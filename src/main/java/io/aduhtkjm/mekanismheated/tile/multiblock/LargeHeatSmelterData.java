@@ -8,9 +8,9 @@ import io.aduhtkjm.mekanismheated.tank.MultiFluidTank;
 import mekanism.api.Action;
 import mekanism.api.AutomationType;
 import mekanism.api.IContentsListener;
-import mekanism.api.functions.ConstantPredicates;
 import mekanism.api.heat.HeatAPI;
 import mekanism.api.heat.HeatAPI.HeatTransfer;
+import mekanism.common.capabilities.heat.BasicHeatCapacitor;
 import mekanism.common.capabilities.heat.VariableHeatCapacitor;
 import mekanism.common.inventory.slot.BasicInventorySlot;
 import mekanism.common.lib.multiblock.MultiblockData;
@@ -321,30 +321,45 @@ public class LargeHeatSmelterData extends MultiblockData {
 
     @Override
     public void onCreated(Level world) {
-        super.onCreated(world);
         biomeAmbientTemp = calculateAverageAmbientTemperature(world);
-        // Absorb each member block's standalone containers into the shared brain, then empty them so the per-block
-        // containers become dormant. Each member's heat already includes its own ambient baseline, so summing the
-        // member heat directly yields the correct combined temperature for the (now volume-scaled) shared capacitor.
-        double totalHeat = 0;
+        //The containers restored from the multiblock cache carry the capacities they were saved with, and applying the
+        //cache overwrote the volume scaling that the validator's postcheck applied before it. Re-apply it (a no-op
+        //for an unchanged volume; setHeatCapacity keeps the stored heat in step with the ambient baseline) so that the
+        //ambient baseline and the clamping done by super line up with the current structure size again.
+        configure(getVolume());
+        super.onCreated(world);
+        heatTransfer.invalidate();
+        //Absorb each standalone member block's containers into the shared brain, then empty them so the per-block
+        //containers become dormant. A member that still references the multiblock cache has already handed its contents
+        //over to that cache, whose contents were restored into the shared containers above, so it is left untouched:
+        //absorbing it as well would count its share a second time.
+        double absorbedHeat = 0;
         for (BlockPos pos : locations) {
             BlockEntity tile = WorldUtils.getTileEntity(world, pos);
-            if (tile instanceof TileEntityHeatSmelter smelter) {
-                inputSlot.insertItem(smelter.getInputSlot().getStack().copy(), Action.EXECUTE, AutomationType.INTERNAL);
-                outputSlot.insertItem(smelter.getOutputSlot().getStack().copy(), Action.EXECUTE, AutomationType.INTERNAL);
-                fuelSlot.insertItem(smelter.getFuelSlot().getStack().copy(), Action.EXECUTE, AutomationType.INTERNAL);
-                smelter.getInputSlot().setStackUnchecked(ItemStack.EMPTY);
-                smelter.getOutputSlot().setStackUnchecked(ItemStack.EMPTY);
-                smelter.getFuelSlot().setStackUnchecked(ItemStack.EMPTY);
-                for (FluidStack fluid : smelter.getFluidTank().getFluids()) {
-                    fluidTank.insert(fluid.copy(), Action.EXECUTE, AutomationType.INTERNAL);
-                }
-                smelter.getFluidTank().setEmpty();
-                totalHeat += smelter.getHeatCapacitor().getHeat();
+            if (!(tile instanceof TileEntityHeatSmelter smelter) || smelter.getCacheID() != null) {
+                continue;
             }
+            inputSlot.insertItem(smelter.getInputSlot().getStack().copy(), Action.EXECUTE, AutomationType.INTERNAL);
+            outputSlot.insertItem(smelter.getOutputSlot().getStack().copy(), Action.EXECUTE, AutomationType.INTERNAL);
+            fuelSlot.insertItem(smelter.getFuelSlot().getStack().copy(), Action.EXECUTE, AutomationType.INTERNAL);
+            smelter.getInputSlot().setStackUnchecked(ItemStack.EMPTY);
+            smelter.getOutputSlot().setStackUnchecked(ItemStack.EMPTY);
+            smelter.getFuelSlot().setStackUnchecked(ItemStack.EMPTY);
+            for (FluidStack fluid : smelter.getFluidTank().getFluids()) {
+                fluidTank.insert(fluid.copy(), Action.EXECUTE, AutomationType.INTERNAL);
+            }
+            smelter.getFluidTank().setEmpty();
+            //A member's heat includes its own ambient baseline, which the volume-scaled shared capacitor already
+            //accounts for once, so only the energy it stores above its ambient is transferred
+            BasicHeatCapacitor memberCapacitor = smelter.getHeatCapacitor();
+            double memberAmbient = HeatAPI.getAmbientTemp(world, pos);
+            absorbedHeat += memberCapacitor.getHeat() - memberCapacitor.getHeatCapacity() * memberAmbient;
+            //Leave the member's capacitor at its ambient baseline, matching its emptied item and fluid containers
+            memberCapacitor.setHeat(memberCapacitor.getHeatCapacity() * memberAmbient);
         }
-        heatCapacitor.setHeat(totalHeat);
-        heatTransfer.invalidate();
+        if (absorbedHeat != 0) {
+            heatCapacitor.setHeat(heatCapacitor.getHeat() + absorbedHeat);
+        }
     }
 
     @Override
