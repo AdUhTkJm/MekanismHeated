@@ -112,7 +112,7 @@ public class GuiStackedFluidGauge extends GuiGauge<Void> {
                 //Clamp to the window as a safety net: if the tank ever reports more than its capacity (for example while
                 // a synced capacity is still catching up), the excess must be clipped rather than drawn above the gauge.
                 int bandTop = relativeY + 1 + innerHeight - (int) Math.round((double) cumulative / totalCapacity * innerHeight);
-                bandTop = Math.max(relativeY + 1, Math.min(bandTop, bandBottom));
+                bandTop = Math.clamp(bandTop, relativeY + 1, bandBottom);
                 int bandHeight = bandBottom - bandTop;
                 bandBottom = bandTop;
                 if (bandHeight <= 0) {
