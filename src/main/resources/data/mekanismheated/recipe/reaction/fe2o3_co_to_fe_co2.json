@@ -1,0 +1,28 @@
+{
+  "type": "mekanismheated:reaction",
+  "comment": "Fe2O3 (90) + 3 CO (270) = 2 Fe (180) + 3 CO2 (270)",
+  "inputs": {
+    "item": {
+      "count": 1,
+      "item": "mekanismheated:fe2o3_dust"
+    },
+    "fluids": [],
+    "chemicals": [{
+      "chemical": "mekanismheated:carbon_monoxide",
+      "amount": 270
+    }]
+  },
+  "outputs": {
+    "fluids": [{
+      "fluid": "mekanismheated:molten_iron",
+      "amount": 180
+    }],
+    "chemicals": [{
+      "chemical": "mekanismheated:carbon_dioxide",
+      "amount": 270
+    }]
+  },
+  "min_temperature": 1800,
+  "max_temperature": 4000,
+  "duration": 20
+}

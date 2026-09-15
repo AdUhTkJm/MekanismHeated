@@ -1,0 +1,12 @@
+{
+  "type": "mekanismheated:heated_melting",
+  "input": {
+    "count": 1,
+    "tag": "mekanismheated:sponge_iron_ingot"
+  },
+  "output": {
+    "amount": 90,
+    "tag": "c:molten_iron"
+  },
+  "temperature": 1808
+}
