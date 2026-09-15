@@ -2,7 +2,7 @@
   "type": "mekanismheated:fractionating",
   "input": {
     "amount": 10,
-    "tag": "mekanismheated:wood_tar"
+    "fluid": "mekanismheated:wood_tar"
   },
   "outputs": [
     {

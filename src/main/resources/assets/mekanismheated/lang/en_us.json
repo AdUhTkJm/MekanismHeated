@@ -90,6 +90,7 @@
   "container.mekanismheated.retroentropic_array_casing": "Retroentropic Array Casing",
   "container.mekanismheated.shaker": "Shaker",
   "container.mekanismheated.temperature_controller": "Temperature Controller",
+  "container.mekanismheated.thermal_fractionation_controller": "Thermal Fractionation Tower",
   "description.mekanismheated.atmosphere_heater": "A machine that warms the ambient temperature of the chunks around it, burning fuel to reduce its energy consumption.",
   "description.mekanismheated.condenser": "A heat-powered machine that condenses fluids into items, working faster at lower temperatures.",
   "description.mekanismheated.cooler": "A heat pump that uses energy to move heat from the cold faces to the hot face.",

@@ -350,7 +350,7 @@ public class TileEntityShaker extends TileEntityProgressMachine<ShakerRecipe> {
         }
 
         @Override
-        public void calculateOperationsCanSupport(CachedRecipe.OperationTracker tracker, List<ItemStack> toOutput) {
+        public void calculateOperationsCanSupport(@NotNull CachedRecipe.OperationTracker tracker, List<ItemStack> toOutput) {
             for (int i = 0; i < toOutput.size() && i < slots.size() && tracker.shouldContinueChecking(); i++) {
                 calculateOperationsCanSupport(tracker, slots.get(i), toOutput.get(i));
             }

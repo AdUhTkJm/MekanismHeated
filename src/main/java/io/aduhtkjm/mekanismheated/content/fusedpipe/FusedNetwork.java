@@ -246,29 +246,6 @@ public class FusedNetwork {
         updateHeatCapacity();
     }
 
-    public void clampBuffer() {
-        if (!energyContainer.isEmpty() && energyContainer.getEnergy() > getEnergyCapacity()) {
-            energyContainer.setEnergy(getEnergyCapacity());
-        }
-        if (!fluidTank.isEmpty()) {
-            int capacity = getFluidCapacityAsInt();
-            if (fluidTank.getFluidAmount() > capacity) {
-                MekanismUtils.logMismatchedStackSize(fluidTank.setStackSize(capacity, Action.EXECUTE), capacity);
-            }
-        }
-        if (!chemicalTank.isEmpty()) {
-            long capacity = getChemicalCapacity();
-            if (chemicalTank.getStored() > capacity) {
-                MekanismUtils.logMismatchedStackSize(chemicalTank.setStackSize(capacity, Action.EXECUTE), capacity);
-            }
-        }
-        if (heatCapacitor.getHeat() > getTotalHeatCapacity()) {
-            heatCapacitor.setHeat(getTotalHeatCapacity());
-        }
-    }
-
-    //Buffer
-
     public long getEnergyCapacity() {
         long capacity = 0L;
         for (FusedPipeNode node : nodes) {
@@ -581,10 +558,10 @@ public class FusedNetwork {
                 if (extracted.isEmpty()) {
                     continue;
                 }
-                int actuallyExtracted = extracted.getCount();
-                source.extractItem(slot, actuallyExtracted, false);
-                insertIntoBuffer(stackInSlot.copyWithCount(actuallyExtracted));
-                pullRate -= actuallyExtracted;
+                int extractedAmt = extracted.getCount();
+                source.extractItem(slot, extractedAmt, false);
+                insertIntoBuffer(extracted);
+                pullRate -= extractedAmt;
             }
         }
     }
@@ -736,16 +713,6 @@ public class FusedNetwork {
             }
         }
         return eligible;
-    }
-
-    @NotNull
-    private static FluidStack sumFluids(@NotNull FluidStack a, @NotNull FluidStack b) {
-        return a.copyWithAmount(a.getAmount() + b.getAmount());
-    }
-
-    @NotNull
-    private static ChemicalStack sumChemicals(@NotNull ChemicalStack a, @NotNull ChemicalStack b) {
-        return a.copyWithAmount(a.getAmount() + b.getAmount());
     }
 
     /**

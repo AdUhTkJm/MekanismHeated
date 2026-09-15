@@ -244,8 +244,8 @@ public class FractionationMultiblockData extends MultiblockData {
         FluidStack current = inputTank.getFluid();
         FractionationRecipe recipe;
         if (current.isEmpty()) {
-            //Passive generation only runs on an empty sump. Passive recipes take no input, but getRecipeFor short-circuits
-            //empty inputs (returning nothing), so fetch the type's recipes directly and use the first complete one.
+            // Passive generation only runs on an empty sump. Passive recipes take no input, but getRecipeFor short-circuits
+            // empty inputs (returning nothing), so fetch the type's recipes directly and use the first complete one.
             recipe = level.getRecipeManager()
                   .getAllRecipesFor(ModRecipeTypes.TYPE_FRACTIONATING_PASSIVE.value())
                   .stream()
@@ -259,7 +259,7 @@ public class FractionationMultiblockData extends MultiblockData {
                   .map(RecipeHolder::value)
                   .orElse(null);
         }
-        if (recipe == null || recipe.getMinTemperature() > getTemperature()) {
+        if (recipe == null || recipe.getMinTemperature() > getTemperature() || recipe.getMaxTemperature() < getTemperature()) {
             return wasProcessing != (processing = false);
         }
         // Speed scales linearly from zero ops at min temperature up to nominal speed at base temperature.

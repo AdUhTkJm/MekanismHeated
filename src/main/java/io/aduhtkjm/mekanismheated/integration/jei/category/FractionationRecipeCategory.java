@@ -47,7 +47,7 @@ public class FractionationRecipeCategory extends HolderRecipeCategory<Fractionat
         addSimpleProgress(ProgressType.RIGHT, 84, 36);
         GaugeType outputType = GaugeType.SMALL.with(DataType.OUTPUT);
         for (int i = 0; i < OUTPUT_SLOTS; i++) {
-            //i = 0 is the lowest bank, drawn at the bottom of the column
+            // i = 0 is the lowest bank, drawn at the bottom of the column
             outputPool.add(addElement(GuiFluidGauge.getDummy(outputType, this, 140, 78 - i * 32)));
         }
     }
@@ -57,17 +57,17 @@ public class FractionationRecipeCategory extends HolderRecipeCategory<Fractionat
                           IFocusGroup focusGroup) {
         FractionationRecipe recipe = recipeHolder.value();
         IRecipeSlotBuilder temperatureSlot = null;
-        //Input-based recipes feed the sump; passive recipes have no input
+        // Input-based recipes feed the sump; passive recipes have no input
         if (recipe instanceof BasicFractionationRecipe basic) {
             temperatureSlot = initFluid(builder, RecipeIngredientRole.INPUT, inputGauge, basic.getInput().getRepresentations());
         }
-        //Outputs, ordered by bank index so the lowest bank fills the bottom gauge
+        // Outputs, ordered by bank index so the lowest bank fills the bottom gauge
         List<BankOutput> outputs = new ArrayList<>(recipe.getOutputs());
         outputs.sort(Comparator.comparingInt(BankOutput::bank));
         for (int i = 0; i < outputs.size() && i < OUTPUT_SLOTS; i++) {
             BankOutput output = outputs.get(i);
             IRecipeSlotBuilder outputSlot = initFluid(builder, RecipeIngredientRole.OUTPUT, outputPool.get(i), List.of(output.stack()));
-            //Passive recipes have no input slot to carry the temperature window, so attach it to the first output instead
+            // Passive recipes have no input slot to carry the temperature window, so attach it to the first output instead
             if (temperatureSlot == null) {
                 temperatureSlot = outputSlot;
             }

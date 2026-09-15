@@ -90,6 +90,7 @@
   "container.mekanismheated.retroentropic_array_casing": "反熵矩阵外壳",
   "container.mekanismheated.shaker": "摇床",
   "container.mekanismheated.temperature_controller": "温度控制器",
+  "container.mekanismheated.thermal_fractionation_controller": "热力蒸馏塔",
   "description.mekanismheated.atmosphere_heater": "加热周围区块的环境温度，燃烧燃料以降低能耗。",
   "description.mekanismheated.condenser": "使用热量将流体冷凝为物品的机器，温度越低速度越快。",
   "description.mekanismheated.cooler": "使用电力将热量从冷面转移至热面的热泵。",
