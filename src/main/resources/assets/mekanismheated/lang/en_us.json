@@ -209,7 +209,16 @@
   "multiblock.mekanismheated.invalid.incomplete_tray_layer": "Distillation trays must fill all interior positions of their layer",
   "multiblock.mekanismheated.invalid.tray_spacing": "Distillation trays must leave at least one open interior layer between each other and above the sump",
   "multiblock.mekanismheated.invalid.tray_top": "A distillation tray cannot be placed directly below the top opening of the tower",
+  "tooltip.mekanismheated.fused_pipe.advanced": "Advanced",
+  "tooltip.mekanismheated.fused_pipe.basic": "Basic",
+  "tooltip.mekanismheated.fused_pipe.chemical": "Chemical",
+  "tooltip.mekanismheated.fused_pipe.elite": "Elite",
+  "tooltip.mekanismheated.fused_pipe.energy": "Energy",
+  "tooltip.mekanismheated.fused_pipe.fluid": "Fluid",
   "tooltip.mekanismheated.fused_pipe.function": "%s: %s",
+  "tooltip.mekanismheated.fused_pipe.item": "Item",
+  "tooltip.mekanismheated.fused_pipe.heat": "Heat",
+  "tooltip.mekanismheated.fused_pipe.ultimate": "Ultimate",
   "tooltip.mekanismheated.impure": "impure",
   "tooltip.mekanismheated.pure": "pure"
 }

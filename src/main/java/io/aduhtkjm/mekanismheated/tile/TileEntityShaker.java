@@ -146,7 +146,10 @@ public class TileEntityShaker extends TileEntityProgressMachine<ShakerRecipe> {
     @Override
     protected IEnergyContainerHolder getInitialEnergyContainers(IContentsListener listener, IContentsListener recipeCacheListener, IContentsListener recipeCacheUnpauseListener) {
         EnergyContainerHelper builder = EnergyContainerHelper.forSideWithConfig(this);
-        builder.addContainer(energyContainer = MachineEnergyContainer.input(this, listener));
+        //Use the unpause listener rather than the plain one: running out of energy pauses the cached recipe (see
+        //CachedRecipe#pausedForErrors), and it is only resumed when a container that can resolve the error changes.
+        //Without this, adding energy to an already-loaded machine would never wake the recipe back up.
+        builder.addContainer(energyContainer = MachineEnergyContainer.input(this, recipeCacheUnpauseListener));
         return builder.build();
     }
 

@@ -210,8 +210,11 @@ public class TileEntityHeatSmelter
     protected IHeatCapacitorHolder getInitialHeatCapacitors(IContentsListener listener, IContentsListener recipeCacheListener, IContentsListener recipeCacheUnpauseListener,
           CachedAmbientTemperature ambientTemperature) {
         HeatCapacitorHelper builder = HeatCapacitorHelper.forSideWithConfig(this);
+        //Use the unpause listener rather than the plain one: the heat capacitor is this machine's "energy", so a change
+        //to it must be able to resume a cached recipe that got paused (see CachedRecipe#pausedForErrors) once heat is
+        //available again
         builder.addCapacitor(heatCapacitor = BasicHeatCapacitor.create(Config.HeatSmelter.HEAT_CAPACITY.get(), Config.HeatSmelter.INVERSE_CONDUCTION_COEFFICIENT.get(),
-              Config.HeatSmelter.INVERSE_INSULATION_COEFFICIENT.get(), ambientTemperature, listener));
+              Config.HeatSmelter.INVERSE_INSULATION_COEFFICIENT.get(), ambientTemperature, recipeCacheUnpauseListener));
         IHeatCapacitorHolder standalone = builder.build();
         //While formed, expose the shared brain's heat capacitor; otherwise the per-block one
         return side -> getMultiblock().isFormed() ? getMultiblock().getHeatCapacitors(side) : standalone.getHeatCapacitors(side);
@@ -227,6 +230,9 @@ public class TileEntityHeatSmelter
                       fluidChanged = true;
                   }
                   listener.onContentsChanged();
+                  //Draining the output tank frees up space for the recipe's output, so it has to be able to resume a
+                  //cached recipe that got paused for NOT_ENOUGH_FLUID_OUTPUT_SPACE_ERROR (see CachedRecipe#pausedForErrors)
+                  recipeCacheUnpauseListener.onContentsChanged();
                   onContentsChanged();
               });
         for (MultiFluidTank.Slot slot : fluidTank.getSlots()) {

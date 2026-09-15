@@ -4,6 +4,8 @@ import io.aduhtkjm.mekanismheated.block.BlockFusedPipe;
 import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedFunction;
 import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedPipeConfig;
 import java.util.List;
+import java.util.Locale;
+
 import mekanism.api.tier.BaseTier;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
@@ -40,14 +42,11 @@ public class ItemBlockFusedPipe extends BlockItem {
         for (FusedFunction function : FusedFunction.VALUES) {
             BaseTier tier = config.getTier(function);
             if (tier != null) {
+                String funcKey = String.format("tooltip.mekanismheated.fused_pipe.%s", function.name().toLowerCase());
+                String tierKey = String.format("tooltip.mekanismheated.fused_pipe.%s", tier.name().toLowerCase());
                 tooltip.add(Component.translatable("tooltip.mekanismheated.fused_pipe.function",
-                      pretty(function.name()), pretty(tier.name())));
+                      Component.translatable(funcKey), Component.translatable(tierKey)));
             }
         }
-    }
-
-    private static String pretty(String name) {
-        String lower = name.toLowerCase(java.util.Locale.ROOT);
-        return Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
     }
 }

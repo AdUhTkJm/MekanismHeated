@@ -209,7 +209,16 @@
   "multiblock.mekanismheated.invalid.incomplete_tray_layer": "同一层的蒸馏柱必须填满所有内部空间",
   "multiblock.mekanismheated.invalid.tray_spacing": "蒸馏柱之间以及托盘与进料仓之间必须至少留有一个空层",
   "multiblock.mekanismheated.invalid.tray_top": "蒸馏柱不能直接放置在塔顶开口下方",
+  "tooltip.mekanismheated.fused_pipe.advanced": "高级",
+  "tooltip.mekanismheated.fused_pipe.basic": "基础",
+  "tooltip.mekanismheated.fused_pipe.chemical": "化学品",
+  "tooltip.mekanismheated.fused_pipe.elite": "精英",
+  "tooltip.mekanismheated.fused_pipe.energy": "能量",
+  "tooltip.mekanismheated.fused_pipe.fluid": "流体",
   "tooltip.mekanismheated.fused_pipe.function": "%s：%s",
+  "tooltip.mekanismheated.fused_pipe.item": "物品",
+  "tooltip.mekanismheated.fused_pipe.heat": "热量",
+  "tooltip.mekanismheated.fused_pipe.ultimate": "终极",
   "tooltip.mekanismheated.impure": "不纯",
   "tooltip.mekanismheated.pure": "纯"
 }

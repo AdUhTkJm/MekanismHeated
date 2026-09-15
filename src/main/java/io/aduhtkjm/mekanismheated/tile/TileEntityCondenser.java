@@ -146,8 +146,10 @@ public class TileEntityCondenser extends TileEntityProgressMachine<CondenserReci
     protected IHeatCapacitorHolder getInitialHeatCapacitors(IContentsListener listener, IContentsListener recipeCacheListener, IContentsListener recipeCacheUnpauseListener,
           CachedAmbientTemperature ambientTemperature) {
         HeatCapacitorHelper builder = HeatCapacitorHelper.forSideWithConfig(this);
+        //Use the unpause listener rather than the plain one: the heat capacitor is this machine's temperature source, so
+        //a change to it must be able to resume a cached recipe that got paused (see CachedRecipe#pausedForErrors)
         builder.addCapacitor(heatCapacitor = BasicHeatCapacitor.create(Config.Condenser.HEAT_CAPACITY.get(), Config.Condenser.INVERSE_CONDUCTION_COEFFICIENT.get(),
-              Config.Condenser.INVERSE_INSULATION_COEFFICIENT.get(), ambientTemperature, listener));
+              Config.Condenser.INVERSE_INSULATION_COEFFICIENT.get(), ambientTemperature, recipeCacheUnpauseListener));
         return builder.build();
     }
 
