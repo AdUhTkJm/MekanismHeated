@@ -3,6 +3,7 @@ package io.aduhtkjm.mekanismheated.registries;
 import io.aduhtkjm.mekanismheated.Config;
 import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.ModLang;
+import io.aduhtkjm.mekanismheated.block.AsphaltBlock;
 import io.aduhtkjm.mekanismheated.block.BlockFusedPipe;
 import io.aduhtkjm.mekanismheated.block.atmosphereheater.AtmosphereHeaterBlock;
 import io.aduhtkjm.mekanismheated.block.condenser.CondenserBlock;
@@ -70,6 +71,12 @@ public class ModBlocks {
 
     public static final BlockRegistryObject<Block, BlockItem> THERMAL_CASING =
           BLOCKS.register("thermal_casing", BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(3.5F, 9F).sound(SoundType.METAL));
+
+    //Solid asphalt. Obtained by pouring out an asphalt bucket, turned back into one by an empty bucket
+    //(AsphaltBlock implements BucketPickup) and minable by any pickaxe.
+    public static final BlockRegistryObject<AsphaltBlock, BlockItem> ASPHALT_BLOCK =
+          BLOCKS.register("asphalt_block", () -> new AsphaltBlock(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.COLOR_BLACK).requiresCorrectToolForDrops().strength(1.5F, 6.0F).sound(SoundType.STONE)));
 
     public static final Machine<TileEntityHeatSmelter> HEAT_SMELTER_TYPE = MachineBuilder
           .createMachine(() -> ModTileEntityTypes.HEAT_SMELTER, ModLang.DESCRIPTION_HEAT_SMELTER)

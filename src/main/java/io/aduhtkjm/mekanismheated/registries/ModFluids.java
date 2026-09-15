@@ -3,6 +3,7 @@ package io.aduhtkjm.mekanismheated.registries;
 import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.content.unstablelava.UnstableLavaFluid;
 import io.aduhtkjm.mekanismheated.content.unstablelava.UnstableLavaVariant;
+import io.aduhtkjm.mekanismheated.item.ItemAsphaltBucket;
 import io.aduhtkjm.mekanismheated.item.ItemChemicalFormulaBucket;
 import io.aduhtkjm.mekanismheated.item.ItemFe2O3Dust;
 import java.util.List;
@@ -33,8 +34,11 @@ public class ModFluids {
 
     public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, BucketItem> WOOD_TAR =
         FLUIDS.register("wood_tar", renderProperties -> renderProperties.tint(0xFF513721));
-    public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, BucketItem> ASPHALT =
-        FLUIDS.register("asphalt", renderProperties -> renderProperties.tint(0xFF234623));
+    public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ItemAsphaltBucket> ASPHALT =
+        //Asphalt is a fluid, but pouring it out in the world sets a solid asphalt block, so its bucket is a
+        //custom item rather than a plain BucketItem.
+        FLUIDS.register("asphalt", ItemAsphaltBucket::new,
+            UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFF234623));
     public static final FluidRegistryObject<MekanismFluidType, Source, Flowing, LiquidBlock, ItemChemicalFormulaBucket> METHANOL =
         FLUIDS.register("methanol", (fluid, properties) -> new ItemChemicalFormulaBucket(fluid, properties, "CH\u2083OH"),
             UnaryOperator.identity(), renderProperties -> renderProperties.tint(0xFFCDCDB2));

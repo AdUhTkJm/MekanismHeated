@@ -3,6 +3,7 @@ package io.aduhtkjm.mekanismheated;
 import com.mojang.logging.LogUtils;
 import io.aduhtkjm.mekanismheated.command.ChunkTemperatureCommand;
 import io.aduhtkjm.mekanismheated.content.ambient.AmbientMeltingHandler;
+import io.aduhtkjm.mekanismheated.content.asphalt.AsphaltSpeedHandler;
 import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedPipeRegistry;
 import io.aduhtkjm.mekanismheated.content.moltenfluid.MoltenFluidHandler;
 import io.aduhtkjm.mekanismheated.network.PacketCoolerSetEnergy;
@@ -67,9 +68,9 @@ public class Mod {
         ModRecipeSerializers.RECIPE_SERIALIZERS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
 
-        //Build the multiblock managers during mod loading, not lazily when the first multiblock tile asks for one.
-        //Mekanism only creates/loads a manager's saved data once per world load (LevelEvent.Load), so a manager that
-        //first appears later never gets its cache persisted to disk (contents such as heat or items would reset).
+        // Build the multiblock managers during mod loading, not lazily when the first multiblock tile asks for one.
+        // Mekanism only creates/loads a manager's saved data once per world load (LevelEvent.Load), so a manager that
+        // first appears later never gets its cache persisted to disk.
         ModMultiblockManagers.init();
 
         modEventBus.addListener(this::commonSetup);
@@ -78,6 +79,7 @@ public class Mod {
 
         // Register ourselves for server and other game events we are interested in.
         NeoForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.addListener(AsphaltSpeedHandler::onPlayerTick);
         NeoForge.EVENT_BUS.addListener(FusedPipeRegistry::onServerTickPost);
         NeoForge.EVENT_BUS.addListener(FusedPipeRegistry::onServerStopping);
         NeoForge.EVENT_BUS.addListener(MoltenFluidHandler::onEntityTickPost);

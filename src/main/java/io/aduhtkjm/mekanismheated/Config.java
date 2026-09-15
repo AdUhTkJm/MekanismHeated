@@ -126,6 +126,10 @@ public class Config {
         public static ModConfigSpec.DoubleValue INVERSE_INSULATION_COEFFICIENT;
     }
 
+    public static class Asphalt {
+        public static ModConfigSpec.DoubleValue SPEED_BONUS;
+    }
+
     private static String heatCapacity(String name) {
         return String.format("Heat capacity of the %s in J/K, controlling how quickly its temperature changes.", name);
     }
@@ -403,6 +407,12 @@ public class Config {
         RetroentropicArray.INVERSE_INSULATION_COEFFICIENT = BUILDER
             .comment(invIns("Retroentropic Array"))
             .defineInRange("inverseInsulationCoefficient", 5, 1, Double.MAX_VALUE);
+        BUILDER.pop();
+
+        BUILDER.push("asphalt");
+        Asphalt.SPEED_BONUS = BUILDER
+            .comment("Movement speed bonus while a player is standing on an asphalt block, as a fraction of that player's speed (0.2 = 20% faster). Set to 0 to make asphalt behave like ordinary ground.")
+            .defineInRange("speedBonus", 0.2, 0, Double.MAX_VALUE);
         BUILDER.pop();
 
         SPEC = BUILDER.build();
