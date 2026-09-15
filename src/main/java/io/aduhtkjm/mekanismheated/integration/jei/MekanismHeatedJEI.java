@@ -11,6 +11,7 @@ import mekanism.client.recipe_viewer.jei.MekanismJEI;
 import mekanism.client.recipe_viewer.type.IRecipeViewerRecipeType;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.registration.IModIngredientRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
@@ -87,6 +88,21 @@ public class MekanismHeatedJEI implements IModPlugin {
         registerRecipes(registry, ModRecipeViewerTypes.RETROENTROPIC_ARRAY_PROCESSING, ModRecipeTypes.TYPE_RETROENTROPIC_ARRAY);
         //Both fractionation recipe forms share one category, so their recipes are collected separately and merged.
         registerFractionationRecipes(registry, ModRecipeViewerTypes.FRACTIONATING);
+        registerFusedPipeVariants(registry);
+    }
+
+    /**
+     * Registers our fused pipe variants in JEI's own crafting category. The pipe is crafted by a single dynamic recipe
+     * that reads the enabled functions off the grid and therefore declares no ingredients, which JEI drops as an
+     * "empty input" recipe; see {@link FusedPipeCraftingRecipes} for the expansion into concrete shapeless recipes.
+     */
+    private static void registerFusedPipeVariants(IRecipeRegistration registry) {
+        Level level = Minecraft.getInstance().level;
+        if (level == null) {
+            //No world loaded yet; JEI re-registers recipes once one exists
+            return;
+        }
+        registry.addRecipes(RecipeTypes.CRAFTING, FusedPipeCraftingRecipes.create(level));
     }
 
     @Override
