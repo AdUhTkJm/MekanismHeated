@@ -51,7 +51,8 @@ public class GuiStackedFluidGauge extends GuiGauge<Void> {
         if (tank == null || tank.getTotalCapacity() <= 0) {
             return 0;
         }
-        return (int) Math.round((double) tank.getTotalAmount() / tank.getTotalCapacity() * (height - 2));
+        //Clamp so a tank transiently reporting more than its capacity can never yield a fill taller than the window
+        return Math.min(height - 2, (int) Math.round((double) tank.getTotalAmount() / tank.getTotalCapacity() * (height - 2)));
     }
 
     @Nullable
@@ -100,19 +101,27 @@ public class GuiStackedFluidGauge extends GuiGauge<Void> {
             int innerWidth = width - 2;
             int totalCapacity = tank.getTotalCapacity();
 
-            //Render each fluid as a band stacked from the bottom, sized by its share of total capacity
-            int yCursor = relativeY + 1 + innerHeight;
-            List<FluidStack> fluids = tank.getFluids();
-            for (FluidStack fluid : fluids) {
-                int bandHeight = (int) Math.round((double) fluid.getAmount() / totalCapacity * innerHeight);
+            //Render each fluid as a band stacked from the bottom, sized by its share of total capacity. The band edges
+            // are derived from the running total instead of summing per-band heights, so per-band rounding cannot
+            // accumulate: the top edge of the stack is always rounded from the full stack height, which keeps the
+            // drawing inside the window even when many fluids are present.
+            int bandBottom = relativeY + 1 + innerHeight;
+            long cumulative = 0;
+            for (FluidStack fluid : tank.getFluids()) {
+                cumulative += fluid.getAmount();
+                //Clamp to the window as a safety net: if the tank ever reports more than its capacity (for example while
+                // a synced capacity is still catching up), the excess must be clipped rather than drawn above the gauge.
+                int bandTop = relativeY + 1 + innerHeight - (int) Math.round((double) cumulative / totalCapacity * innerHeight);
+                bandTop = Math.max(relativeY + 1, Math.min(bandTop, bandBottom));
+                int bandHeight = bandBottom - bandTop;
+                bandBottom = bandTop;
                 if (bandHeight <= 0) {
                     continue;
                 }
-                yCursor -= bandHeight;
                 TextureAtlasSprite icon = MekanismRenderer.getFluidTexture(fluid, FluidTextureType.STILL);
                 if (icon != null) {
                     MekanismRenderer.color(guiGraphics, fluid);
-                    drawTiledSprite(guiGraphics, relativeX + 1, yCursor, bandHeight, innerWidth, bandHeight, icon, TilingDirection.UP_RIGHT);
+                    drawTiledSprite(guiGraphics, relativeX + 1, bandTop, bandHeight, innerWidth, bandHeight, icon, TilingDirection.UP_RIGHT);
                     MekanismRenderer.resetColor(guiGraphics);
                 }
             }

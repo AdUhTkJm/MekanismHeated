@@ -80,8 +80,9 @@ public class LargeHeatSmelterData extends MultiblockData {
             fluidChanged = !isRemote();
             listener.onContentsChanged();
         };
-        // The initial capacities are for a single block; they are scaled up by {@link #configure(int)} once the
-        // structure forms (called from the validator's postcheck on the server and from readUpdateTag on the client).
+        // The initial capacities are for a single block; they are scaled up by {@link #configure(int)} as soon as the
+        // structure's volume is known. On the server that is when the formation protocol calls setShape, and on the
+        // client it is when the synced volume arrives (see {@link #setVolume(int)}).
         fluidTank = MultiFluidTank.output(TileEntityHeatSmelter.MAX_FLUID, fluidListener);
         // The heat capacitor must be registered in the heat capacitors list, otherwise the multiblock exposes no
         // heat handler at all and nothing can add or receive heat
@@ -102,6 +103,24 @@ public class LargeHeatSmelterData extends MultiblockData {
     public void configure(int volume) {
         fluidTank.setTotalCapacity(TileEntityHeatSmelter.MAX_FLUID * volume);
         heatCapacitor.setHeatCapacity(Config.HeatSmelter.HEAT_CAPACITY.get() * volume, true);
+    }
+
+    /**
+     * Keeps the volume-scaled capacities in step with the synced volume. Volume is a container-synced field, so this is
+     * the hook the client uses to learn the structure's size: update-tag loading calls it via {@code super.readUpdateTag},
+     * and every member block's open container calls it as well. Without this, a GUI opened on a non-master member would
+     * read the shared tank's (large) contents against the unscaled single-block capacity, and the fluid gauge would draw
+     * above its own top.
+     */
+    @Override
+    public void setVolume(int volume) {
+        if (getVolume() != volume) {
+            super.setVolume(volume);
+            //A zero volume means the structure is not laid out yet; the heat capacitor must never have a capacity of zero
+            if (volume > 0) {
+                configure(volume);
+            }
+        }
     }
 
     public BasicInventorySlot getInputSlot() {
@@ -330,8 +349,8 @@ public class LargeHeatSmelterData extends MultiblockData {
 
     @Override
     public void readUpdateTag(@NotNull CompoundTag tag, @NotNull HolderLookup.Provider provider) {
+        //Note: super.readUpdateTag syncs the volume, which re-configures the volume-scaled capacities via setVolume
         super.readUpdateTag(tag, provider);
-        configure(getVolume());
         NBTUtils.setCompoundIfPresent(tag, "smelter_fluid", nbt -> fluidTank.deserializeNBT(provider, nbt));
         NBTUtils.setCompoundIfPresent(tag, "smelter_heat", nbt -> heatCapacitor.deserializeNBT(provider, nbt));
         inputSlot.deserializeNBT(provider, tag.getCompound("smelter_input"));
