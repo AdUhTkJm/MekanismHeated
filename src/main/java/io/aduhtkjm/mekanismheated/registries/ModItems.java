@@ -3,8 +3,11 @@ package io.aduhtkjm.mekanismheated.registries;
 import io.aduhtkjm.mekanismheated.Mod;
 import io.aduhtkjm.mekanismheated.content.obsidiandust.ObsidianDustVariant;
 import io.aduhtkjm.mekanismheated.content.unstablelava.UnstableLavaVariant;
+import io.aduhtkjm.mekanismheated.content.upgrade.HeatedUpgrade;
 import io.aduhtkjm.mekanismheated.item.*;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import mekanism.common.registration.impl.ItemDeferredRegister;
 import mekanism.common.registration.impl.ItemRegistryObject;
 import net.minecraft.world.item.CreativeModeTab;
@@ -28,6 +31,24 @@ public class ModItems {
     public static final ItemRegistryObject<ItemFeS2Dust> FES2_DUST = ITEMS.registerItem("fes2_dust", ItemFeS2Dust::new);
     public static final ItemRegistryObject<ItemCu2SDust> CU2S_DUST = ITEMS.registerItem("cu2s_dust", ItemCu2SDust::new);
     public static final ItemRegistryObject<ItemPureCuODust> PURE_CUO_DUST = ITEMS.registerItem("pure_cuo_dust", ItemPureCuODust::new);
+
+    //Heat upgrades. The item textures start out as copies of Mekanism's chemical upgrade and can be adjusted later.
+    private static final Map<HeatedUpgrade, ItemRegistryObject<ItemHeatedUpgrade>> HEATED_UPGRADES_BUILDER = new EnumMap<>(HeatedUpgrade.class);
+    public static final ItemRegistryObject<ItemHeatedUpgrade> UPGRADE_CONDUCTION =
+          registerHeatedUpgrade(HeatedUpgrade.CONDUCTION, "upgrade_conduction");
+    public static final ItemRegistryObject<ItemHeatedUpgrade> UPGRADE_INSULATION =
+          registerHeatedUpgrade(HeatedUpgrade.INSULATION, "upgrade_insulation");
+    public static final ItemRegistryObject<ItemHeatedUpgrade> UPGRADE_CAPACITY =
+          registerHeatedUpgrade(HeatedUpgrade.CAPACITY, "upgrade_capacity");
+
+    /** Every heat upgrade item, keyed by the upgrade it installs. */
+    public static final Map<HeatedUpgrade, ItemRegistryObject<ItemHeatedUpgrade>> HEATED_UPGRADES = Map.copyOf(HEATED_UPGRADES_BUILDER);
+
+    private static ItemRegistryObject<ItemHeatedUpgrade> registerHeatedUpgrade(HeatedUpgrade type, String name) {
+        ItemRegistryObject<ItemHeatedUpgrade> item = ITEMS.registerItem(name, properties -> new ItemHeatedUpgrade(type, properties));
+        HEATED_UPGRADES_BUILDER.put(type, item);
+        return item;
+    }
 
     //Obsidian dusts: obsidian dust with the metal it was condensed from in its top-left corner. One register call per
     //ore; the matching overlay textures come from scripts/obsidian_dust_overlay.py.
@@ -66,6 +87,10 @@ public class ModItems {
         output.accept(ModBlocks.PHASE_CHANGE_HIGH);
         output.accept(ModBlocks.RETROENTROPIC_ARRAY_CASING);
         output.accept(ModBlocks.ASPHALT_BLOCK);
+
+        for (HeatedUpgrade type : HeatedUpgrade.values()) {
+            output.accept(HEATED_UPGRADES.get(type).get());
+        }
 
         output.accept(ModItems.SPONGE_IRON_INGOT.get());
         output.accept(ModItems.IMPURE_SN_INGOT.get());

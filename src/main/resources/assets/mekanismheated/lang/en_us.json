@@ -158,6 +158,8 @@
   "gui.mekanismheated.temperature_controller.status.empty": "No expression set",
   "gui.mekanismheated.temperature_controller.status.ok": "Working",
   "gui.mekanismheated.temperature_range": "Temperature: %1$s - %2$s",
+  "gui.mekanismheated.upgrade.amount": "%1$s/%2$s",
+  "gui.mekanismheated.upgrades.heat": "Heat Upgrades",
   "item.mekanismheated.acetic_acid_bucket": "Acetic Acid Bucket",
   "item.mekanismheated.asphalt_bucket": "Asphalt Bucket",
   "item.mekanismheated.caco3_dust": "Limestone Dust",
@@ -199,6 +201,9 @@
   "item.mekanismheated.unstable_lava_lead_bucket": "Unstable Lead Lava Bucket",
   "item.mekanismheated.unstable_lava_osmium_bucket": "Unstable Osmium Lava Bucket",
   "item.mekanismheated.unstable_lava_tin_bucket": "Unstable Tin Lava Bucket",
+  "item.mekanismheated.upgrade_capacity": "Capacity Upgrade",
+  "item.mekanismheated.upgrade_conduction": "Conduction Upgrade",
+  "item.mekanismheated.upgrade_insulation": "Insulation Upgrade",
   "item.mekanismheated.wood_tar_bucket": "Wood Tar Bucket",
   "itemGroup.mekanismheated": "Mekanism Heated",
   "mekanismheated.jade.chemical": "Chemical",
@@ -223,5 +228,11 @@
   "tooltip.mekanismheated.fused_pipe.heat": "Heat",
   "tooltip.mekanismheated.fused_pipe.ultimate": "Ultimate",
   "tooltip.mekanismheated.impure": "impure",
-  "tooltip.mekanismheated.pure": "pure"
+  "tooltip.mekanismheated.pure": "pure",
+  "upgrade.mekanismheated.capacity": "Capacity",
+  "upgrade.mekanismheated.capacity.description": "Increases the machine's heat capacity, improving by 10% per installed upgrade.",
+  "upgrade.mekanismheated.conduction": "Conduction",
+  "upgrade.mekanismheated.conduction.description": "Makes the machine exchange heat with adjacent blocks more readily, improving by 10% per installed upgrade.",
+  "upgrade.mekanismheated.insulation": "Insulation",
+  "upgrade.mekanismheated.insulation.description": "Reduces the heat the machine loses to the environment, improving by 10% per installed upgrade."
 }

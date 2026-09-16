@@ -130,6 +130,13 @@ public class Config {
         public static ModConfigSpec.DoubleValue SPEED_BONUS;
     }
 
+    public static class Upgrades {
+        public static ModConfigSpec.DoubleValue CONDUCTION;
+        public static ModConfigSpec.DoubleValue INSULATION;
+        public static ModConfigSpec.DoubleValue CAPACITY;
+        public static ModConfigSpec.IntValue MAX_HEAT_UPGRADES;
+    }
+
     private static String heatCapacity(String name) {
         return String.format("Heat capacity of the %s in J/K, controlling how quickly its temperature changes.", name);
     }
@@ -144,6 +151,11 @@ public class Config {
 
     private static String maxEnergy(String name) {
         return String.format("Max energy in Joules that the %s can hold,", name);
+    }
+
+    private static String upgradeBonus(String name, String effect) {
+        return String.format("Fraction by which each %s improves a machine: 0.1 means every installed upgrade is a 10%% improvement. "
+              + "Upgrades stack multiplicatively, so n installed upgrades %s by a factor of (1 + this value)^n. Up to 64 of each can be installed.", name, effect);
     }
 
     public static ModConfigSpec SPEC;
@@ -413,6 +425,21 @@ public class Config {
         Asphalt.SPEED_BONUS = BUILDER
             .comment("Movement speed bonus while a player is standing on an asphalt block, as a fraction of that player's speed (0.2 = 20% faster). Set to 0 to make asphalt behave like ordinary ground.")
             .defineInRange("speedBonus", 0.2, 0, Double.MAX_VALUE);
+        BUILDER.pop();
+
+        BUILDER.push("upgrades");
+        Upgrades.CONDUCTION = BUILDER
+            .comment(upgradeBonus("Conduction Upgrade", "divide the machine's inverse conduction coefficient"))
+            .defineInRange("conduction", 0.1, 0, Double.MAX_VALUE);
+        Upgrades.INSULATION = BUILDER
+            .comment(upgradeBonus("Insulation Upgrade", "multiply the machine's inverse insulation coefficient"))
+            .defineInRange("insulation", 0.1, 0, Double.MAX_VALUE);
+        Upgrades.CAPACITY = BUILDER
+            .comment(upgradeBonus("Capacity Upgrade", "multiply the machine's heat capacity"))
+            .defineInRange("capacity", 0.1, 0, Double.MAX_VALUE);
+        Upgrades.MAX_HEAT_UPGRADES = BUILDER
+            .comment("Max amount of each heat upgrade that can be installed to a machine.")
+            .defineInRange("max_heat_upgrade", 64, 1, 256);
         BUILDER.pop();
 
         SPEC = BUILDER.build();

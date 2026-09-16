@@ -35,6 +35,7 @@ import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityFractionationBlock;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityRetroentropicArrayCasing;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationController;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationValve;
+import mekanism.api.Upgrade;
 import mekanism.common.block.attribute.AttributeParticleFX;
 import mekanism.common.block.attribute.AttributeSideConfig;
 import mekanism.common.block.attribute.AttributeStateFacing;
@@ -103,6 +104,9 @@ public class ModBlocks {
           .createBlock(() -> ModTileEntityTypes.THERMAL_FRACTIONATION_CONTROLLER, ModLang.DESCRIPTION_THERMAL_FRACTIONATION_CONTROLLER)
           .withGui(() -> ModContainerTypes.THERMAL_FRACTIONATION_CONTROLLER)
           .with(Attributes.ACTIVE, new AttributeStateFacing(), new AttributeCustomResistance(9))
+          //Heat upgrades are installed here; the controller is the tower's only block with a GUI, so it is the only one
+          //where they can be seen and uninstalled again. Muffling is the smallest set the attribute accepts.
+          .withSupportedUpgrades(Upgrade.MUFFLING)
           .externalMultiblock()
           .build();
 
@@ -195,7 +199,6 @@ public class ModBlocks {
           .createMachine(() -> ModTileEntityTypes.REACTION_CHAMBER, ModLang.DESCRIPTION_REACTION_CHAMBER)
           .withGui(() -> ModContainerTypes.REACTION_CHAMBER)
           .with(AttributeSideConfig.create(TransmissionType.ITEM, TransmissionType.FLUID, TransmissionType.CHEMICAL, TransmissionType.HEAT))
-          .without(AttributeUpgradeSupport.class)
           .build();
 
     public static final BlockRegistryObject<ReactionChamberBlock, ItemBlockTooltip<ReactionChamberBlock>> REACTION_CHAMBER =
@@ -271,6 +274,8 @@ public class ModBlocks {
         .createBlock(() -> ModTileEntityTypes.RETROENTROPIC_ARRAY_CASING, ModLang.DESCRIPTION_RETROENTROPIC_ARRAY_CASING)
         .withGui(() -> ModContainerTypes.RETROENTROPIC_ARRAY)
         .with(new AttributeCustomResistance(9))
+        //Heat upgrades are installed here; muffling is the smallest set the attribute accepts
+        .withSupportedUpgrades(Upgrade.MUFFLING)
         .externalMultiblock()
         .build();
 

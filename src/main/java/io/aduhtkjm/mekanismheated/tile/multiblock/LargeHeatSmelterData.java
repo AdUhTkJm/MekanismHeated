@@ -1,6 +1,8 @@
 package io.aduhtkjm.mekanismheated.tile.multiblock;
 
 import io.aduhtkjm.mekanismheated.Config;
+import io.aduhtkjm.mekanismheated.content.upgrade.HeatedUpgrades;
+import io.aduhtkjm.mekanismheated.content.upgrade.IHeatedUpgradeMultiblockData;
 import io.aduhtkjm.mekanismheated.recipe.HeatSmelterRecipe;
 import io.aduhtkjm.mekanismheated.tile.HeatSmelterLogic;
 import io.aduhtkjm.mekanismheated.tile.TileEntityHeatSmelter;
@@ -42,7 +44,7 @@ import org.jetbrains.annotations.Nullable;
  * root of the operation count (capped at {@link Config.HeatSmelter#MAX_HEAT_MULTIPLIER}), so a large smelter is more
  * heat-efficient than the equivalent number of separate smelters.</p>
  */
-public class LargeHeatSmelterData extends MultiblockData {
+public class LargeHeatSmelterData extends MultiblockData implements IHeatedUpgradeMultiblockData {
 
     private final BasicInventorySlot inputSlot;
     private final BasicInventorySlot outputSlot;
@@ -102,7 +104,13 @@ public class LargeHeatSmelterData extends MultiblockData {
      */
     public void configure(int volume) {
         fluidTank.setTotalCapacity(TileEntityHeatSmelter.MAX_FLUID * volume);
-        heatCapacitor.setHeatCapacity(Config.HeatSmelter.HEAT_CAPACITY.get() * volume, true);
+        double baseHeatCapacity = Config.HeatSmelter.HEAT_CAPACITY.get() * volume;
+        heatCapacitor.setHeatCapacity(baseHeatCapacity, true);
+        if (!isRemote()) {
+            //The capacity was just derived from the structure's volume, so re-apply the heat upgrades on top of it. The
+            //client is skipped: its capacity arrives through the update tag and the container sync instead.
+            HeatedUpgrades.applyTo(heatCapacitor, baseHeatCapacity, HeatedUpgrades.multipliersFor(this));
+        }
     }
 
     /**

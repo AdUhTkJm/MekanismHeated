@@ -1,12 +1,13 @@
 package io.aduhtkjm.mekanismheated.tile.multiblock;
 
+import io.aduhtkjm.mekanismheated.content.upgrade.IHeatedUpgradeTile;
 import io.aduhtkjm.mekanismheated.registries.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class TileEntityThermalFractionationController extends TileEntityFractionationBlock {
+public class TileEntityThermalFractionationController extends TileEntityFractionationBlock implements IHeatedUpgradeTile {
 
     public TileEntityThermalFractionationController(BlockPos pos, BlockState state) {
         super(ModBlocks.THERMAL_FRACTIONATION_CONTROLLER, pos, state);

@@ -1,6 +1,7 @@
 package io.aduhtkjm.mekanismheated.tile.multiblock;
 
 import io.aduhtkjm.mekanismheated.Config;
+import io.aduhtkjm.mekanismheated.content.upgrade.IHeatedUpgradeMultiblockData;
 import io.aduhtkjm.mekanismheated.recipe.ModRecipeTypes;
 import io.aduhtkjm.mekanismheated.recipe.RetroentropicArrayRecipe;
 import mekanism.api.Action;
@@ -24,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
  * A machine that works only when temperatuer <0K. This needs rapidly switching the cooler, or just making the cooler
  * run on 1MJ/t.
  */
-public class RetroentropicArrayData extends MultiblockData {
+public class RetroentropicArrayData extends MultiblockData implements IHeatedUpgradeMultiblockData {
     /**
      * The amount of game days backtracked by the retroentropic array. <p>
      *
@@ -80,6 +81,11 @@ public class RetroentropicArrayData extends MultiblockData {
         super.onCreated(world);
         biomeAmbientTemp = calculateAverageAmbientTemperature(world);
         heatTransfer.invalidate();
+        if (!isRemote()) {
+            // The shared capacitor may have been restored from the multiblock cache, which stores the already scaled
+            // capacity, so the heat upgrades are re-applied here to end up with the base capacity times the multipliers.
+            mekanismheated$recalculateHeatedUpgrades();
+        }
     }
 
     @Override

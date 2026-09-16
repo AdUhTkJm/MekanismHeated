@@ -7,6 +7,7 @@ import io.aduhtkjm.mekanismheated.content.asphalt.AsphaltSpeedHandler;
 import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedPipeRegistry;
 import io.aduhtkjm.mekanismheated.content.moltenfluid.MoltenFluidHandler;
 import io.aduhtkjm.mekanismheated.network.PacketCoolerSetEnergy;
+import io.aduhtkjm.mekanismheated.network.PacketRemoveHeatedUpgrade;
 import io.aduhtkjm.mekanismheated.network.PacketSetChunkTargetTemperature;
 import io.aduhtkjm.mekanismheated.network.PacketSetHeatTarget;
 import io.aduhtkjm.mekanismheated.network.PacketSetTemperatureControllerMode;
@@ -16,6 +17,7 @@ import io.aduhtkjm.mekanismheated.recipe.ModRecipeTypes;
 import io.aduhtkjm.mekanismheated.registries.ModBlocks;
 import io.aduhtkjm.mekanismheated.registries.ModChemicals;
 import io.aduhtkjm.mekanismheated.registries.ModContainerTypes;
+import io.aduhtkjm.mekanismheated.registries.ModDataComponents;
 import io.aduhtkjm.mekanismheated.registries.ModFluids;
 import io.aduhtkjm.mekanismheated.registries.ModItems;
 import io.aduhtkjm.mekanismheated.registries.ModMultiblockManagers;
@@ -64,6 +66,7 @@ public class Mod {
         ModTileEntityTypes.TILE_ENTITY_TYPES.register(modEventBus);
         ModContainerTypes.CONTAINER_TYPES.register(modEventBus);
         ModChemicals.CHEMICALS.register(modEventBus);
+        ModDataComponents.DATA_COMPONENTS.register(modEventBus);
         ModRecipeTypes.RECIPE_TYPES.register(modEventBus);
         ModRecipeSerializers.RECIPE_SERIALIZERS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
@@ -119,7 +122,8 @@ public class Mod {
               .playToServer(PacketCoolerSetEnergy.TYPE, PacketCoolerSetEnergy.STREAM_CODEC, PacketCoolerSetEnergy::handle)
               .playToServer(PacketSetTemperatureExpression.TYPE, PacketSetTemperatureExpression.STREAM_CODEC, PacketSetTemperatureExpression::handle)
               .playToServer(PacketSetTemperatureControllerMode.TYPE, PacketSetTemperatureControllerMode.STREAM_CODEC,
-                    PacketSetTemperatureControllerMode::handle);
+                    PacketSetTemperatureControllerMode::handle)
+              .playToServer(PacketRemoveHeatedUpgrade.TYPE, PacketRemoveHeatedUpgrade.STREAM_CODEC, PacketRemoveHeatedUpgrade::handle);
     }
 
     @SubscribeEvent

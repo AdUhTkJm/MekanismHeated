@@ -5,12 +5,17 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "MekanismHeated.refmap.json",
   "mixins": [
+    "MixinBasicHeatCapacitor",
+    "MixinBasicInventorySlot",
     "MixinCachedAmbientTemperature",
     "MixinHeatAPI",
     "MixinITileHeatHandler",
-    "MixinMultiblockData"
+    "MixinMultiblockData",
+    "MixinTileComponentUpgrade",
+    "MixinVariableHeatCapacitor"
   ],
   "client": [
+    "MixinGuiUpgradeWindowTab"
   ],
   "injectors": {
     "defaultRequire": 1

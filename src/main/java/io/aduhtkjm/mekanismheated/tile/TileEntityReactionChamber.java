@@ -1,6 +1,7 @@
 package io.aduhtkjm.mekanismheated.tile;
 
 import io.aduhtkjm.mekanismheated.Config;
+import io.aduhtkjm.mekanismheated.content.upgrade.IHeatedUpgradeTile;
 import io.aduhtkjm.mekanismheated.recipe.ModRecipeTypes;
 import io.aduhtkjm.mekanismheated.recipe.ReactionChamberRecipe;
 import io.aduhtkjm.mekanismheated.recipe.ReactionChamberRecipeInput;
@@ -77,7 +78,7 @@ import org.jetbrains.annotations.Nullable;
  * shared inputs first) is left waiting instead of being re-tested every tick. A recipe that is no longer watched at all is
  * simply absent from the list, and only gets looked at again by a rebuild.
  */
-public class TileEntityReactionChamber extends TileEntityConfigurableMachine {
+public class TileEntityReactionChamber extends TileEntityConfigurableMachine implements IHeatedUpgradeTile {
 
     /** Capacity of the shared fluid/chemical pool, in milli-buckets. */
     public static final int MAX_CAPACITY = (int) Math.min(Integer.MAX_VALUE,

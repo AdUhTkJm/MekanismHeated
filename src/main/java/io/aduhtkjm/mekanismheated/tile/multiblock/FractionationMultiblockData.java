@@ -1,6 +1,8 @@
 package io.aduhtkjm.mekanismheated.tile.multiblock;
 
 import io.aduhtkjm.mekanismheated.Config;
+import io.aduhtkjm.mekanismheated.content.upgrade.HeatedUpgrades;
+import io.aduhtkjm.mekanismheated.content.upgrade.IHeatedUpgradeMultiblockData;
 import io.aduhtkjm.mekanismheated.recipe.BasicFractionationRecipe;
 import io.aduhtkjm.mekanismheated.recipe.FractionationRecipe;
 import io.aduhtkjm.mekanismheated.recipe.FractionationRecipe.BankOutput;
@@ -45,7 +47,7 @@ import org.jetbrains.annotations.Nullable;
  * feed sump ({@link #inputTank}), and every compartment directly above a tray forms one output bank. Banks are indexed
  * from the bottom of the tower.</p>
  */
-public class FractionationMultiblockData extends MultiblockData {
+public class FractionationMultiblockData extends MultiblockData implements IHeatedUpgradeMultiblockData {
 
     /**
      * Display cap for the GUI temperature bar, in Kelvin.
@@ -168,7 +170,13 @@ public class FractionationMultiblockData extends MultiblockData {
     public void onCreated(Level world) {
         super.onCreated(world);
         biomeAmbientTemp = calculateAverageAmbientTemperature(world);
-        heatCapacitor.setHeatCapacity(Config.Fractionation.HEAT_CAPACITY_PER_HEIGHT.get() * height(), true);
+        double baseHeatCapacity = Config.Fractionation.HEAT_CAPACITY_PER_HEIGHT.get() * height();
+        heatCapacitor.setHeatCapacity(baseHeatCapacity, true);
+        if (!isRemote()) {
+            //The capacity was just derived from the tower's height, so re-apply the heat upgrades on top of it. The
+            //client is skipped: its capacity arrives through the update tag and the container sync instead.
+            HeatedUpgrades.applyTo(heatCapacitor, baseHeatCapacity, HeatedUpgrades.multipliersFor(this));
+        }
         heatTransfer.invalidate();
     }
 

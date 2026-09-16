@@ -77,6 +77,16 @@ public enum ModLang implements ILangEntry {
     GUI_TEMPERATURE_CONTROLLER_ERROR_TOO_DEEP("gui", "temperature_controller.error.too_deep"),
     GUI_TEMPERATURE_CONTROLLER_ERROR_TOO_LARGE("gui", "temperature_controller.error.too_large"),
 
+    // Heat upgrades.
+    UPGRADE_CONDUCTION("upgrade", "conduction"),
+    UPGRADE_CONDUCTION_DESCRIPTION("upgrade", "conduction.description"),
+    UPGRADE_INSULATION("upgrade", "insulation"),
+    UPGRADE_INSULATION_DESCRIPTION("upgrade", "insulation.description"),
+    UPGRADE_CAPACITY("upgrade", "capacity"),
+    UPGRADE_CAPACITY_DESCRIPTION("upgrade", "capacity.description"),
+    GUI_HEAT_UPGRADES("gui", "upgrades.heat"),
+    GUI_UPGRADE_AMOUNT("gui", "upgrade.amount"),
+
     // Miscellanous.
     MULTIBLOCK_INVALID_INCOMPLETE_TRAY_LAYER("multiblock", "invalid.incomplete_tray_layer"),
     MULTIBLOCK_INVALID_TRAY_TOP("multiblock", "invalid.tray_top"),
