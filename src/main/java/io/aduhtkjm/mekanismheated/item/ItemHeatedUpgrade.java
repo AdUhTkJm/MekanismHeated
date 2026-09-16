@@ -59,9 +59,7 @@ public class ItemHeatedUpgrade extends Item {
         if (player != null && player.isShiftKeyDown()) {
             Level level = context.getLevel();
             BlockEntity tile = WorldUtils.getTileEntity(level, context.getClickedPos());
-            //Note: This mirrors Mekanism's own upgrade item, except that it requires the machine to be one of this mod's
-            // heat capacitor machines, so the upgrades can never be installed into a plain Mekanism machine
-            if (tile instanceof TileEntityMekanism mekTile && HeatedUpgrades.supports(mekTile) && mekTile.supportsUpgrades()
+            if (tile instanceof TileEntityMekanism mekTile && HeatedUpgrades.supports(mekTile)
                   && mekTile.getComponent() instanceof IHeatedUpgradeComponent component) {
                 if (!level.isClientSide) {
                     ItemStack stack = context.getItemInHand();

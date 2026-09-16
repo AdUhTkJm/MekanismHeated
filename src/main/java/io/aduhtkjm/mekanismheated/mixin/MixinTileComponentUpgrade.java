@@ -69,9 +69,8 @@ public abstract class MixinTileComponentUpgrade implements IHeatedUpgradeCompone
      */
     @Inject(method = "<init>", at = @At("TAIL"))
     private void mekanismheated$allowHeatedUpgradeItems(TileEntityMekanism tileEntity, CallbackInfo ci) {
-        //Note: this.tile is assigned before the upgrade slots are created, so reading the shadowed field is fine here
         if (HeatedUpgrades.supports(tile)) {
-            //The input slot is where our items are installed from, the output slot is where uninstalled ones are put
+            // The input slot is where our items are installed from, the output slot is where uninstalled ones are put
             ((IHeatedUpgradeSlot) upgradeSlot).mekanismheated$allowHeatedUpgradeInstall();
             ((IHeatedUpgradeSlot) upgradeOutputSlot).mekanismheated$allowHeatedUpgradeItems();
         }

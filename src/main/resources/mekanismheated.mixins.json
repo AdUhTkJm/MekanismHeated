@@ -15,7 +15,8 @@
     "MixinVariableHeatCapacitor"
   ],
   "client": [
-    "MixinGuiUpgradeWindowTab"
+    "MixinGuiSupportedUpgrades",
+    "MixinGuiUpgradeWindow"
   ],
   "injectors": {
     "defaultRequire": 1

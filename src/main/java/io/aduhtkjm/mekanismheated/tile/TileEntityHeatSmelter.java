@@ -140,6 +140,8 @@ public class TileEntityHeatSmelter
         configComponent.setupInputConfig(TransmissionType.HEAT, heatCapacitor);
         applySideDefaults();
 
+        ;
+
         ejectorComponent = new TileComponentEjector(this);
         ejectorComponent.setOutputData(configComponent, TransmissionType.ITEM);
         ejectorComponent.setOutputData(configComponent, TransmissionType.FLUID);
@@ -211,9 +213,9 @@ public class TileEntityHeatSmelter
     protected IHeatCapacitorHolder getInitialHeatCapacitors(IContentsListener listener, IContentsListener recipeCacheListener, IContentsListener recipeCacheUnpauseListener,
           CachedAmbientTemperature ambientTemperature) {
         HeatCapacitorHelper builder = HeatCapacitorHelper.forSideWithConfig(this);
-        //Use the unpause listener rather than the plain one: the heat capacitor is this machine's "energy", so a change
-        //to it must be able to resume a cached recipe that got paused (see CachedRecipe#pausedForErrors) once heat is
-        //available again
+        // Use the unpause listener rather than the plain one: the heat capacitor is this machine's "energy", so a change
+        // to it must be able to resume a cached recipe that got paused (see CachedRecipe#pausedForErrors) once heat is
+        // available again
         builder.addCapacitor(heatCapacitor = BasicHeatCapacitor.create(Config.HeatSmelter.HEAT_CAPACITY.get(), Config.HeatSmelter.INVERSE_CONDUCTION_COEFFICIENT.get(),
               Config.HeatSmelter.INVERSE_INSULATION_COEFFICIENT.get(), ambientTemperature, recipeCacheUnpauseListener));
         IHeatCapacitorHolder standalone = builder.build();

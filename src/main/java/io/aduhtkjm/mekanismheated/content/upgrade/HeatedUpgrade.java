@@ -6,6 +6,7 @@ import io.aduhtkjm.mekanismheated.ModLang;
 import io.netty.buffer.ByteBuf;
 import java.util.function.IntFunction;
 import mekanism.api.text.EnumColor;
+import mekanism.api.text.IHasTranslationKey;
 import mekanism.api.text.ILangEntry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -27,27 +28,10 @@ import org.lwjgl.system.NonnullDefault;
  * practice the mod's own machines with a heat capacitor. Mekanism's own machines are unaffected.</p>
  */
 @NonnullDefault
-public enum HeatedUpgrade implements StringRepresentable {
-    /**
-     * Divides the machine's inverse conduction coefficient by {@code (1 + bonus)^n}, making it exchange heat with
-     * adjacent blocks (heaters, coolers, neighbouring machines) more readily.
-     */
+public enum HeatedUpgrade implements IHasTranslationKey.IHasEnumNameTranslationKey, StringRepresentable {
     CONDUCTION("conduction", ModLang.UPGRADE_CONDUCTION, ModLang.UPGRADE_CONDUCTION_DESCRIPTION, EnumColor.ORANGE),
-    /**
-     * Multiplies the machine's inverse insulation coefficient by {@code (1 + bonus)^n}, making it lose less heat to the
-     * environment.
-     */
     INSULATION("insulation", ModLang.UPGRADE_INSULATION, ModLang.UPGRADE_INSULATION_DESCRIPTION, EnumColor.INDIGO),
-    /**
-     * Multiplies the machine's heat capacity by {@code (1 + bonus)^n}, giving it more thermal mass so its temperature
-     * moves more slowly.
-     */
     CAPACITY("capacity", ModLang.UPGRADE_CAPACITY, ModLang.UPGRADE_CAPACITY_DESCRIPTION, EnumColor.PURPLE);
-
-    /**
-     * Maximum number of upgrades of a single type that can be installed on one machine.
-     */
-    public static final int MAX = 64;
 
     /**
      * Codec for serializing heat upgrades by their name.
@@ -78,7 +62,7 @@ public enum HeatedUpgrade implements StringRepresentable {
      * Gets the maximum number of upgrades of this type that can be installed on a single machine.
      */
     public int getMax() {
-        return MAX;
+        return Config.Upgrades.MAX_HEAT_UPGRADES.get();
     }
 
     /**
@@ -124,5 +108,10 @@ public enum HeatedUpgrade implements StringRepresentable {
     @Override
     public String getSerializedName() {
         return name;
+    }
+
+    @Override
+    public String getTranslationKey() {
+        return langEntry.getTranslationKey();
     }
 }

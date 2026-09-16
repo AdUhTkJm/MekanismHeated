@@ -65,13 +65,11 @@ public abstract class MixinBasicHeatCapacitor implements IHeatedHeatCapacitor {
 
     @ModifyReturnValue(method = "getInverseConduction", at = @At("RETURN"))
     private double mekanismheated$scaleInverseConduction(double original) {
-        //A higher inverse conduction means less heat is exchanged, so improving conduction divides it
         return original / mekanismheated$conductionDivisor;
     }
 
     @ModifyReturnValue(method = "getInverseInsulation", at = @At("RETURN"))
     private double mekanismheated$scaleInverseInsulation(double original) {
-        //A higher inverse insulation means less heat is lost to the environment
         return original * mekanismheated$insulationMultiplier;
     }
 
@@ -81,10 +79,6 @@ public abstract class MixinBasicHeatCapacitor implements IHeatedHeatCapacitor {
         double oldCapacity = self.getHeatCapacity();
         if (oldCapacity != newCapacity) {
             if (oldCapacity > 0) {
-                //Scale the stored heat with the capacity so the machine keeps its temperature: the extra thermal mass
-                //arrives at the temperature the machine already has. (Mekanism's own setHeatCapacity(capacity, true)
-                //instead adds the new mass at ambient temperature, which would drag a cooler's cold side back up to
-                //ambient and a heat smelter partway down to it.)
                 self.setHeat(self.getHeat() * (newCapacity / oldCapacity));
             }
             self.setHeatCapacity(newCapacity, false);

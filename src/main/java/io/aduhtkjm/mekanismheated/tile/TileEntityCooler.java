@@ -3,11 +3,7 @@ package io.aduhtkjm.mekanismheated.tile;
 import io.aduhtkjm.mekanismheated.Config;
 import io.aduhtkjm.mekanismheated.content.upgrade.IHeatedUpgradeTile;
 import io.aduhtkjm.mekanismheated.registries.ModBlocks;
-import mekanism.api.Action;
-import mekanism.api.AutomationType;
-import mekanism.api.IContentsListener;
-import mekanism.api.RelativeSide;
-import mekanism.api.SerializationConstants;
+import mekanism.api.*;
 import mekanism.common.capabilities.energy.MachineEnergyContainer;
 import mekanism.common.capabilities.heat.BasicHeatCapacitor;
 import mekanism.common.capabilities.heat.CachedAmbientTemperature;
@@ -25,7 +21,10 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.system.NonnullDefault;
+
+import java.util.Set;
 
 @NonnullDefault
 public class TileEntityCooler extends TileEntityMekanism implements IHeatedUpgradeTile {

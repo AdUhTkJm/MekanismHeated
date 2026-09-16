@@ -83,7 +83,7 @@ public final class HeatedUpgrades {
      * implement {@link IHeatedUpgradeTile}, so Mekanism's machines are left alone.
      */
     public static boolean supports(TileEntityMekanism tile) {
-        return tile instanceof IHeatedUpgradeTile;
+        return tile.supportsUpgrades() && tile instanceof IHeatedUpgradeTile;
     }
 
     /**

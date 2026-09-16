@@ -34,7 +34,7 @@ public class RetroentropicArrayData extends MultiblockData implements IHeatedUpg
     @ContainerSync
     private int backtracked;
     /**
-     * Duration of {@link #cachedRecipe} in ticks. Kept as a separate synced field because the recipe itself is only ever
+     * Duration of {@link #cachedRecipe} in ticks. Kept as a separate synced field because the recipe itself is only
      * resolved server-side, while the GUI and Jade need the duration to render the progress.
      */
     @ContainerSync

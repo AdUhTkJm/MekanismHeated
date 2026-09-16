@@ -104,8 +104,6 @@ public class ModBlocks {
           .createBlock(() -> ModTileEntityTypes.THERMAL_FRACTIONATION_CONTROLLER, ModLang.DESCRIPTION_THERMAL_FRACTIONATION_CONTROLLER)
           .withGui(() -> ModContainerTypes.THERMAL_FRACTIONATION_CONTROLLER)
           .with(Attributes.ACTIVE, new AttributeStateFacing(), new AttributeCustomResistance(9))
-          //Heat upgrades are installed here; the controller is the tower's only block with a GUI, so it is the only one
-          //where they can be seen and uninstalled again. Muffling is the smallest set the attribute accepts.
           .withSupportedUpgrades(Upgrade.MUFFLING)
           .externalMultiblock()
           .build();
