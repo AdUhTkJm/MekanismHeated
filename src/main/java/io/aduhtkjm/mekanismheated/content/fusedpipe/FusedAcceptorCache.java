@@ -232,7 +232,7 @@ public final class FusedAcceptorCache {
             for (Direction side : Direction.values()) {
                 BlockPos neighborPos = pos.relative(side);
                 // Don't forcefully load neighbouring chunks.
-                if (level.isLoaded(neighborPos)) {
+                if (!level.isLoaded(neighborPos)) {
                     continue;
                 }
 

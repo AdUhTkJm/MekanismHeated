@@ -37,7 +37,17 @@ import net.neoforged.neoforge.capabilities.ICapabilityInvalidationListener;
 public final class CapabilityWatch {
 
     private final Runnable onInvalidated;
+    /**
+     * The positions currently watched. Doubles as the duplicate guard within one build cycle, so
+     * several owners sharing a neighbour cannot register listeners for it twice.
+     */
     private final Set<BlockPos> watchedPositions = new HashSet<>();
+    /**
+     * Strong references to the live registrations. The level only holds listeners weakly, so without
+     * keeping our own reference they would be collected — and silently stop firing — as soon as the
+     * garbage collector runs. Dropped again by {@link #clear()} when the position set is rebuilt.
+     */
+    private final List<Registration> registrations = new ArrayList<>();
 
     /**
      * @param onInvalidated invoked whenever one of the watched positions may have changed its
@@ -55,21 +65,44 @@ public final class CapabilityWatch {
         if (!watchedPositions.add(pos)) {
             return;
         }
-        ICapabilityInvalidationListener registration = () -> {
+        Registration registration = new Registration();
+        registrations.add(registration);
+        level.registerCapabilityListener(pos, registration);
+    }
+
+    /**
+     * Stops watching every registered position. The level has no way to unregister a listener, but it
+     * drops any listener whose callback returns {@code false}, so superseded registrations are disarmed
+     * and then released here. This has to be called before re-arming to avoid duplicate registrations.
+     */
+    public void clear() {
+        for (Registration registration : registrations) {
+            // The level only notices a disarmed registration once it invalidates that position again.
+            // Until then it may still call us, so make sure a stale registration cannot flag the owner
+            // as dirty after the list it belonged to has already been rebuilt.
+            registration.disarmed = true;
+        }
+        registrations.clear();
+        watchedPositions.clear();
+    }
+
+    /**
+     * A single registration, kept alive by {@link #registrations}.
+     */
+    private final class Registration implements ICapabilityInvalidationListener {
+
+        private boolean disarmed;
+
+        @Override
+        public boolean onInvalidate() {
+            if (disarmed) {
+                return false;
+            }
             onInvalidated.run();
             // The notification already flagged our data as stale, and whoever rebuilds will arm a
             // fresh watcher. Dropping this registration keeps stale listeners from piling up in the
             // level while the rebuild is pending.
             return false;
-        };
-        level.registerCapabilityListener(pos, registration);
-    }
-
-    /**
-     * Stops watching every registered position. The level only holds weak references, so releasing
-     * our own is enough; this has to be called before re-arming to avoid duplicate registrations.
-     */
-    public void clear() {
-        watchedPositions.clear();
+        }
     }
 }
