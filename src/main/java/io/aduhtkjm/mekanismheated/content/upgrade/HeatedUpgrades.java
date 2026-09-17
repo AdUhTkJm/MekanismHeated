@@ -143,12 +143,20 @@ public final class HeatedUpgrades {
      * Re-applies a machine's installed heat upgrades to its heat capacitors, delegating to the shared structure when the
      * machine is currently formed as part of a multiblock.
      *
-     * <p>Called from the machine's {@code recalculateUpgrades} whenever a heat upgrade is installed or removed (see
-     * {@code MixinTileEntityMekanism}), and by the multiblock code when a structure forms or falls apart. A no-op on the
-     * client, where the scaled values arrive through the container and update tag sync.</p>
+     * <p>Called from the machine's {@code recalculateUpgrades} whenever a heat upgrade is installed or removed, when a
+     * machine is read from NBT (see {@code MixinTileEntityMekanism}), and by the multiblock code when a structure forms
+     * or falls apart. Only a machine that already lives in a client level is skipped, since its scaled values arrive
+     * through the container and update tag sync instead.</p>
+     *
+     * <p>The level is {@code null} while a tile is being read from NBT ({@code BlockEntity#loadAdditional} runs before
+     * the tile is added to a level), and {@code TileEntityMekanism#isRemote()} throws in that case. That path must not
+     * be skipped, both because it is where the scaled coefficients get restored after a reload (they are not persisted)
+     * and because throwing out of it makes {@code BlockEntity#loadStatic} discard the whole block entity - losing the
+     * machine's upgrades and contents on every load. So {@code null} is treated as the server.</p>
      */
     public static void reapply(TileEntityMekanism tile) {
-        if (tile.isRemote()) {
+        Level level = tile.getLevel();
+        if (level != null && level.isClientSide()) {
             return;
         }
         if (tile instanceof IMultiblock<?> multiblock) {
