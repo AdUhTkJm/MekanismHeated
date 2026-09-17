@@ -1,7 +1,6 @@
 package io.aduhtkjm.mekanismheated.tile;
 
 import io.aduhtkjm.mekanismheated.Config;
-import io.aduhtkjm.mekanismheated.content.upgrade.IHeatedUpgradeTile;
 import io.aduhtkjm.mekanismheated.recipe.*;
 import io.aduhtkjm.mekanismheated.recipe.cache.HeatSensitiveOneInputCachedRecipe;
 import io.aduhtkjm.mekanismheated.recipe.lookup.monitor.HeatSmelterRecipeCacheLookupMonitor;
@@ -68,7 +67,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class TileEntityHeatSmelter
       extends TileEntityProgressMultiblockMachine<LargeHeatSmelterData, HeatSmelterRecipe>
-      implements IRecipeLookupHandler<HeatSmelterRecipe>, IHeatedUpgradeTile {
+      implements IRecipeLookupHandler<HeatSmelterRecipe> {
 
     /** Error for the melting input slot, separate from the smelting input's error so their warnings do not cross-talk. */
     public static final RecipeError NOT_ENOUGH_MELT_INPUT_ERROR = RecipeError.create();

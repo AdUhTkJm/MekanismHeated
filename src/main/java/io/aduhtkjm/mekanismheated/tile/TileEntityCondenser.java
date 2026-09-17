@@ -1,7 +1,6 @@
 package io.aduhtkjm.mekanismheated.tile;
 
 import io.aduhtkjm.mekanismheated.Config;
-import io.aduhtkjm.mekanismheated.content.upgrade.IHeatedUpgradeTile;
 import io.aduhtkjm.mekanismheated.integration.jei.ModRecipeViewerTypes;
 import io.aduhtkjm.mekanismheated.recipe.CondenserRecipe;
 import io.aduhtkjm.mekanismheated.recipe.ModRecipeTypes;
@@ -57,7 +56,7 @@ import net.neoforged.neoforge.fluids.FluidType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class TileEntityCondenser extends TileEntityProgressMachine<CondenserRecipe> implements IRecipeLookupHandler<CondenserRecipe>, IHeatedUpgradeTile {
+public class TileEntityCondenser extends TileEntityProgressMachine<CondenserRecipe> implements IRecipeLookupHandler<CondenserRecipe> {
 
     public static final RecipeError NOT_ENOUGH_FLUID_INPUT_ERROR = RecipeError.create();
 

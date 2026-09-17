@@ -87,6 +87,16 @@ versionRange = "[1.21.1-10.7,)"
 ordering = "AFTER"
 side = "BOTH"
 
+# Mekanism Extras also extends Mekanism's Upgrade enum from its own MixinUpgrade, so the order in which those mixins are
+# applied decides the ordinals of both mods' upgrade constants, and therefore saved data and network ids. Loading after
+# it pins that order.
+[[dependencies."${mod_id}"]]
+modId = "mekanism_extras"
+type = "optional"
+versionRange = "[1.4.1,)"
+ordering = "AFTER"
+side = "BOTH"
+
 [[dependencies."${mod_id}"]]
 modId = "jei"
 type = "optional"

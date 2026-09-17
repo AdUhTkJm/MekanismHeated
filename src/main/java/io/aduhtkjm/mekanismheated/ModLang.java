@@ -3,6 +3,7 @@ package io.aduhtkjm.mekanismheated;
 import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.text.ILangEntry;
 import net.minecraft.Util;
+import net.minecraft.resources.ResourceLocation;
 
 @NothingNullByDefault
 public enum ModLang implements ILangEntry {
@@ -97,7 +98,9 @@ public enum ModLang implements ILangEntry {
     private final String key;
 
     ModLang(String type, String path) {
-        this(Util.makeDescriptionId(type, Mod.rl(path)));
+        //Use MODID directly instead of Mod.rl: this enum is initialized while Mekanism's Upgrade enum is being extended
+        //(see MixinUpgrade), and calling a method on Mod from there would force Mod to initialize that early.
+        this(Util.makeDescriptionId(type, ResourceLocation.fromNamespaceAndPath(Mod.MODID, path)));
     }
 
     ModLang(String key) {

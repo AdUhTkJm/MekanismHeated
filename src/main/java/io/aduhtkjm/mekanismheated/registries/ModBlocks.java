@@ -20,6 +20,7 @@ import io.aduhtkjm.mekanismheated.block.temperaturecontroller.TemperatureControl
 import io.aduhtkjm.mekanismheated.content.phasechange.PhaseChangeTier;
 import io.aduhtkjm.mekanismheated.item.ItemBlockFusedPipe;
 import io.aduhtkjm.mekanismheated.content.fusedpipe.FusedPipeConfig;
+import io.aduhtkjm.mekanismheated.content.upgrade.HeatedUpgrades;
 import io.aduhtkjm.mekanismheated.tile.TileEntityAtmosphereHeater;
 import io.aduhtkjm.mekanismheated.tile.TileEntityCondenser;
 import io.aduhtkjm.mekanismheated.tile.TileEntityCooler;
@@ -35,7 +36,6 @@ import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityFractionationBlock;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityRetroentropicArrayCasing;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationController;
 import io.aduhtkjm.mekanismheated.tile.multiblock.TileEntityThermalFractionationValve;
-import mekanism.api.Upgrade;
 import mekanism.common.block.attribute.AttributeParticleFX;
 import mekanism.common.block.attribute.AttributeSideConfig;
 import mekanism.common.block.attribute.AttributeStateFacing;
@@ -83,6 +83,7 @@ public class ModBlocks {
           .createMachine(() -> ModTileEntityTypes.HEAT_SMELTER, ModLang.DESCRIPTION_HEAT_SMELTER)
           .withGui(() -> ModContainerTypes.HEAT_SMELTER)
           .with(AttributeSideConfig.create(TransmissionType.ITEM, TransmissionType.FLUID, TransmissionType.HEAT))
+          .with(HeatedUpgrades.MACHINE_UPGRADES)
           .build();
 
     public static final BlockRegistryObject<HeatSmelterBlock, ItemBlockTooltip<HeatSmelterBlock>> HEAT_SMELTER =
@@ -104,7 +105,7 @@ public class ModBlocks {
           .createBlock(() -> ModTileEntityTypes.THERMAL_FRACTIONATION_CONTROLLER, ModLang.DESCRIPTION_THERMAL_FRACTIONATION_CONTROLLER)
           .withGui(() -> ModContainerTypes.THERMAL_FRACTIONATION_CONTROLLER)
           .with(Attributes.ACTIVE, new AttributeStateFacing(), new AttributeCustomResistance(9))
-          .withSupportedUpgrades(Upgrade.MUFFLING)
+          .with(HeatedUpgrades.HEAT_UPGRADES_ONLY)
           .externalMultiblock()
           .build();
 
@@ -166,6 +167,7 @@ public class ModBlocks {
           .createMachine(() -> ModTileEntityTypes.COOLER, ModLang.DESCRIPTION_COOLER)
           .withGui(() -> ModContainerTypes.COOLER)
           .withEnergyConfig(() -> TileEntityCooler.BASE_USAGE, null)
+          .with(HeatedUpgrades.MACHINE_UPGRADES)
           .build();
 
     public static final BlockRegistryObject<CoolerBlock, BlockItem> COOLER =
@@ -175,6 +177,7 @@ public class ModBlocks {
           .createMachine(() -> ModTileEntityTypes.CONDENSER, ModLang.DESCRIPTION_CONDENSER)
           .withGui(() -> ModContainerTypes.CONDENSER)
           .with(AttributeSideConfig.create(TransmissionType.ITEM, TransmissionType.FLUID, TransmissionType.HEAT))
+          .with(HeatedUpgrades.MACHINE_UPGRADES)
           .build();
 
     public static final BlockRegistryObject<CondenserBlock, ItemBlockTooltip<CondenserBlock>> CONDENSER =
@@ -197,6 +200,7 @@ public class ModBlocks {
           .createMachine(() -> ModTileEntityTypes.REACTION_CHAMBER, ModLang.DESCRIPTION_REACTION_CHAMBER)
           .withGui(() -> ModContainerTypes.REACTION_CHAMBER)
           .with(AttributeSideConfig.create(TransmissionType.ITEM, TransmissionType.FLUID, TransmissionType.CHEMICAL, TransmissionType.HEAT))
+          .with(HeatedUpgrades.MACHINE_UPGRADES)
           .build();
 
     public static final BlockRegistryObject<ReactionChamberBlock, ItemBlockTooltip<ReactionChamberBlock>> REACTION_CHAMBER =
@@ -272,8 +276,7 @@ public class ModBlocks {
         .createBlock(() -> ModTileEntityTypes.RETROENTROPIC_ARRAY_CASING, ModLang.DESCRIPTION_RETROENTROPIC_ARRAY_CASING)
         .withGui(() -> ModContainerTypes.RETROENTROPIC_ARRAY)
         .with(new AttributeCustomResistance(9))
-        //Heat upgrades are installed here; muffling is the smallest set the attribute accepts
-        .withSupportedUpgrades(Upgrade.MUFFLING)
+        .with(HeatedUpgrades.HEAT_UPGRADES_ONLY)
         .externalMultiblock()
         .build();
 

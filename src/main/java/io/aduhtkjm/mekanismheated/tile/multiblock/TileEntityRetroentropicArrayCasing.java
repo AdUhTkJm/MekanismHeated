@@ -1,6 +1,5 @@
 package io.aduhtkjm.mekanismheated.tile.multiblock;
 
-import io.aduhtkjm.mekanismheated.content.upgrade.IHeatedUpgradeTile;
 import io.aduhtkjm.mekanismheated.registries.ModBlocks;
 import io.aduhtkjm.mekanismheated.registries.ModMultiblockManagers;
 import mekanism.api.IContentsListener;
@@ -15,7 +14,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
-public class TileEntityRetroentropicArrayCasing extends TileEntityMultiblock<RetroentropicArrayData> implements IHeatedUpgradeTile {
+public class TileEntityRetroentropicArrayCasing extends TileEntityMultiblock<RetroentropicArrayData> {
 
     public TileEntityRetroentropicArrayCasing(BlockPos pos, BlockState state) {
         this(ModBlocks.RETROENTROPIC_ARRAY_CASING, pos, state);

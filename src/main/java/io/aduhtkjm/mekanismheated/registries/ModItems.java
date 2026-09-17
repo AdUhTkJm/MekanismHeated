@@ -5,9 +5,10 @@ import io.aduhtkjm.mekanismheated.content.obsidiandust.ObsidianDustVariant;
 import io.aduhtkjm.mekanismheated.content.unstablelava.UnstableLavaVariant;
 import io.aduhtkjm.mekanismheated.content.upgrade.HeatedUpgrade;
 import io.aduhtkjm.mekanismheated.item.*;
-import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
+import java.util.function.Supplier;
+import mekanism.api.Upgrade;
+import mekanism.common.item.ItemUpgrade;
 import mekanism.common.registration.impl.ItemDeferredRegister;
 import mekanism.common.registration.impl.ItemRegistryObject;
 import net.minecraft.world.item.CreativeModeTab;
@@ -32,22 +33,15 @@ public class ModItems {
     public static final ItemRegistryObject<ItemCu2SDust> CU2S_DUST = ITEMS.registerItem("cu2s_dust", ItemCu2SDust::new);
     public static final ItemRegistryObject<ItemPureCuODust> PURE_CUO_DUST = ITEMS.registerItem("pure_cuo_dust", ItemPureCuODust::new);
 
-    //Heat upgrades. The item textures start out as copies of Mekanism's chemical upgrade and can be adjusted later.
-    private static final Map<HeatedUpgrade, ItemRegistryObject<ItemHeatedUpgrade>> HEATED_UPGRADES_BUILDER = new EnumMap<>(HeatedUpgrade.class);
-    public static final ItemRegistryObject<ItemHeatedUpgrade> UPGRADE_CONDUCTION =
-          registerHeatedUpgrade(HeatedUpgrade.CONDUCTION, "upgrade_conduction");
-    public static final ItemRegistryObject<ItemHeatedUpgrade> UPGRADE_INSULATION =
-          registerHeatedUpgrade(HeatedUpgrade.INSULATION, "upgrade_insulation");
-    public static final ItemRegistryObject<ItemHeatedUpgrade> UPGRADE_CAPACITY =
-          registerHeatedUpgrade(HeatedUpgrade.CAPACITY, "upgrade_capacity");
+    //Heat upgrades. They use Mekanism's own upgrade item class, so the only thing this mod supplies is the texture and
+    //the enum constant the item installs (MixinUpgrade adds those to Mekanism's Upgrade enum).
+    public static final ItemRegistryObject<ItemUpgrade> UPGRADE_CONDUCTION = registerHeatedUpgrade("upgrade_conduction", () -> HeatedUpgrade.CONDUCTION);
+    public static final ItemRegistryObject<ItemUpgrade> UPGRADE_INSULATION = registerHeatedUpgrade("upgrade_insulation", () -> HeatedUpgrade.INSULATION);
+    public static final ItemRegistryObject<ItemUpgrade> UPGRADE_CAPACITY = registerHeatedUpgrade("upgrade_capacity", () -> HeatedUpgrade.CAPACITY);
 
-    /** Every heat upgrade item, keyed by the upgrade it installs. */
-    public static final Map<HeatedUpgrade, ItemRegistryObject<ItemHeatedUpgrade>> HEATED_UPGRADES = Map.copyOf(HEATED_UPGRADES_BUILDER);
-
-    private static ItemRegistryObject<ItemHeatedUpgrade> registerHeatedUpgrade(HeatedUpgrade type, String name) {
-        ItemRegistryObject<ItemHeatedUpgrade> item = ITEMS.registerItem(name, properties -> new ItemHeatedUpgrade(type, properties));
-        HEATED_UPGRADES_BUILDER.put(type, item);
-        return item;
+    private static ItemRegistryObject<ItemUpgrade> registerHeatedUpgrade(String name, Supplier<Upgrade> type) {
+        //Note: the supplier is evaluated when the item is created, long after MixinUpgrade has added the constants
+        return ITEMS.registerItem(name, properties -> new ItemUpgrade(type.get(), properties));
     }
 
     //Obsidian dusts: obsidian dust with the metal it was condensed from in its top-left corner. One register call per
@@ -88,9 +82,9 @@ public class ModItems {
         output.accept(ModBlocks.RETROENTROPIC_ARRAY_CASING);
         output.accept(ModBlocks.ASPHALT_BLOCK);
 
-        for (HeatedUpgrade type : HeatedUpgrade.values()) {
-            output.accept(HEATED_UPGRADES.get(type).get());
-        }
+        output.accept(UPGRADE_CONDUCTION);
+        output.accept(UPGRADE_INSULATION);
+        output.accept(UPGRADE_CAPACITY);
 
         output.accept(ModItems.SPONGE_IRON_INGOT.get());
         output.accept(ModItems.IMPURE_SN_INGOT.get());

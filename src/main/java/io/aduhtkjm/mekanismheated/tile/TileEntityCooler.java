@@ -1,7 +1,6 @@
 package io.aduhtkjm.mekanismheated.tile;
 
 import io.aduhtkjm.mekanismheated.Config;
-import io.aduhtkjm.mekanismheated.content.upgrade.IHeatedUpgradeTile;
 import io.aduhtkjm.mekanismheated.registries.ModBlocks;
 import mekanism.api.*;
 import mekanism.common.capabilities.energy.MachineEnergyContainer;
@@ -27,7 +26,7 @@ import org.lwjgl.system.NonnullDefault;
 import java.util.Set;
 
 @NonnullDefault
-public class TileEntityCooler extends TileEntityMekanism implements IHeatedUpgradeTile {
+public class TileEntityCooler extends TileEntityMekanism {
 
     public static final long BASE_USAGE = 100;
     private long energyUsed = 0;

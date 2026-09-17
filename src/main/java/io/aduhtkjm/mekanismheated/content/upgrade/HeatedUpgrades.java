@@ -1,35 +1,40 @@
 package io.aduhtkjm.mekanismheated.content.upgrade;
 
 import io.aduhtkjm.mekanismheated.Config;
-import io.aduhtkjm.mekanismheated.item.ItemHeatedUpgrade;
-import io.aduhtkjm.mekanismheated.registries.ModItems;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import mekanism.api.SerializationConstants;
+import mekanism.api.Upgrade;
 import mekanism.api.heat.IHeatCapacitor;
+import mekanism.common.block.attribute.AttributeUpgradeSupport;
+import mekanism.common.lib.multiblock.IMultiblock;
 import mekanism.common.lib.multiblock.MultiblockData;
 import mekanism.common.tile.base.TileEntityMekanism;
+import mekanism.common.tile.component.TileComponentUpgrade;
 import mekanism.common.util.WorldUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 
 /**
- * Shared helpers for the heat upgrades: reading/writing them, resolving the item they are installed with, computing the
- * multipliers from an installed count, and pushing those multipliers onto heat capacitors.
+ * Shared helpers for the heat upgrades: computing the multipliers from the installed counts and pushing those
+ * multipliers onto heat capacitors.
+ *
+ * <p>The installed counts live in Mekanism's own {@link TileComponentUpgrade}, keyed by {@link Upgrade}, because the
+ * heat upgrades are real members of that enum (see {@link HeatedUpgrade}). Nothing is stored or synced by this mod
+ * itself.</p>
  */
 public final class HeatedUpgrades {
 
     /**
-     * Key the installed heat upgrades are stored under inside Mekanism's upgrade component NBT.
+     * Supported upgrades of a machine that takes the standard machine upgrades plus the heat upgrades.
      */
-    public static final String NBT_KEY = "heated_upgrades";
+    public static final AttributeUpgradeSupport MACHINE_UPGRADES = AttributeUpgradeSupport.create(
+          Upgrade.SPEED, Upgrade.ENERGY, Upgrade.MUFFLING, HeatedUpgrade.CONDUCTION, HeatedUpgrade.INSULATION, HeatedUpgrade.CAPACITY);
+    /**
+     * Supported upgrades of a machine that only supports the heat upgrades.
+     */
+    public static final AttributeUpgradeSupport HEAT_UPGRADES_ONLY = AttributeUpgradeSupport.create(
+          HeatedUpgrade.CONDUCTION, HeatedUpgrade.INSULATION, HeatedUpgrade.CAPACITY);
 
     private HeatedUpgrades() {
     }
@@ -38,9 +43,9 @@ public final class HeatedUpgrades {
      * The factors a machine's heat capacitor values get scaled by. {@link #NONE} restores the values a capacitor was
      * constructed with.
      *
-     * @param conductionDivisor     Factor the inverse conduction coefficient is divided by.
-     * @param insulationMultiplier  Factor the inverse insulation coefficient is multiplied by.
-     * @param capacityMultiplier    Factor the heat capacity is multiplied by.
+     * @param conductionDivisor    Factor the inverse conduction coefficient is divided by.
+     * @param insulationMultiplier Factor the inverse insulation coefficient is multiplied by.
+     * @param capacityMultiplier   Factor the heat capacity is multiplied by.
      */
     public record Multipliers(double conductionDivisor, double insulationMultiplier, double capacityMultiplier) {
 
@@ -48,55 +53,52 @@ public final class HeatedUpgrades {
     }
 
     /**
-     * Gets the heat upgrade item for the given stack, or {@code null} if the stack isn't a heat upgrade.
-     */
-    @Nullable
-    public static ItemHeatedUpgrade getItem(ItemStack stack) {
-        return stack.getItem() instanceof ItemHeatedUpgrade item ? item : null;
-    }
-
-    /**
-     * Gets the heat upgrade type of the given stack, or {@code null} if the stack isn't a heat upgrade.
-     */
-    @Nullable
-    public static HeatedUpgrade getType(ItemStack stack) {
-        ItemHeatedUpgrade item = getItem(stack);
-        return item == null ? null : item.getHeatedUpgradeType();
-    }
-
-    /**
-     * Checks whether the given stack is one of this mod's heat upgrades.
-     */
-    public static boolean isHeatedUpgrade(ItemStack stack) {
-        return stack.getItem() instanceof ItemHeatedUpgrade;
-    }
-
-    /**
-     * Gets a stack of the item used to install the given heat upgrade.
-     */
-    public static ItemStack getStack(HeatedUpgrade upgrade, int count) {
-        return new ItemStack(ModItems.HEATED_UPGRADES.get(upgrade).get(), count);
-    }
-
-    /**
-     * Checks whether the given tile accepts this mod's heat upgrades. Only the mod's own machines with a heat capacitor
-     * implement {@link IHeatedUpgradeTile}, so Mekanism's machines are left alone.
+     * Checks whether the given machine accepts this mod's heat upgrades. Machines of this mod that own a heat capacitor
+     * list them in their block's supported upgrades.
      */
     public static boolean supports(TileEntityMekanism tile) {
-        return tile.supportsUpgrades() && tile instanceof IHeatedUpgradeTile;
+        if (!tile.supportsUpgrades()) {
+            return false;
+        }
+        for (Upgrade upgrade : HeatedUpgrade.HEAT_UPGRADES) {
+            if (tile.getSupportedUpgrade().contains(upgrade)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Gets the configured per-upgrade bonus as a fraction: 0.1 means every upgrade is a 10% improvement.
+     */
+    public static double bonus(Upgrade upgrade) {
+        if (upgrade == HeatedUpgrade.CONDUCTION) {
+            return Config.Upgrades.CONDUCTION.get();
+        } else if (upgrade == HeatedUpgrade.INSULATION) {
+            return Config.Upgrades.INSULATION.get();
+        }
+        return Config.Upgrades.CAPACITY.get();
+    }
+
+    /**
+     * Gets the factor the given heat upgrade applies to its capacitor value for the given installed count, which is
+     * {@code (1 + bonus)^count}.
+     */
+    public static double multiplier(Upgrade upgrade, int count) {
+        return count <= 0 ? 1 : Math.pow(1 + bonus(upgrade), count);
     }
 
     /**
      * Gets the multipliers for the given installed heat upgrades.
      */
-    public static Multipliers multipliers(Map<HeatedUpgrade, Integer> installed) {
+    public static Multipliers multipliers(Map<Upgrade, Integer> installed) {
         if (installed.isEmpty()) {
             return Multipliers.NONE;
         }
         return new Multipliers(
-              HeatedUpgrade.CONDUCTION.getMultiplier(installed.getOrDefault(HeatedUpgrade.CONDUCTION, 0)),
-              HeatedUpgrade.INSULATION.getMultiplier(installed.getOrDefault(HeatedUpgrade.INSULATION, 0)),
-              HeatedUpgrade.CAPACITY.getMultiplier(installed.getOrDefault(HeatedUpgrade.CAPACITY, 0))
+              multiplier(HeatedUpgrade.CONDUCTION, installed.getOrDefault(HeatedUpgrade.CONDUCTION, 0)),
+              multiplier(HeatedUpgrade.INSULATION, installed.getOrDefault(HeatedUpgrade.INSULATION, 0)),
+              multiplier(HeatedUpgrade.CAPACITY, installed.getOrDefault(HeatedUpgrade.CAPACITY, 0))
         );
     }
 
@@ -104,10 +106,15 @@ public final class HeatedUpgrades {
      * Gets the multipliers from a single machine's own installed heat upgrades.
      */
     public static Multipliers multipliersFor(TileEntityMekanism tile) {
-        if (tile.supportsUpgrades() && tile.getComponent() instanceof IHeatedUpgradeComponent component) {
-            return multipliers(component.mekanismheated$getHeatedUpgrades());
+        if (!tile.supportsUpgrades()) {
+            return Multipliers.NONE;
         }
-        return Multipliers.NONE;
+        TileComponentUpgrade component = tile.getComponent();
+        return new Multipliers(
+              multiplier(HeatedUpgrade.CONDUCTION, component.getUpgrades(HeatedUpgrade.CONDUCTION)),
+              multiplier(HeatedUpgrade.INSULATION, component.getUpgrades(HeatedUpgrade.INSULATION)),
+              multiplier(HeatedUpgrade.CAPACITY, component.getUpgrades(HeatedUpgrade.CAPACITY))
+        );
     }
 
     /**
@@ -120,16 +127,38 @@ public final class HeatedUpgrades {
         if (level == null) {
             return Multipliers.NONE;
         }
-        Map<HeatedUpgrade, Integer> highest = new EnumMap<>(HeatedUpgrade.class);
+        Map<Upgrade, Integer> highest = new EnumMap<>(Upgrade.class);
         for (BlockPos pos : data.locations) {
-            if (WorldUtils.getTileEntity(level, pos) instanceof TileEntityMekanism tile && tile.supportsUpgrades()
-                  && tile.getComponent() instanceof IHeatedUpgradeComponent component) {
-                for (HeatedUpgrade type : HeatedUpgrade.values()) {
-                    highest.merge(type, component.mekanismheated$getHeatedUpgrades(type), Math::max);
+            if (WorldUtils.getTileEntity(level, pos) instanceof TileEntityMekanism tile && tile.supportsUpgrades()) {
+                TileComponentUpgrade component = tile.getComponent();
+                for (Upgrade type : HeatedUpgrade.HEAT_UPGRADES) {
+                    highest.merge(type, component.getUpgrades(type), Math::max);
                 }
             }
         }
         return multipliers(highest);
+    }
+
+    /**
+     * Re-applies a machine's installed heat upgrades to its heat capacitors, delegating to the shared structure when the
+     * machine is currently formed as part of a multiblock.
+     *
+     * <p>Called from the machine's {@code recalculateUpgrades} whenever a heat upgrade is installed or removed (see
+     * {@code MixinTileEntityMekanism}), and by the multiblock code when a structure forms or falls apart. A no-op on the
+     * client, where the scaled values arrive through the container and update tag sync.</p>
+     */
+    public static void reapply(TileEntityMekanism tile) {
+        if (tile.isRemote()) {
+            return;
+        }
+        if (tile instanceof IMultiblock<?> multiblock) {
+            MultiblockData shared = multiblock.getMultiblock();
+            if (shared.isFormed() && shared instanceof IHeatedUpgradeMultiblockData data) {
+                data.mekanismheated$recalculateHeatedUpgrades();
+                return;
+            }
+        }
+        applyTo(multipliersFor(tile), tile.getHeatCapacitors(null));
     }
 
     /**
@@ -158,44 +187,5 @@ public final class HeatedUpgrades {
         if (capacitor instanceof IHeatedHeatCapacitor heated) {
             heated.mekanismheated$applyMultipliers(multipliers, baseHeatCapacity);
         }
-    }
-
-    /**
-     * Reads the map of installed heat upgrades to their amounts from NBT.
-     *
-     * @implNote Unmodifiable if empty.
-     */
-    public static Map<HeatedUpgrade, Integer> read(@Nullable CompoundTag nbt) {
-        if (nbt == null || !nbt.contains(NBT_KEY, Tag.TAG_LIST)) {
-            return Collections.emptyMap();
-        }
-        ListTag list = nbt.getList(NBT_KEY, Tag.TAG_COMPOUND);
-        Map<HeatedUpgrade, Integer> upgrades = null;
-        for (int i = 0; i < list.size(); i++) {
-            CompoundTag compound = list.getCompound(i);
-            HeatedUpgrade upgrade = HeatedUpgrade.BY_ID.apply(compound.getInt(SerializationConstants.TYPE));
-            int installed = Math.clamp(compound.getInt(SerializationConstants.AMOUNT), 0, Config.Upgrades.MAX_HEAT_UPGRADES.get());
-            if (installed > 0) {
-                if (upgrades == null) {
-                    upgrades = new EnumMap<>(HeatedUpgrade.class);
-                }
-                upgrades.put(upgrade, installed);
-            }
-        }
-        return upgrades == null ? Collections.emptyMap() : upgrades;
-    }
-
-    /**
-     * Writes a map of installed heat upgrades to a new NBT list, mirroring how Mekanism serializes its own upgrades.
-     */
-    public static ListTag write(Map<HeatedUpgrade, Integer> upgrades) {
-        ListTag list = new ListTag();
-        for (Map.Entry<HeatedUpgrade, Integer> entry : upgrades.entrySet()) {
-            CompoundTag compound = new CompoundTag();
-            compound.putInt(SerializationConstants.TYPE, entry.getKey().ordinal());
-            compound.putInt(SerializationConstants.AMOUNT, entry.getValue());
-            list.add(compound);
-        }
-        return list;
     }
 }

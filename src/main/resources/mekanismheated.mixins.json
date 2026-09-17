@@ -6,18 +6,16 @@
   "refmap": "MekanismHeated.refmap.json",
   "mixins": [
     "MixinBasicHeatCapacitor",
-    "MixinBasicInventorySlot",
     "MixinCachedAmbientTemperature",
     "MixinHeatAPI",
     "MixinITileHeatHandler",
     "MixinMultiblockData",
-    "MixinTileComponentUpgrade",
+    "MixinTileEntityMekanism",
+    "MixinUpgrade",
+    "MixinUpgradeUtils",
     "MixinVariableHeatCapacitor"
   ],
-  "client": [
-    "MixinGuiSupportedUpgrades",
-    "MixinGuiUpgradeWindow"
-  ],
+  "client": [],
   "injectors": {
     "defaultRequire": 1
   }

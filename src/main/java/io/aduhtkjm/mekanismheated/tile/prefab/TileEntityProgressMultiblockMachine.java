@@ -1,6 +1,6 @@
 package io.aduhtkjm.mekanismheated.tile.prefab;
 
-import io.aduhtkjm.mekanismheated.content.upgrade.IHeatedUpgradeTile;
+import io.aduhtkjm.mekanismheated.content.upgrade.HeatedUpgrades;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -243,10 +243,10 @@ public abstract class TileEntityProgressMultiblockMachine<T extends MultiblockDa
             }
         }
         if (!multiblock.isFormed()) {
-            if (this instanceof IHeatedUpgradeTile heated) {
+            if (HeatedUpgrades.supports(this)) {
                 //The per-block capacitors are live again now that the structure is gone, while they were dormant (and
                 //so unscaled) while formed: re-apply this block's own heat upgrades to them
-                heated.mekanismheated$recalculateHeatedUpgrades();
+                HeatedUpgrades.reapply(this);
             }
             //If we have no structure just mark the comparator as dirty for each block,
             // this will only perform neighbor updates if the block supports comparators
