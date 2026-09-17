@@ -87,17 +87,23 @@ public class MixinUpgrade {
 
     @Inject(method = "<clinit>", at = @At("TAIL"))
     private static void mekanismheated$addHeatUpgrades(CallbackInfo ci) {
-        //The max passed here is only a fallback: getMax is injected below to return the configured value instead.
         HeatedUpgrade.CONDUCTION = mekanismheated$addVariant("CONDUCTION", ModLang.UPGRADE_CONDUCTION, ModLang.UPGRADE_CONDUCTION_DESCRIPTION, EnumColor.ORANGE);
         HeatedUpgrade.INSULATION = mekanismheated$addVariant("INSULATION", ModLang.UPGRADE_INSULATION, ModLang.UPGRADE_INSULATION_DESCRIPTION, EnumColor.INDIGO);
         HeatedUpgrade.CAPACITY = mekanismheated$addVariant("CAPACITY", ModLang.UPGRADE_CAPACITY, ModLang.UPGRADE_CAPACITY_DESCRIPTION, EnumColor.PURPLE);
-        HeatedUpgrade.HEAT_UPGRADES = new Upgrade[]{HeatedUpgrade.CONDUCTION, HeatedUpgrade.INSULATION, HeatedUpgrade.CAPACITY};
+        HeatedUpgrade.INV_CONDUCTION = mekanismheated$addVariant("INV_CONDUCTION", ModLang.UPGRADE_INV_CONDUCTION, ModLang.UPGRADE_INV_CONDUCTION_DESCRIPTION, EnumColor.ORANGE);
+        HeatedUpgrade.INV_INSULATION = mekanismheated$addVariant("INV_INSULATION", ModLang.UPGRADE_INV_INSULATION, ModLang.UPGRADE_INV_INSULATION_DESCRIPTION, EnumColor.INDIGO);
+        HeatedUpgrade.INV_CAPACITY = mekanismheated$addVariant("INV_CAPACITY", ModLang.UPGRADE_INV_CAPACITY, ModLang.UPGRADE_INV_CAPACITY_DESCRIPTION, EnumColor.PURPLE);
+        HeatedUpgrade.HEAT_UPGRADES = new Upgrade[]{
+            HeatedUpgrade.CONDUCTION, HeatedUpgrade.INSULATION, HeatedUpgrade.CAPACITY,
+            HeatedUpgrade.INV_CONDUCTION,  HeatedUpgrade.INV_INSULATION,  HeatedUpgrade.INV_CAPACITY
+        };
         //The static lookups were built from the original array, so they have to be rebuilt on top of the extended one
         mekanismheated$reinitializeLookups();
     }
 
     @Unique
     private static Upgrade mekanismheated$addVariant(String constantName, ILangEntry langKey, ILangEntry descLangKey, EnumColor color) {
+        // The max passed here is only a fallback: getMax is injected below to return the configured value instead.
         ArrayList<Upgrade> variants = new ArrayList<>(Arrays.asList($VALUES));
         Upgrade upgrade = mekanismheated$init(constantName, variants.getLast().ordinal() + 1, constantName.toLowerCase(Locale.ROOT), langKey, descLangKey, 64, color);
         variants.add(upgrade);
@@ -109,7 +115,7 @@ public class MixinUpgrade {
     private static void mekanismheated$reinitializeLookups() {
         Upgrade[] values = $VALUES;
         Function<String, Upgrade> nameLookup = StringRepresentable.createNameLookup(values, Function.identity());
-        //Keep Mekanism's backcompat for the "gas" name its chemical upgrade used to have
+        // Keep Mekanism's backcompat for the "gas" name its chemical upgrade used to have
         Function<String, Upgrade> remapper = it -> "gas".equals(it) ? CHEMICAL : nameLookup.apply(it);
         CODEC = new StringRepresentable.EnumCodec<>(values, remapper);
         BY_ID = ByIdMap.continuous(Upgrade::ordinal, values, ByIdMap.OutOfBoundsStrategy.WRAP);

@@ -20,5 +20,12 @@ for t in tiers:
     path = f"{prefix}/item/fused_pipe_{t}.png"
     convert_white_to_transparent(path, path)
 
+upgrades = ["capacity", "insulation", "conduction"]
+for t in upgrades:
+    path = f"{prefix}/item/upgrade_{t}.png"
+    convert_white_to_transparent(path, path)
+    path = f"{prefix}/item/downgrade_{t}.png"
+    convert_white_to_transparent(path, path)
+
 path = f"{prefix}/block/models/cooler_led.png"
 convert_white_to_transparent(path, path)

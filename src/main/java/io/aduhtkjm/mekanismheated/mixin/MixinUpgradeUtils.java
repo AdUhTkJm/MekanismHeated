@@ -31,6 +31,12 @@ public abstract class MixinUpgradeUtils {
             cir.setReturnValue(ModItems.UPGRADE_INSULATION);
         } else if (upgrade == HeatedUpgrade.CAPACITY) {
             cir.setReturnValue(ModItems.UPGRADE_CAPACITY);
+        } else if (upgrade == HeatedUpgrade.INV_CONDUCTION) {
+            cir.setReturnValue(ModItems.UPGRADE_INV_CONDUCTION);
+        } else if (upgrade == HeatedUpgrade.INV_INSULATION) {
+            cir.setReturnValue(ModItems.UPGRADE_INV_INSULATION);
+        } else if (upgrade == HeatedUpgrade.INV_CAPACITY) {
+            cir.setReturnValue(ModItems.UPGRADE_INV_CAPACITY);
         }
     }
 }

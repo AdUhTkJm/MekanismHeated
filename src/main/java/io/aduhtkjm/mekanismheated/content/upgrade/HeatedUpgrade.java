@@ -26,14 +26,17 @@ public final class HeatedUpgrade {
      * {@code (1 + bonus)^count}.
      */
     public static Upgrade CONDUCTION;
+    public static Upgrade INV_CONDUCTION;
     /**
      * Less heat is lost to the environment: the inverse insulation coefficient is multiplied by {@code (1 + bonus)^count}.
      */
     public static Upgrade INSULATION;
+    public static Upgrade INV_INSULATION;
     /**
      * The machine can hold more heat: the heat capacity is multiplied by {@code (1 + bonus)^count}.
      */
     public static Upgrade CAPACITY;
+    public static Upgrade INV_CAPACITY;
 
     /**
      * All heat upgrades, in the order they were injected. Assigned by {@code MixinUpgrade} next to the fields above.
@@ -46,6 +49,9 @@ public final class HeatedUpgrade {
      * Checks whether the given upgrade is one of this mod's heat upgrades.
      */
     public static boolean isHeatUpgrade(@Nullable Upgrade upgrade) {
-        return upgrade != null && (upgrade == CONDUCTION || upgrade == INSULATION || upgrade == CAPACITY);
+        return upgrade != null && (
+            upgrade == CONDUCTION || upgrade == INSULATION || upgrade == CAPACITY ||
+            upgrade == INV_CONDUCTION || upgrade == INV_INSULATION ||  upgrade == INV_CAPACITY
+        );
     }
 }

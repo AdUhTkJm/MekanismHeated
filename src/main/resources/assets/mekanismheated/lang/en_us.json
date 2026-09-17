@@ -204,6 +204,9 @@
   "item.mekanismheated.upgrade_capacity": "Capacity Upgrade",
   "item.mekanismheated.upgrade_conduction": "Conduction Upgrade",
   "item.mekanismheated.upgrade_insulation": "Insulation Upgrade",
+  "item.mekanismheated.upgrade_inv_capacity": "Capacity Downgrade",
+  "item.mekanismheated.upgrade_inv_conduction": "Conduction Downgrade",
+  "item.mekanismheated.upgrade_inv_insulation": "Insulation Downgrade",
   "item.mekanismheated.wood_tar_bucket": "Wood Tar Bucket",
   "itemGroup.mekanismheated": "Mekanism Heated",
   "mekanismheated.jade.chemical": "Chemical",
@@ -230,9 +233,15 @@
   "tooltip.mekanismheated.impure": "impure",
   "tooltip.mekanismheated.pure": "pure",
   "upgrade.mekanismheated.capacity": "Capacity",
-  "upgrade.mekanismheated.capacity.description": "Increases the machine's heat capacity, improving by 10% per installed upgrade.",
+  "upgrade.mekanismheated.capacity.description": "Makes temperature of this machine harder to change.",
   "upgrade.mekanismheated.conduction": "Conduction",
-  "upgrade.mekanismheated.conduction.description": "Makes the machine exchange heat with adjacent blocks more readily, improving by 10% per installed upgrade.",
+  "upgrade.mekanismheated.conduction.description": "Speeds up heat exchange with adjacent blocks.",
   "upgrade.mekanismheated.insulation": "Insulation",
-  "upgrade.mekanismheated.insulation.description": "Reduces the heat the machine loses to the environment, improving by 10% per installed upgrade."
+  "upgrade.mekanismheated.insulation.description": "Decreases heat communication rate with the environment.",
+  "upgrade.mekanismheated.inv_capacity": "Capacity Downgrade",
+  "upgrade.mekanismheated.inv_capacity.description": "Makes temperature of this machine easier to change.",
+  "upgrade.mekanismheated.inv_conduction": "Conduction Downgrade",
+  "upgrade.mekanismheated.inv_conduction.description": "Slows down heat exchange with adjacent blocks.",
+  "upgrade.mekanismheated.inv_insulation": "Insulation Downgrade",
+  "upgrade.mekanismheated.inv_insulation.description": "Increases heat communication rate with the environment."
 }

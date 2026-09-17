@@ -29,12 +29,15 @@ public final class HeatedUpgrades {
      * Supported upgrades of a machine that takes the standard machine upgrades plus the heat upgrades.
      */
     public static final AttributeUpgradeSupport MACHINE_UPGRADES = AttributeUpgradeSupport.create(
-          Upgrade.SPEED, Upgrade.ENERGY, Upgrade.MUFFLING, HeatedUpgrade.CONDUCTION, HeatedUpgrade.INSULATION, HeatedUpgrade.CAPACITY);
+          Upgrade.SPEED, Upgrade.ENERGY, Upgrade.MUFFLING,
+          HeatedUpgrade.CONDUCTION, HeatedUpgrade.INSULATION, HeatedUpgrade.CAPACITY,
+          HeatedUpgrade.INV_CONDUCTION, HeatedUpgrade.INV_INSULATION, HeatedUpgrade.INV_CAPACITY);
     /**
      * Supported upgrades of a machine that only supports the heat upgrades.
      */
     public static final AttributeUpgradeSupport HEAT_UPGRADES_ONLY = AttributeUpgradeSupport.create(
-          HeatedUpgrade.CONDUCTION, HeatedUpgrade.INSULATION, HeatedUpgrade.CAPACITY);
+          HeatedUpgrade.CONDUCTION, HeatedUpgrade.INSULATION, HeatedUpgrade.CAPACITY,
+          HeatedUpgrade.INV_CONDUCTION, HeatedUpgrade.INV_INSULATION, HeatedUpgrade.INV_CAPACITY);
 
     private HeatedUpgrades() {
     }
@@ -95,10 +98,13 @@ public final class HeatedUpgrades {
         if (installed.isEmpty()) {
             return Multipliers.NONE;
         }
+        int cdt = installed.getOrDefault(HeatedUpgrade.CONDUCTION, 0) - installed.getOrDefault(HeatedUpgrade.INV_CONDUCTION, 0);
+        int ins = installed.getOrDefault(HeatedUpgrade.INSULATION, 0) - installed.getOrDefault(HeatedUpgrade.INV_INSULATION, 0);
+        int cap = installed.getOrDefault(HeatedUpgrade.CAPACITY, 0) -  installed.getOrDefault(HeatedUpgrade.INV_CAPACITY, 0);
         return new Multipliers(
-              multiplier(HeatedUpgrade.CONDUCTION, installed.getOrDefault(HeatedUpgrade.CONDUCTION, 0)),
-              multiplier(HeatedUpgrade.INSULATION, installed.getOrDefault(HeatedUpgrade.INSULATION, 0)),
-              multiplier(HeatedUpgrade.CAPACITY, installed.getOrDefault(HeatedUpgrade.CAPACITY, 0))
+              multiplier(HeatedUpgrade.CONDUCTION, cdt),
+              multiplier(HeatedUpgrade.INSULATION, ins),
+              multiplier(HeatedUpgrade.CAPACITY, cap)
         );
     }
 
@@ -110,10 +116,13 @@ public final class HeatedUpgrades {
             return Multipliers.NONE;
         }
         TileComponentUpgrade component = tile.getComponent();
+        int cdt = component.getUpgrades(HeatedUpgrade.CONDUCTION) - component.getUpgrades(HeatedUpgrade.INV_CONDUCTION);
+        int ins = component.getUpgrades(HeatedUpgrade.INSULATION) - component.getUpgrades(HeatedUpgrade.INV_INSULATION);
+        int cap = component.getUpgrades(HeatedUpgrade.CAPACITY) - component.getUpgrades(HeatedUpgrade.INV_CAPACITY);
         return new Multipliers(
-              multiplier(HeatedUpgrade.CONDUCTION, component.getUpgrades(HeatedUpgrade.CONDUCTION)),
-              multiplier(HeatedUpgrade.INSULATION, component.getUpgrades(HeatedUpgrade.INSULATION)),
-              multiplier(HeatedUpgrade.CAPACITY, component.getUpgrades(HeatedUpgrade.CAPACITY))
+              multiplier(HeatedUpgrade.CONDUCTION, cdt),
+              multiplier(HeatedUpgrade.INSULATION, ins),
+              multiplier(HeatedUpgrade.CAPACITY, cap)
         );
     }
 

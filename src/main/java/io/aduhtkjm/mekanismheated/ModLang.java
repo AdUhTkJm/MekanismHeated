@@ -85,6 +85,12 @@ public enum ModLang implements ILangEntry {
     UPGRADE_INSULATION_DESCRIPTION("upgrade", "insulation.description"),
     UPGRADE_CAPACITY("upgrade", "capacity"),
     UPGRADE_CAPACITY_DESCRIPTION("upgrade", "capacity.description"),
+    UPGRADE_INV_CONDUCTION("upgrade", "inv_conduction"),
+    UPGRADE_INV_CONDUCTION_DESCRIPTION("upgrade", "inv_conduction.description"),
+    UPGRADE_INV_INSULATION("upgrade", "inv_insulation"),
+    UPGRADE_INV_INSULATION_DESCRIPTION("upgrade", "inv_insulation.description"),
+    UPGRADE_INV_CAPACITY("upgrade", "inv_capacity"),
+    UPGRADE_INV_CAPACITY_DESCRIPTION("upgrade", "inv_capacity.description"),
     GUI_HEAT_UPGRADES("gui", "upgrades.heat"),
     GUI_UPGRADE_AMOUNT("gui", "upgrade.amount"),
 

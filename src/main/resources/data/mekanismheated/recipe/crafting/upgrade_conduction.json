@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " G ",
+    "IPI",
+    " G "
+  ],
+  "key": {
+    "G": {
+      "tag": "c:glass_blocks/cheap"
+    },
+    "I": {
+      "tag": "mekanism:alloys/infused"
+    },
+    "P": {
+      "item": "mekanismheated:phase_change_block_medium"
+    }
+  },
+  "result": {
+    "count": 8,
+    "id": "mekanismheated:upgrade_conduction"
+  }
+}

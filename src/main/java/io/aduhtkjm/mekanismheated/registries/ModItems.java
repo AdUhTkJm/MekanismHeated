@@ -38,6 +38,9 @@ public class ModItems {
     public static final ItemRegistryObject<ItemUpgrade> UPGRADE_CONDUCTION = registerHeatedUpgrade("upgrade_conduction", () -> HeatedUpgrade.CONDUCTION);
     public static final ItemRegistryObject<ItemUpgrade> UPGRADE_INSULATION = registerHeatedUpgrade("upgrade_insulation", () -> HeatedUpgrade.INSULATION);
     public static final ItemRegistryObject<ItemUpgrade> UPGRADE_CAPACITY = registerHeatedUpgrade("upgrade_capacity", () -> HeatedUpgrade.CAPACITY);
+    public static final ItemRegistryObject<ItemUpgrade> UPGRADE_INV_CONDUCTION = registerHeatedUpgrade("upgrade_inv_conduction", () -> HeatedUpgrade.INV_CONDUCTION);
+    public static final ItemRegistryObject<ItemUpgrade> UPGRADE_INV_INSULATION = registerHeatedUpgrade("upgrade_inv_insulation", () -> HeatedUpgrade.INV_INSULATION);
+    public static final ItemRegistryObject<ItemUpgrade> UPGRADE_INV_CAPACITY = registerHeatedUpgrade("upgrade_inv_capacity", () -> HeatedUpgrade.INV_CAPACITY);
 
     private static ItemRegistryObject<ItemUpgrade> registerHeatedUpgrade(String name, Supplier<Upgrade> type) {
         //Note: the supplier is evaluated when the item is created, long after MixinUpgrade has added the constants
@@ -82,9 +85,12 @@ public class ModItems {
         output.accept(ModBlocks.RETROENTROPIC_ARRAY_CASING);
         output.accept(ModBlocks.ASPHALT_BLOCK);
 
-        output.accept(UPGRADE_CONDUCTION);
-        output.accept(UPGRADE_INSULATION);
-        output.accept(UPGRADE_CAPACITY);
+        output.accept(ModItems.UPGRADE_CONDUCTION);
+        output.accept(ModItems.UPGRADE_INSULATION);
+        output.accept(ModItems.UPGRADE_CAPACITY);
+        output.accept(ModItems.UPGRADE_INV_CONDUCTION);
+        output.accept(ModItems.UPGRADE_INV_INSULATION);
+        output.accept(ModItems.UPGRADE_INV_CAPACITY);
 
         output.accept(ModItems.SPONGE_IRON_INGOT.get());
         output.accept(ModItems.IMPURE_SN_INGOT.get());

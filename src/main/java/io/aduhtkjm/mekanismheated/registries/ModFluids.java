@@ -128,7 +128,7 @@ public class ModFluids {
     /** Every unstable lava variant, in registration order. */
     public static final List<UnstableLavaVariant> UNSTABLE_LAVA_VARIANTS =
           List.of(UNSTABLE_LAVA, UNSTABLE_LAVA_IRON, UNSTABLE_LAVA_COPPER, UNSTABLE_LAVA_TIN,  UNSTABLE_LAVA_OSMIUM,
-              UNSTABLE_LAVA_GOLD,  UNSTABLE_LAVA_LEAD);
+              UNSTABLE_LAVA_GOLD, UNSTABLE_LAVA_LEAD);
 
     /** Registers all four unstable lava registries with the mod event bus. */
     public static void registerUnstableLavaRegisters(IEventBus bus) {
